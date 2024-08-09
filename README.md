@@ -1,6 +1,6 @@
-## Ticket naming conventions:
-Backend (b-xx) e.g. b-01, b-12
+## Branch and Ticket naming conventions:
+Backend b-{ticket number}-{title/purpose of branch}
 
-Frontend (f-xx)
+Frontend f-{ticket number}-{title/purpose of branch}
 
-Branch names should be exactly the ticket name e.g main -> b-01
+If no ticket then omit ticket number.
