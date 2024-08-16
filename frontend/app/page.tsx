@@ -111,7 +111,7 @@ export default function Home() {
 
             <div className="flex items-center justify-center text-center w-full" id="see all button">
               <button className="bg-white text-indigo-900 text-xs border border-indigo-900 px-2 py-1 rounded hover:bg-indigo-500">
-                See all -{'>'}
+                See all →
               </button>
             </div>
           </main>
