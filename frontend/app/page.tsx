@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
 
 export default function Home() {
@@ -71,6 +72,47 @@ export default function Home() {
                 alt="Swapping clothes"
                 className="ml-auto size-5/6 h-auto rounded-3xl"
               />
+            </div>
+          </main>
+        </div>
+
+        <div className="mt-6 p-8 flex justify-center items-center">
+          <main className="flex flex-col items-center justify-center text-center w-full">
+            <div className="flex flex-col items-center justify-center text-center">
+              <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">POPULAR ON SWAPBLOO</p>
+              <p className="my-3 text-indigo-900 text-xs mt-0">Update your wardrobe or try a brand new style - It's Earth approved!</p>
+            </div>
+
+            <div className="flex flex-row items-center text-center w-full">
+              <div className="lg:w-1/2 flex pl-10 flex-col items-center text-center lg:items-start lg:text-left">
+                <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">WOMEN</p>
+                <div className="flex flex-row items-center text-center">
+                  <div className="flex flex-col items-center text-center">
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                  </div>
+                  <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 flex pl-10 flex-col items-center text-center lg:items-start lg:text-left">
+                <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">MEN</p>
+                <div className="flex flex-row items-center text-center">
+                  <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                  <div className="flex flex-col items-center text-center">
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center text-center w-full" id="see all button">
+              <button className="bg-white text-indigo-900 text-xs border border-indigo-900 px-2 py-1 rounded hover:bg-indigo-500">
+                See all -{'>'}
+              </button>
             </div>
           </main>
         </div>
