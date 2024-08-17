@@ -1,14 +1,17 @@
-import "dotenv";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import twilio from "twilio";
+//import 'dotenv';
+import dotenv from 'dotenv';
+import pkg from '@supabase/supabase-js';
+const { createClient, SupabaseClient } = pkg;
+import twilio from 'twilio';
+
+// Load environment variables from .env file
+dotenv.config({ path: '../.env' }); // Optional: specify the path to .env
 import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from './constants.js';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-const SIZES = []
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
