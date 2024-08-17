@@ -1,6 +1,12 @@
-import 'dotenv';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+//import 'dotenv';
+import dotenv from 'dotenv';
+import pkg from '@supabase/supabase-js';
+const { createClient, SupabaseClient } = pkg;
 import twilio from 'twilio';
+
+// Load environment variables from .env file
+dotenv.config({ path: '../.env' }); // Optional: specify the path to .env
+
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -17,6 +23,15 @@ if (!supabaseUrl || !supabaseKey) {
  * @param {string} uid - The ID of the user to fetch.
  * @returns {Promise<{data: Array<Object>, error: Error|null}>} 
  *          - Resolves to an object with:
+ *            - data: An array containing user data if found, or empty if no user matches the ID.
+ *            - error: Error object if the query fails, or null if successful.
+ */
+/**
+ * Retrieves user data from the 'Users' table by user ID.
+ *
+ * @param {string} uid - The ID of the user to fetch.
+ * @returns {Promise<{data: Array<Object>, error: Error|null}>} 
+ *          - Resolves to an object with:
  *            - `data`: An array containing user data if found, or empty if no user matches the ID.
  *            - `error`: Error object if the query fails, or null if successful.
  */
@@ -27,3 +42,88 @@ async function viewUser(uid) {
     // Filters
     .eq('id', uid)
 }
+
+/**
+ * Fetches the listing of items for a specific user from the "Items" table.
+ *
+ * @async
+ * @function getUserListing
+ * @param {string} uid - The unique identifier (ID) of the user whose items are to be fetched.
+ * @returns {Promise<Object>} - Returns a promise that resolves to an object containing:
+ *    @property {Array<Object>} data - An array of items that match the user's ID, if successful.
+ *    @property {Object} error - An error object if there was an issue fetching the data.
+ * 
+ * @example
+ * // Example usage:
+ * const userId = '12345';
+ * const { data, error } = await getUserListing(userId);
+ * if (error) {
+ *     console.error('Error fetching user items:', error);
+ * } else {
+ *     console.log('User items:', data);
+ * }
+ */
+async function getUserListing(uid) {
+    let { data: Items, error } = await supabase
+    .from('Items')
+    .select("*")
+    // Filters
+    .eq('id', uid)
+}
+
+
+async function getUserLocation(uid) {
+    let { data: Users, error } = await supabase
+    .from('Users')
+    .select('location')
+    .eq('id', uid)
+}
+
+async function getUserDescription(uid) {
+    let { data: Users, error } = await supabase
+    .from('Users')
+    .select('description')
+    .eq('id', uid)
+}
+
+async function getUserName(uid) {
+    let { data: Users, error } = await supabase
+    .from('Users')
+    .select('name')
+    .eq('id', uid)
+}
+
+/**
+ * 
+ * @param {*} uid 
+ * @returns image
+ */
+async function getUserProfilePhoto(uid) {
+    let { data: Users, error } = await supabase
+    .from('Users')
+    .select('image')
+    .eq('id', uid)
+}
+
+/**
+ * 
+ * @param {*} uid 
+ * @returns string formatted: timestamp with time zone
+ */
+async function getUserJoinDate(uid) {
+    let { data: Users, error } = await supabase
+    .from('Users')
+    .select('created_at')
+    .eq('id', uid)
+}
+
+
+(async () => {
+    try {
+        // Your async code here
+        const result = await getUserDescription('29527509-64c9-4798-9144-23773f3ee72c');
+        console.log(result);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+})();
