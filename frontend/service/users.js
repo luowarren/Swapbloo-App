@@ -69,6 +69,7 @@ async function getUserListing(uid) {
     .select("*")
     // Filters
     .eq('id', uid)
+    return { data: Users, error };
 }
 
 
@@ -77,6 +78,7 @@ async function getUserLocation(uid) {
     .from('Users')
     .select('location')
     .eq('id', uid)
+    return { data: Users, error };
 }
 
 async function getUserDescription(uid) {
@@ -84,6 +86,7 @@ async function getUserDescription(uid) {
     .from('Users')
     .select('description')
     .eq('id', uid)
+    return { data: Users, error };
 }
 
 async function getUserName(uid) {
@@ -91,6 +94,7 @@ async function getUserName(uid) {
     .from('Users')
     .select('name')
     .eq('id', uid)
+    return { data: Users, error };
 }
 
 /**
@@ -103,6 +107,7 @@ async function getUserProfilePhoto(uid) {
     .from('Users')
     .select('image')
     .eq('id', uid)
+    return { data: Users, error };
 }
 
 /**
@@ -115,14 +120,31 @@ async function getUserJoinDate(uid) {
     .from('Users')
     .select('created_at')
     .eq('id', uid)
+    return { data: Users, error };
 }
+
+async function getItems() {
+    let { data: Items, error } = await supabase
+    .from('Items')
+    .select('created_at')
+    
+    return { data: Items, error };
+}
+
 
 
 (async () => {
     try {
         // Your async code here
         const result = await getUserDescription('29527509-64c9-4798-9144-23773f3ee72c');
+        
         console.log(result);
+        const loc = await getUserLocation("29527509-64c9-4798-9144-23773f3ee72c");
+        console.log(loc);
+
+        const items = await getItems();
+        console.log(items);
+
     } catch (error) {
         console.error('Error:', error);
     }
