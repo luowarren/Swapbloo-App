@@ -1,12 +1,13 @@
 //import 'dotenv';
-import dotenv from 'dotenv';
-import pkg from '@supabase/supabase-js';
+import dotenv from "dotenv";
+import pkg from "@supabase/supabase-js";
 const { createClient, SupabaseClient } = pkg;
-import twilio from 'twilio';
+import twilio from "twilio";
 
 // Load environment variables from .env file
-dotenv.config({ path: '../.env' }); // Optional: specify the path to .env
-import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from './constants.js';
+dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
+import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
+import { get } from "https";
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -17,19 +18,30 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
+async function loginUser(email, password) {
+  let { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
+  //   console.log(data);
+}
+
 /**
  * Retrieves user data from the 'Users' table by user ID.
  *
  * @returns {Promise}
  */
 async function getActiveListings() {
-  let { data: Users, error } = await supabase
+  let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
-    // Filters
-    .eq("swapped", "false")
-    // pagination
-    .range(0, 20);
+    .eq("swapped", "false");
+  if (error) {
+    console.error("Error Items:", error.message);
+    return;
+  }
+
+  console.log(Items);
 }
 
 /**
@@ -45,8 +57,14 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
+    .eq("swapped", "false")
     .in("size", sizes)
     .in("category", categories)
     .in("condition", conditions)
     .in("demographic", demographics);
+  console.log(Items);
 }
+
+loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415").then(() => {
+  getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
+});
