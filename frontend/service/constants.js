@@ -28,5 +28,19 @@ export const CATEGORIES = [
   "Footwear",
   "Swimwear",
 ];
-export const DEMOGRAPHICS = ["Womens", "Mens"];
-export const CONDITIONS = [];
+export const DEMOGRAPHICS = [
+  "Womens",
+  "Mens",
+  "Girls",
+  "Boys",
+  "Infants",
+  "Unisex",
+];
+export const CONDITIONS = [
+  "Used - Good",
+  "Used - Fair",
+  "Used - Like New",
+  "New",
+];
+
+
