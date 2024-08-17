@@ -123,27 +123,23 @@ async function getUserJoinDate(uid) {
     return { data: Users, error };
 }
 
-async function getItems() {
-    let { data: Items, error } = await supabase
-    .from('Items')
-    .select('created_at')
-    
-    return { data: Items, error };
+/**
+ * This requires the user to be logged in
+ * @returns user object
+ */
+async function getUser() {
+    const { data: { user } } = await supabase.auth.getUser()
+    return user;
 }
-
-
 
 (async () => {
     try {
-        // Your async code here
-        const result = await getUserDescription('29527509-64c9-4798-9144-23773f3ee72c');
+        const userId = '29527509-64c9-4798-9144-23773f3ee72c'
+        const result = await getUserDescription(userId);
         
         console.log(result);
-        const loc = await getUserLocation("29527509-64c9-4798-9144-23773f3ee72c");
+        const loc = await getUserLocation(userId);
         console.log(loc);
-
-        const items = await getItems();
-        console.log(items);
 
     } catch (error) {
         console.error('Error:', error);
