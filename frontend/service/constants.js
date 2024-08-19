@@ -43,4 +43,8 @@ export const CONDITIONS = [
   "New",
 ];
 
-
+export const SWAP_STATUS = [
+  "Pending",
+  "Completed",
+  "Cancelled"
+];
