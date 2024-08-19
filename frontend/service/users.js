@@ -124,7 +124,8 @@ async function getUserJoinDate(uid) {
 }
 
 /**
- * This requires the user to be logged in
+ * This requires the user to be logged in - i dont think will work with this set up
+ * THis is like get self, as opposed to get any other user
  * @returns user object
  */
 async function getUser() {
@@ -132,14 +133,25 @@ async function getUser() {
     return user;
 }
 
+
+function testResult(expected, actual) {
+    if (expected != actual) {
+        console.log("expected result (" + expected + ") was not actually the result (" + actual + ")" )
+    }
+}
+
 (async () => {
     try {
         const userId = '29527509-64c9-4798-9144-23773f3ee72c'
-        const result = await getUserDescription(userId);
+        const userDescription = await getUserDescription(userId);
+        //console.log(userDescription);
+        testResult("I love cheese", userDescription.data[0].description);
         
-        console.log(result);
         const loc = await getUserLocation(userId);
-        console.log(loc);
+        testResult("Woolloomooloo", loc.data[0].location);
+
+        const joinDate = await getUserJoinDate(userId);
+        testResult("2024-08-09T04:54:43.076912+00:00", joinDate.data[0].created_at);
 
     } catch (error) {
         console.error('Error:', error);
