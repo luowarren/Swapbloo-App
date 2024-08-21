@@ -168,53 +168,6 @@ async function getItems() {
   return { data: Items, error };
 }
 
-async function getRequestedItems(uid) {
-  // Fetch item_ids from Swaps where requester_id matches
-  let { data: swaps, swapError } = await supabase
-    .from("Swaps")
-    .select("item_id")
-    .eq("requester_id", uid);
-  // .in("status", ["PENDING", "ACCEPTED", "REJECTED"]);
-
-  if (swapError) {
-    return { data: swaps, swapError };
-  }
-
-  // Extract item_ids from the query result
-  const itemIds = swaps.map((swap) => swap.item_id);
-
-  // Fetch items where id is in the list of item_ids
-  const { data: items, itemError } = await supabase
-    .from("Items")
-    .select("title")
-    .in("id", itemIds);
-
-  return { data: items, itemError };
-}
-
-async function getReceivedRequests(uid) {
-  // Fetch item_ids from Swaps where requester_id matches
-  let { data: swaps, swapError } = await supabase
-    .from("Swaps")
-    .select("item_id")
-    .eq("accepter_id", uid);
-  // .in("status", ["PENDING", "ACCEPTED", "REJECTED"]);
-
-  if (swapError) {
-    return { data: swaps, swapError };
-  }
-
-  // Extract item_ids from the query result
-  const itemIds = swaps.map((swap) => swap.item_id);
-
-  // Fetch items where id is in the list of item_ids
-  const { data: items, itemError } = await supabase
-    .from("Items")
-    .select("title")
-    .in("id", itemIds);
-
-  return { data: items, itemError };
-}
 
 (async () => {
   try {
