@@ -13,6 +13,7 @@ export const SIZES = [
   "12",
   "14",
   "16",
+  "ONE SIZE"
 ];
 export const CATEGORIES = [
   "Shirts",
@@ -25,7 +26,6 @@ export const CATEGORIES = [
   "Activewear",
   "Sleepwear",
   "Accessories",
-  "Footwear",
   "Swimwear",
 ];
 export const DEMOGRAPHICS = [

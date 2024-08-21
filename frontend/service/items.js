@@ -1,4 +1,3 @@
-//import 'dotenv';
 import dotenv from "dotenv";
 import pkg from "@supabase/supabase-js";
 const { createClient, SupabaseClient } = pkg;
@@ -26,9 +25,10 @@ async function loginUser(email, password) {
 }
 
 /**
- * Retrieves user data from the 'Users' table by user ID.
+ * Retrieves all the active listings (active meaning, they have not yet been
+ * swapped, but could be pending).
  *
- * @returns {Promise}
+ * @returns
  */
 async function getActiveListings() {
   let { data: Items, error } = await supabase
@@ -39,11 +39,15 @@ async function getActiveListings() {
     console.error("Error Items:", error.message);
     return;
   }
-  return ({ data: Items, error });
+  return { data: Items, error };
 }
 
 /**
- * Retrieves user data from the 'Users' table by user ID.
+ * filters items by sizes, categories, conditions, demographics. For full
+ * list what possible types for these, refer to ./constants.js
+ *
+ * if sizes = ["XS", "XXS"], this will only return items of size XS and XSS.
+ * Essentially, the array must contain the criteria you DONT want filtered out.
  *
  * @param {Array<string>} sizes - the sizes users want to filter by
  * @param {Array<string>} categories - the categories users want to filter by
@@ -60,7 +64,59 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
     .in("category", categories)
     .in("condition", conditions)
     .in("demographic", demographics);
-  return ({ data: Items, error });
+  return { data: Items, error };
+}
+
+async function createItemListing(
+  uid,
+  size,
+  condition,
+  category,
+  demographic,
+  title,
+  caption,
+  brand
+) {
+  let { data: Item, error } = await supabase
+    .from("Items")
+    .insert([
+      {
+        owner_id: uid,
+        size,
+        condition,
+        category,
+        demographic,
+        title,
+        caption,
+        brand,
+        swapped: false,
+      },
+    ])
+    .select();
+  return { data: Item, error };
+}
+
+async function removeItemListing(id) {
+  let { error } = await supabase.from("Items").delete().eq("id", id);
+  return { error };
+}
+
+async function itemSwapped(id) {
+  let { data: Item, error } = await supabase
+    .from("Items")
+    .update({ swapped: true })
+    .eq("id", id)
+    .select();
+  return { data: Item, error };
+}
+
+async function editItemListing(id, title, caption) {
+  let { data: Item, error } = await supabase
+    .from("Items")
+    .update({ title, caption })
+    .eq("id", id)
+    .select();
+  return { data: Item, error };
 }
 
 await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
