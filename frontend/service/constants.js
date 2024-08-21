@@ -42,5 +42,10 @@ export const CONDITIONS = [
   "Used - Like New",
   "New",
 ];
-
+export const SWAP_STATUS = [
+  "Rejected",
+  "Accepted",
+  "Pending",
+  "Deleted"
+]
 

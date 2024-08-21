@@ -23,7 +23,6 @@ async function loginUser(email, password) {
     email: email,
     password: password,
   });
-  //   console.log(data);
 }
 
 /**
@@ -40,8 +39,7 @@ async function getActiveListings() {
     console.error("Error Items:", error.message);
     return;
   }
-
-  console.log(Items);
+  return ({ data: Items, error });
 }
 
 /**
@@ -62,9 +60,9 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
     .in("category", categories)
     .in("condition", conditions)
     .in("demographic", demographics);
-  console.log(Items);
+  return ({ data: Items, error });
 }
 
-loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415").then(() => {
-  getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
-});
+await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
+let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
+console.log(x["data"]);

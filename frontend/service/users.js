@@ -1,12 +1,12 @@
-//import 'dotenv';
-import dotenv from 'dotenv';
-import pkg from '@supabase/supabase-js';
+import dotenv from "dotenv";
+import pkg from "@supabase/supabase-js";
 const { createClient, SupabaseClient } = pkg;
-import twilio from 'twilio';
+import twilio from "twilio";
 
 // Load environment variables from .env file
-dotenv.config({ path: '../.env' }); // Optional: specify the path to .env
-
+dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
+import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
+import { get } from "https";
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -14,33 +14,71 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Supabase URL and key are required.');
+  throw new Error("Supabase URL and key are required.");
+}
+
+async function loginUser(email, password) {
+  let { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  });
 }
 
 /**
  * Retrieves user data from the 'Users' table by user ID.
  *
- * @param {string} uid - The ID of the user to fetch.
- * @returns {Promise<{data: Array<Object>, error: Error|null}>} 
- *          - Resolves to an object with:
- *            - data: An array containing user data if found, or empty if no user matches the ID.
- *            - error: Error object if the query fails, or null if successful.
+ * @returns {Promise}
  */
+async function getActiveListings() {
+  let { data: Items, error } = await supabase
+    .from("Items")
+    .select("*")
+    .eq("swapped", "false");
+  if (error) {
+    console.error("Error Items:", error.message);
+    return;
+  }
+  return { data: Items, error };
+}
+
 /**
  * Retrieves user data from the 'Users' table by user ID.
  *
+ * @param {Array<string>} sizes - the sizes users want to filter by
+ * @param {Array<string>} categories - the categories users want to filter by
+ * @param {Array<string>} conditions - the conditions users want to filter by
+ * @param {Array<string>} demographics - the sizes users want to filter by
+ * @returns {Promise}
+ */
+async function getfilteredItems(sizes, categories, conditions, demographics) {
+  let { data: Items, error } = await supabase
+    .from("Items")
+    .select("*")
+    .eq("swapped", "false")
+    .in("size", sizes)
+    .in("category", categories)
+    .in("condition", conditions)
+    .in("demographic", demographics);
+  return { data: Items, error };
+}
+
+/**
+ * Retrieves user data from the 'Users' table by user ID. Used for
+ * viewing a users profile
+ *
  * @param {string} uid - The ID of the user to fetch.
- * @returns {Promise<{data: Array<Object>, error: Error|null}>} 
+ * @returns {Promise<{data: Array<Object>, error: Error|null}>}
  *          - Resolves to an object with:
  *            - `data`: An array containing user data if found, or empty if no user matches the ID.
  *            - `error`: Error object if the query fails, or null if successful.
  */
 async function viewUser(uid) {
-    let { data: Users, error } = await supabase
-    .from('Users')
+  let { data: Users, error } = await supabase
+    .from("Swaps")
     .select("*")
     // Filters
-    .eq('id', uid)
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
 /**
@@ -52,7 +90,7 @@ async function viewUser(uid) {
  * @returns {Promise<Object>} - Returns a promise that resolves to an object containing:
  *    @property {Array<Object>} data - An array of items that match the user's ID, if successful.
  *    @property {Object} error - An error object if there was an issue fetching the data.
- * 
+ *
  * @example
  * // Example usage:
  * const userId = '12345';
@@ -63,89 +101,140 @@ async function viewUser(uid) {
  *     console.log('User items:', data);
  * }
  */
-async function getUserListing(uid) {
-    let { data: Items, error } = await supabase
-    .from('Items')
+async function getUserListings(uid) {
+  let { data: Items, error } = await supabase
+    .from("Items")
     .select("*")
     // Filters
-    .eq('id', uid)
-    return { data: Users, error };
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
-
 async function getUserLocation(uid) {
-    let { data: Users, error } = await supabase
-    .from('Users')
-    .select('location')
-    .eq('id', uid)
-    return { data: Users, error };
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("location")
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
 async function getUserDescription(uid) {
-    let { data: Users, error } = await supabase
-    .from('Users')
-    .select('description')
-    .eq('id', uid)
-    return { data: Users, error };
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("description")
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
 async function getUserName(uid) {
-    let { data: Users, error } = await supabase
-    .from('Users')
-    .select('name')
-    .eq('id', uid)
-    return { data: Users, error };
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("name")
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
 /**
- * 
- * @param {*} uid 
+ *
+ * @param {*} uid
  * @returns image
  */
 async function getUserProfilePhoto(uid) {
-    let { data: Users, error } = await supabase
-    .from('Users')
-    .select('image')
-    .eq('id', uid)
-    return { data: Users, error };
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("image")
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
 /**
- * 
- * @param {*} uid 
+ *
+ * @param {*} uid
  * @returns string formatted: timestamp with time zone
  */
 async function getUserJoinDate(uid) {
-    let { data: Users, error } = await supabase
-    .from('Users')
-    .select('created_at')
-    .eq('id', uid)
-    return { data: Users, error };
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("created_at")
+    .eq("id", uid);
+  return { data: Users, error };
 }
 
 async function getItems() {
-    let { data: Items, error } = await supabase
-    .from('Items')
-    .select('created_at')
-    
-    return { data: Items, error };
+  let { data: Items, error } = await supabase
+    .from("Items")
+    .select("created_at");
+
+  return { data: Items, error };
 }
 
+async function getRequestedItems(uid) {
+  // Fetch item_ids from Swaps where requester_id matches
+  let { data: swaps, swapError } = await supabase
+    .from("Swaps")
+    .select("item_id")
+    .eq("requester_id", uid);
+  // .in("status", ["PENDING", "ACCEPTED", "REJECTED"]);
 
+  if (swapError) {
+    return { data: swaps, swapError };
+  }
+
+  // Extract item_ids from the query result
+  const itemIds = swaps.map((swap) => swap.item_id);
+
+  // Fetch items where id is in the list of item_ids
+  const { data: items, itemError } = await supabase
+    .from("Items")
+    .select("title")
+    .in("id", itemIds);
+
+  return { data: items, itemError };
+}
+
+async function getReceivedRequests(uid) {
+  // Fetch item_ids from Swaps where requester_id matches
+  let { data: swaps, swapError } = await supabase
+    .from("Swaps")
+    .select("item_id")
+    .eq("accepter_id", uid);
+  // .in("status", ["PENDING", "ACCEPTED", "REJECTED"]);
+
+  if (swapError) {
+    return { data: swaps, swapError };
+  }
+
+  // Extract item_ids from the query result
+  const itemIds = swaps.map((swap) => swap.item_id);
+
+  // Fetch items where id is in the list of item_ids
+  const { data: items, itemError } = await supabase
+    .from("Items")
+    .select("title")
+    .in("id", itemIds);
+
+  return { data: items, itemError };
+}
 
 (async () => {
-    try {
-        // Your async code here
-        const result = await getUserDescription('29527509-64c9-4798-9144-23773f3ee72c');
-        
-        console.log(result);
-        const loc = await getUserLocation("29527509-64c9-4798-9144-23773f3ee72c");
-        console.log(loc);
+  try {
+    // Your async code here
+    const result = await getUserDescription(
+      "29527509-64c9-4798-9144-23773f3ee72c"
+    );
 
-        const items = await getItems();
-        console.log(items);
+    // console.log(result);
+    // const loc = await getUserLocation("29527509-64c9-4798-9144-23773f3ee72c");
+    // console.log(loc);
 
-    } catch (error) {
-        console.error('Error:', error);
-    }
+    // const items = await getItems();
+    // console.log(items);
+
+    const reqesteditems = await viewUser(
+
+    );
+    console.log(reqesteditems);
+  } catch (error) {
+    console.error("Error:", error);
+  }
 })();
