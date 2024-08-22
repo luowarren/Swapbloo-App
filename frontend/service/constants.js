@@ -16,17 +16,17 @@ export const SIZES = [
   "ONE SIZE"
 ];
 export const CATEGORIES = [
-  "Shirts",
   "Jackets",
   "Sweaters",
+  "Shirts",
   "Shorts",
-  "Skirts",
   "Pants",
+  "Skirts",
   "Dresses",
-  "Activewear",
   "Sleepwear",
-  "Accessories",
   "Swimwear",
+  "Activewear",
+  "Accessories",
 ];
 export const DEMOGRAPHICS = [
   "Womens",
