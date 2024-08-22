@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
 
 export default function Home() {
@@ -71,6 +72,91 @@ export default function Home() {
                 alt="Swapping clothes"
                 className="ml-auto size-5/6 h-auto rounded-3xl"
               />
+            </div>
+          </main>
+        </div>
+
+        <div className="mt-6 p-8 flex justify-center items-center">
+          <main className="flex flex-col items-center justify-center text-center w-full">
+            <div className="flex flex-col items-center justify-center text-center">
+              <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">POPULAR ON SWAPBLOO</p>
+              <p className="my-3 text-indigo-900 text-xs mt-0">Update your wardrobe or try a brand new style - It's Earth approved!</p>
+            </div>
+
+            <div className="flex flex-row items-center text-center w-full">
+              <div className="lg:w-1/2 flex pl-10 flex-col items-center text-center lg:items-start lg:text-left">
+                <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">WOMEN</p>
+                <div className="flex flex-row items-center text-center">
+                  <div className="flex flex-col items-center text-center">
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                  </div>
+                  <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                </div>
+              </div>
+
+              <div className="lg:w-1/2 flex pl-10 flex-col items-center text-center lg:items-start lg:text-left">
+                <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">MEN</p>
+                <div className="flex flex-row items-center text-center">
+                  <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                  <div className="flex flex-col items-center text-center">
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                    <img src="flower.png" alt="Facebook" className="w-20 h-20" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center text-center w-full" id="see all button">
+              <button className="bg-white text-indigo-900 text-xs border border-indigo-900 px-2 py-1 rounded hover:bg-indigo-500">
+                See all →
+              </button>
+            </div>
+          </main>
+        </div>
+
+        <div className="mt-6 p-8 flex justify-center items-center">
+          <main className="flex flex-col items-center justify-center text-center w-full">
+            <div className="flex flex-col items-center justify-center text-center">
+              <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-0">HOW IT WORKS</p>
+
+            </div>
+
+            <div className="flex flex-row items-center text-center w-full">
+              <div className="flex flex-col items-center text-center">
+                <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                <p className="my-3 text-indigo-900 text-3xl mb-0">Snap!</p>
+                <p className="my-3 text-indigo-900 text-xs mt-0">Snap a pic of items you want to swap and upload with descriptors through QR codes. It takes less than 60 seconds!</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                <p className="my-3 text-indigo-900 text-3xl mb-0">Swipe!</p>
+                <p className="my-3 text-indigo-900 text-xs mt-0">Browse items through tags, search or swipe through options to find your perfect swap.</p>
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                <p className="my-3 text-indigo-900 text-3xl mb-0">SwapBLOO!!</p>
+                <p className="my-3 text-indigo-900 text-xs mt-0">When you make a mathc, you can arrange a swap at one of your designated locations or arrange your own locations!</p>
+              </div>
+            </div>
+          </main>
+        </div>
+
+        <div className="mt-6 p-8 flex justify-center items-center">
+          <main className="flex flex-col items-center justify-center w-full">
+            <div className="flex flex-row items-center w-full">
+              <img src="flower.png" alt="Facebook" className="w-60 h-60" />
+              <div className="flex flex-col">
+                <p className="my-3 text-indigo-900 text-3xl font-bold mb-0">Features integrated with love</p>
+                <p className="my-3 text-indigo-900 text-xs font-bold mt-0">We love you</p>
+                <p className="my-3 text-indigo-900 text-xs mt-0">Your security comes first. With designated meetup locations and two-factor authentication, you can be assured of your safety.</p>
+                <p className="my-3 text-indigo-900 text-xs font-bold mt-0">We love fashion</p>
+                <p className="my-3 text-indigo-900 text-xs mt-0">SwapBloo will forever be free. We want you to be able to swap to your heart's desire and complete a closet that you truly love.</p>
+                <p className="my-3 text-indigo-900 text-xs font-bold mt-0">We love the Earth</p>
+                <p className="my-3 text-indigo-900 text-xs mt-0">Thousands of garments from landfill by swappers like you but that's not all. For every successful swap, earn 1 Earth Token and we will plan a real tree in Australia for every 50 you collect!</p>
+              </div>
             </div>
           </main>
         </div>
