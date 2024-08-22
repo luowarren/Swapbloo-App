@@ -69,9 +69,9 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
 }
 
 /**
- * Creates an Item type that is inserted into the Items table. Used when user 
+ * Creates an Item type that is inserted into the Items table. Used when user
  * wants to create a new item listing
- * 
+ *
  * @param {string} uid - the user who is listing this item
  * @param {string} size - the size of the item
  * @param {string} condition - condition the item is in
@@ -114,47 +114,47 @@ async function createItemListing(
 }
 
 /**
- * Deletes an item from the Items table. 
- * Used when user wants to delete a listing. NOT when user has sucessfully made 
+ * Deletes an item from the Items table.
+ * Used when user wants to delete a listing. NOT when user has sucessfully made
  * a swap.
- * 
- * @param {string} id - the id of the Item being deleted
+ *
+ * @param {string} itemId - the itemId of the Item being deleted
  * @returns error | null
  */
-async function deleteItemListing(id) {
-  let { error } = await supabase.from("Items").delete().eq("id", id);
+async function deleteItemListing(itemId) {
+  let { error } = await supabase.from("Items").delete().eq("itemId", itemId);
   return { error };
 }
 
 /**
- * Updates an Item in the Items table to have swapped = true, indicating that 
+ * Updates an Item in the Items table to have swapped = true, indicating that
  * the item has been successfully swapped.
- * 
- * @param {string} id - the id of the Item being swapped
+ *
+ * @param {string} itemId - the itemId of the Item being swapped
  * @returns Item is a list containing the Item we just swapped.
  */
-async function itemSwapped(id) {
+async function itemSwapped(itemId) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ swapped: true })
-    .eq("id", id)
+    .eq("id", itemId)
     .select();
   return { data: Item, error };
 }
 
 /**
  * Edit an item listing. Only the title / caption of a listing can be updated.
- * 
- * @param {string} id - the id of the Item listing you want to edit
+ *
+ * @param {string} itemId - the id of the Item listing you want to edit
  * @param {string} title - the updated title
  * @param {string} caption - the updated caption
  * @returns Item is a list containing the Item we just edited
  */
-async function editItemListing(id, title, caption) {
+async function editItemListing(itemId, title, caption) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ title, caption })
-    .eq("id", id)
+    .eq("id", itemId)
     .select();
   return { data: Item, error };
 }

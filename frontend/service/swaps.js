@@ -21,7 +21,7 @@ if (!supabaseUrl || !supabaseKey) {
  *
  * @param {number} itemId - The ID of the item being swapped.
  * @param {number} requesterId - The ID of the user requesting the swap.
- * @param {number} ownerId - The ID of the user who owns the item.
+ * @param {number} accepterId - The ID of the user who owns the item.
  * @returns {Promise}
  * 
  * Example response:
@@ -34,15 +34,14 @@ if (!supabaseUrl || !supabaseKey) {
     item_id: 54
   }
  */
-export async function createSwap(itemId, requesterId, ownerId) {
+export async function createSwap(requesterId, accepterId) {
   // default insert as pending swap
-  const { data, error } = await supabase
+  const { data: Swap, error } = await supabase
     .from("Swaps")
     .insert([
       {
-        item_id: itemId,
-        user1_id: requesterId,
-        user2_id: ownerId,
+        requester_id: requesterId,
+        accepter_id: accepterId,
         status: SWAP_STATUS[0],
       },
     ])
@@ -53,7 +52,28 @@ export async function createSwap(itemId, requesterId, ownerId) {
     throw error;
   }
   //console.log(data);
-  return { data, error };
+  return { data: Swap, error };
+}
+
+async function createSwapItem(swapId, itemId, uid) {
+  const { data: Item, error } = await supabase
+    .from("SwapItems")
+    .insert([
+      {
+        swap_id: swapId,
+        item_id: itemId,
+        owner_id: uid,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating swap item:", error.message);
+    throw error;
+  }
+  //console.log(data);
+  return { data: Item, error };
 }
 
 /**
@@ -230,32 +250,37 @@ async function getReceivedSwaps(uid) {
 
 (async () => {
   try {
-    const swapId = 1; // Example swap ID
+    const swapId = 78; // Example swap ID
     const itemId = 54; // Example item ID
     const requesterId = "adfc278c-45f1-42a5-be21-857b95bd113a"; // Example requester ID
     const ownerId = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"; // Example owner ID
-    const newStatus = "Completed"; // Example status
+    const newStatus = "Accepted"; // Example status
 
     // Create a new swap
-    const newSwap = await createSwap(itemId, requesterId, ownerId);
+    const newSwap = await createSwap(requesterId, ownerId);
     console.log(newSwap);
-    const createdSwapId = newSwap.id;
-    console.log("swapp created: " + createdSwapId);
+    const createdSwapId = newSwap['data'][0].id;
+    console.log("swap created: " + createdSwapId);
+
+    const newSwapItem = await createSwapItem('86', itemId, ownerId);
+    // console.log(newSwapItem);
+    const createdSwapItemId = newSwapItem['data'];
+    // console.log("swap item created: " + createdSwapItemId); 
 
     // Get swap by ID
     const swap = await getSwapById(createdSwapId);
-    testResult(createdSwapId, swap.id);
+    testResult(createdSwapId, swap['data'].id);
 
     // Update swap status
     const updatedSwap = await updateSwapStatus(createdSwapId, newStatus);
-    testResult(updatedSwap.status, newStatus);
+    testResult(updatedSwap['data'][0].status, newStatus);
 
     // Delete swap
     const deletedSwap = await deleteSwap(createdSwapId);
     console.log(deleteSwap);
     const checkDeleted = await getSwapById(createdSwapId);
     console.log(checkDeleted);
-    testResult(checkDeleted, null);
+    testResult(checkDeleted['data'], null);
   } catch (error) {
     console.error("Error:", error);
   }
