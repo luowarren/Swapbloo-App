@@ -13,20 +13,20 @@ export const SIZES = [
   "12",
   "14",
   "16",
+  "ONE SIZE"
 ];
 export const CATEGORIES = [
-  "Shirts",
   "Jackets",
   "Sweaters",
+  "Shirts",
   "Shorts",
-  "Skirts",
   "Pants",
+  "Skirts",
   "Dresses",
-  "Activewear",
   "Sleepwear",
-  "Accessories",
-  "Footwear",
   "Swimwear",
+  "Activewear",
+  "Accessories",
 ];
 export const DEMOGRAPHICS = [
   "Womens",
@@ -42,9 +42,10 @@ export const CONDITIONS = [
   "Used - Like New",
   "New",
 ];
-
 export const SWAP_STATUS = [
+  "Rejected",
+  "Accepted",
   "Pending",
-  "Completed",
-  "Cancelled"
-];
+  "Deleted"
+]
+
