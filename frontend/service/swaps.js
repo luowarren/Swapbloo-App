@@ -16,6 +16,79 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
+//requestSwap
+
+//createListing
+
+//modifySwap(itemId array, swapId)
+// Function to insert individual swap items
+async function insertSwapItem(swapInfo) {
+  console.log(`Itemid ${swapInfo.item_id} owner ${swapInfo.owner_id} swap ${swapInfo.swap_id}`)
+  const { data, error } = await supabase
+    .from("SwapItems")
+    .insert([{
+      swap_id: swapInfo.swap_id,
+      item_id: swapInfo.item_id,
+      owner_id: swapInfo.ownerId
+    }]);
+
+  if (error) {
+    console.error("Error adding swap item:", error.message);
+    throw error;
+  }
+  console.log(data);
+  return data;
+}
+
+export async function requestSwap(myItems, requestingItems, ownerId, requesterId) {
+  // First, add to swaps table with a pending status
+  const { data, error } = await supabase
+    .from("Swaps")
+    .insert([{ 
+      requester_id: requesterId, 
+      accepter_id: ownerId,
+      status: SWAP_STATUS[0] 
+    }])
+    .select();
+
+  console.log(data)
+  if (error) {
+    console.error("Error creating swap:", error.message);
+    throw error;
+  }
+
+  const swapId = data[0].id;
+
+  // Insert rows for the owner's items
+  const ownerItems = myItems.map(itemId => ({
+    swap_id: swapId,
+    item_id: itemId,
+    owner_id: ownerId
+  }));
+
+  // Insert rows for the requester's items
+  const requesterItems = requestingItems.map(itemId => ({
+    swap_id: swapId,
+    item_id: itemId,
+    owner_id: requesterId
+  }));
+
+  // Combine both arrays and insert into SwapItems table
+  // Insert each of the owner's items
+  for (const itemId of ownerItems) {
+    await insertSwapItem(itemId);
+  }
+
+  // Insert each of the requester's items
+  for (const itemId of requesterItems) {
+    await insertSwapItem(itemId);
+  }
+
+  return data[0];
+}
+
+
+
 /**
  * Creates a new swap record in the 'Swaps' table.
  *
@@ -142,7 +215,7 @@ export async function deleteSwap(swapId) {
         const newStatus = "Completed"; // Example status
 
         // Create a new swap
-        const newSwap = await createSwap(itemId, requesterId, ownerId);
+        const newSwap = await requestSwap(['54'], ['55'], ownerId, requesterId);
         console.log(newSwap);
         const createdSwapId = newSwap.id;
         console.log("swapp created: " + createdSwapId);
