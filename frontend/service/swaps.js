@@ -88,12 +88,12 @@ export async function createSwapRequest(myItems, requestingItems, ownerId, reque
   // Combine both arrays and insert into SwapItems table
   // Insert each of the owner's items
   for (const itemId of ownerItems) {
-    await insertSwapItem(itemId);
+    await createSwapItem(itemId);
   }
 
   // Insert each of the requester's items
   for (const itemId of requesterItems) {
-    await insertSwapItem(itemId);
+    await createSwapItem(itemId);
   }
 
   return data[0];
@@ -344,20 +344,21 @@ async function getReceivedSwaps(uid) {
     const newStatus = "Accepted"; // Example status
 
     // Create a new swap
+    /*
     const newSwap = await createSwap(requesterId, ownerId);
     console.log(newSwap);
     const createdSwapId = newSwap['data'][0].id;
     console.log("swap created: " + createdSwapId);
-
+    */
     // Create a new swap
-    const newSwap = await requestSwap(['54'], ['55'], ownerId, requesterId);
+    const newSwap = await createSwapRequest(['54'], ['55'], ownerId, requesterId);
     console.log(newSwap);
     const createdSwapId = newSwap.id;
     console.log("swapp created: " + createdSwapId);
 
-    const newSwapItem = await createSwapItem('86', itemId, ownerId);
+    //const newSwapItem = await createSwapItem('86', itemId, ownerId);
     // console.log(newSwapItem);
-    const createdSwapItemId = newSwapItem['data'];
+    //const createdSwapItemId = newSwapItem['data'];
     // console.log("swap item created: " + createdSwapItemId); 
 
     // Get swap by ID
