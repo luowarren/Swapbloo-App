@@ -219,6 +219,40 @@ async function getItemImages(imageIds) {
   return { data: images, error: null };
 }
 
+
+
+async function getItemImageLinks(imageIds) {
+  // Assuming `Item` is an array and contains image paths
+  const images = [];
+  // Calculate the expiry time in seconds (1 month = 30 days = 2592000 seconds)
+  const expiresIn = 30 * 24 * 60 * 60;
+  
+  for (let item of imageIds) {
+    // Get the image path or name from the 'image' column
+    const imagePath = item.image;
+
+    // Log the image path to verify it's correct
+    console.log('Attempting to download image from path:', imagePath);
+
+    // Download the image from the Supabase storage bucket
+    const { data, error } = await supabase
+      .storage
+      .from('images')
+      .createSignedUrl(imagePath, expiresIn);
+
+    console.log(data);
+    if (error) {
+      console.log("error" + error);
+      return { data: null, error: error };
+    }
+    // Convert the image data to a URL or Blob (if needed)
+    const imageUrl = URL.createObjectURL(imageData);
+    images.push(imageUrl);
+  }
+
+  return { data: images, error: null };
+}
+
 async function getImages(id) {
   const imageIds = await getItemImageIds(id);
   console.log(imageIds);
@@ -226,6 +260,22 @@ async function getImages(id) {
     return {data: null, error: imageIds.error};
   } 
   const itemImages = await getItemImages(imageIds.data);
+  if (itemImages.error) {
+    return {data: null, error: itemImages.error};
+  } 
+
+  return {data: itemImages, error: null};
+}
+
+
+async function getImageLinks(id) {
+  console.log('getting image ids');
+  const imageIds = await getItemImageIds(id);
+  console.log(imageIds);
+  if (imageIds.error) {
+    return {data: null, error: imageIds.error};
+  } 
+  const itemImages = await getItemImageLinks(imageIds.data);
   if (itemImages.error) {
     return {data: null, error: itemImages.error};
   } 
@@ -242,7 +292,12 @@ async function getImages(id) {
     console.log('attemping');
     //console.log(listFilenamesFromBucket());
     const imageIds = await getImages('54');
-    console.log(imageIds);
+    ccnsole.log(imageIds);
+
+    console.log("going for number two")
+
+    const imageLinks = await getImageLinks('54');
+    console.log(imageLinks);
 
   } catch {
     //
