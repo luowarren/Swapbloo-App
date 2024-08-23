@@ -18,7 +18,7 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
-async function loginUser(email, password) {
+export async function loginUser(email, password) {
   let { data, error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
@@ -31,7 +31,7 @@ async function loginUser(email, password) {
  *
  * @returns Items is a list of Item types, where swapped = false
  */
-async function getActiveListings() {
+export async function getActiveListings() {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
@@ -57,7 +57,7 @@ async function getActiveListings() {
  * @param {Array<string>} demographics - the sizes users want to filter by
  * @returns Items is a list of Item types where the filtered criteria is met
  */
-async function getfilteredItems(sizes, categories, conditions, demographics) {
+export async function getfilteredItems(sizes, categories, conditions, demographics) {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
@@ -79,12 +79,12 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
  * @param {string} category - type of clothing the item is
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
- * @param {Array<string???>} images - images of the item
+ * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
  * @returns
  */
-async function createItemListing(
+export async function createItemListing(
   uid,
   size,
   condition,
@@ -122,7 +122,7 @@ async function createItemListing(
  * @param {string} itemId - the itemId of the Item being deleted
  * @returns error | null
  */
-async function deleteItemListing(itemId) {
+export async function deleteItemListing(itemId) {
   let { error } = await supabase.from("Items").delete().eq("itemId", itemId);
   return { error };
 }
@@ -134,7 +134,7 @@ async function deleteItemListing(itemId) {
  * @param {string} itemId - the itemId of the Item being swapped
  * @returns Item is a list containing the Item we just swapped.
  */
-async function itemSwapped(itemId) {
+export async function itemSwapped(itemId) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ swapped: true })
@@ -151,7 +151,7 @@ async function itemSwapped(itemId) {
  * @param {string} caption - the updated caption
  * @returns Item is a list containing the Item we just edited
  */
-async function editItemListing(itemId, title, caption) {
+export async function editItemListing(itemId, title, caption) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ title, caption })
@@ -160,7 +160,7 @@ async function editItemListing(itemId, title, caption) {
   return { data: Item, error };
 }
 
-async function getItemImageIds(itemId) {
+export async function getItemImageIds(itemId) {
   // Fetch the image paths from the database
   let { data, error } = await supabase
     .from("ItemImages")
@@ -170,7 +170,7 @@ async function getItemImageIds(itemId) {
   return { data, error };
 }
 
-async function listFilenamesFromBucket() {
+export async function listFilenamesFromBucket() {
   const { data, error } = await supabase
     .storage
     .from('images') // Replace 'images' with your bucket name
@@ -189,7 +189,7 @@ async function listFilenamesFromBucket() {
 }
 
 
-async function getItemImages(imageIds) {
+export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
   
@@ -221,7 +221,7 @@ async function getItemImages(imageIds) {
 
 
 
-async function getItemImageLinks(imageIds) {
+export async function getItemImageLinks(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
   // Calculate the expiry time in seconds (1 month = 30 days = 2592000 seconds)
@@ -253,7 +253,7 @@ async function getItemImageLinks(imageIds) {
   return { data: images, error: null };
 }
 
-async function getImages(id) {
+export async function getImages(id) {
   const imageIds = await getItemImageIds(id);
   console.log(imageIds);
   if (imageIds.error) {
@@ -268,7 +268,7 @@ async function getImages(id) {
 }
 
 
-async function getImageLinks(id) {
+export async function getImageLinks(id) {
   console.log('getting image ids');
   const imageIds = await getItemImageIds(id);
   console.log(imageIds);

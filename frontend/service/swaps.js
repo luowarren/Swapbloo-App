@@ -16,7 +16,7 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
-async function createSwapItem(swapInfo) {
+export async function createSwapItem(swapInfo) {
   console.log(`Itemid ${swapInfo.item_id} owner ${swapInfo.owner_id} swap ${swapInfo.swap_id}`)
   const { data, error } = await supabase
     .from("SwapItems")
@@ -119,7 +119,7 @@ export async function createSwapRequest(myItems, requestingItems, ownerId, reque
     item_id: 54
   }
 
-export async function createSwap(requesterId, accepterId) {
+export export async function createSwap(requesterId, accepterId) {
   // default insert as pending swap
   const { data: Swap, error } = await supabase
     .from("Swaps")
@@ -140,7 +140,7 @@ export async function createSwap(requesterId, accepterId) {
   return { data: Swap, error };
 }
 
-async function createSwapItem(swapId, itemId, uid) {
+export async function createSwapItem(swapId, itemId, uid) {
   const { data: Item, error } = await supabase
     .from("SwapItems")
     .insert([
@@ -252,7 +252,7 @@ export async function deleteSwap(swapId) {
  * @returns Items is a list of all the items a user has wanted to receive as a
  * part of a swap
  */
-async function getRequestedItems(uid) {
+export async function getRequestedItems(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await getRequestedSwaps(uid);
 
@@ -279,7 +279,7 @@ async function getRequestedItems(uid) {
  * @returns Items is a list of all the items a user can choose to agree to swap
  * for
  */
-async function getReceivedRequests(uid) {
+export async function getReceivedRequests(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await getReceivedSwaps(uid);
 
@@ -305,7 +305,7 @@ async function getReceivedRequests(uid) {
  * @param {string} uid - the id of the requester user
  * @returns Swaps is a list of swaps the user has requested
  */
-async function getRequestedSwaps(uid) {
+export async function getRequestedSwaps(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await supabase
     .from("Swaps")
@@ -322,7 +322,7 @@ async function getRequestedSwaps(uid) {
  * @param {string} uid - the id of the accepter user
  * @returns Swaps is a list of all the swaps the user has received
  */
-async function getReceivedSwaps(uid) {
+export async function getReceivedSwaps(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await supabase
     .from("Swaps")
