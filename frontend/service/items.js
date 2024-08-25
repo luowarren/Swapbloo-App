@@ -4,7 +4,10 @@ const { createClient, SupabaseClient } = pkg;
 import twilio from "twilio";
 
 // Load environment variables from .env file
-dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
+const result = dotenv.config(); // Optional: specify the path to .env
+if (result.error) {
+  throw result.error;
+}
 import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
 import { get } from "https";
 import { error } from "console";
@@ -291,15 +294,16 @@ export async function getImageLinks(id) {
   try {
     console.log('attemping');
     //console.log(listFilenamesFromBucket());
-    const imageIds = await getImages('54');
+    // const imageIds = await getImages('5');
     ccnsole.log(imageIds);
 
     console.log("going for number two")
 
-    const imageLinks = await getImageLinks('54');
+    const imageLinks = await getImageLinks('5');
     console.log(imageLinks);
 
   } catch {
     //
+    console.log("something went wrong")
   }
 })();
