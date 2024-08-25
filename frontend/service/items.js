@@ -7,6 +7,7 @@ import twilio from "twilio";
 dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
 import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
 import { get } from "https";
+import { error } from "console";
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -17,7 +18,7 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
-async function loginUser(email, password) {
+export async function loginUser(email, password) {
   let { data, error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
@@ -30,7 +31,7 @@ async function loginUser(email, password) {
  *
  * @returns Items is a list of Item types, where swapped = false
  */
-async function getActiveListings() {
+export async function getActiveListings() {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
@@ -56,7 +57,7 @@ async function getActiveListings() {
  * @param {Array<string>} demographics - the sizes users want to filter by
  * @returns Items is a list of Item types where the filtered criteria is met
  */
-async function getfilteredItems(sizes, categories, conditions, demographics) {
+export async function getfilteredItems(sizes, categories, conditions, demographics) {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
@@ -78,12 +79,12 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
  * @param {string} category - type of clothing the item is
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
- * @param {Array<string???>} images - images of the item
+ * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
  * @returns
  */
-async function createItemListing(
+export async function createItemListing(
   uid,
   size,
   condition,
@@ -121,7 +122,7 @@ async function createItemListing(
  * @param {string} itemId - the itemId of the Item being deleted
  * @returns error | null
  */
-async function deleteItemListing(itemId) {
+export async function deleteItemListing(itemId) {
   let { error } = await supabase.from("Items").delete().eq("itemId", itemId);
   return { error };
 }
@@ -133,7 +134,7 @@ async function deleteItemListing(itemId) {
  * @param {string} itemId - the itemId of the Item being swapped
  * @returns Item is a list containing the Item we just swapped.
  */
-async function itemSwapped(itemId) {
+export async function itemSwapped(itemId) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ swapped: true })
@@ -150,7 +151,7 @@ async function itemSwapped(itemId) {
  * @param {string} caption - the updated caption
  * @returns Item is a list containing the Item we just edited
  */
-async function editItemListing(itemId, title, caption) {
+export async function editItemListing(itemId, title, caption) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ title, caption })
@@ -159,6 +160,146 @@ async function editItemListing(itemId, title, caption) {
   return { data: Item, error };
 }
 
-await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
-let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
-console.log(x["data"]);
+export async function getItemImageIds(itemId) {
+  // Fetch the image paths from the database
+  let { data, error } = await supabase
+    .from("ItemImages")
+    .select("*")
+    .eq("item_id", itemId);
+
+  return { data, error };
+}
+
+export async function listFilenamesFromBucket() {
+  const { data, error } = await supabase
+    .storage
+    .from('images') // Replace 'images' with your bucket name
+    .list(''); // Provide the path inside the bucket, '' lists all files in the root
+
+  if (error) {
+    console.error('Error listing files:', error);
+    return null;
+  }
+
+  // Map through the data to get an array of filenames
+  const filenames = data.map(file => file.name);
+  console.log('Filenames:', filenames);
+
+  return filenames;
+}
+
+
+export async function getItemImages(imageIds) {
+  // Assuming `Item` is an array and contains image paths
+  const images = [];
+  
+  for (let item of imageIds) {
+    // Get the image path or name from the 'image' column
+    const imagePath = item.image;
+
+    // Log the image path to verify it's correct
+    console.log('Attempting to download image from path:', imagePath);
+
+    // Download the image from the Supabase storage bucket
+    const { data, error } = await supabase
+      .storage
+      .from('images')
+      .download(imagePath);
+
+    console.log(data);
+    if (error) {
+      console.log("error" + error);
+      return { data: null, error: error };
+    }
+    // Convert the image data to a URL or Blob (if needed)
+    const imageUrl = URL.createObjectURL(imageData);
+    images.push(imageUrl);
+  }
+
+  return { data: images, error: null };
+}
+
+
+
+export async function getItemImageLinks(imageIds) {
+  // Assuming `Item` is an array and contains image paths
+  const images = [];
+  // Calculate the expiry time in seconds (1 month = 30 days = 2592000 seconds)
+  const expiresIn = 30 * 24 * 60 * 60;
+  
+  for (let item of imageIds) {
+    // Get the image path or name from the 'image' column
+    const imagePath = item.image;
+
+    // Log the image path to verify it's correct
+    console.log('Attempting to download image from path:', imagePath);
+
+    // Download the image from the Supabase storage bucket
+    const { data, error } = await supabase
+      .storage
+      .from('images')
+      .createSignedUrl(imagePath, expiresIn);
+
+    console.log(data);
+    if (error) {
+      console.log("error" + error);
+      return { data: null, error: error };
+    }
+    // Convert the image data to a URL or Blob (if needed)
+    const imageUrl = URL.createObjectURL(imageData);
+    images.push(imageUrl);
+  }
+
+  return { data: images, error: null };
+}
+
+export async function getImages(id) {
+  const imageIds = await getItemImageIds(id);
+  console.log(imageIds);
+  if (imageIds.error) {
+    return {data: null, error: imageIds.error};
+  } 
+  const itemImages = await getItemImages(imageIds.data);
+  if (itemImages.error) {
+    return {data: null, error: itemImages.error};
+  } 
+
+  return {data: itemImages, error: null};
+}
+
+
+export async function getImageLinks(id) {
+  console.log('getting image ids');
+  const imageIds = await getItemImageIds(id);
+  console.log(imageIds);
+  if (imageIds.error) {
+    return {data: null, error: imageIds.error};
+  } 
+  const itemImages = await getItemImageLinks(imageIds.data);
+  if (itemImages.error) {
+    return {data: null, error: itemImages.error};
+  } 
+
+  return {data: itemImages, error: null};
+}
+//await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
+//let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
+//console.log(x["data"]);
+
+
+(async () => {
+  try {
+    console.log('attemping');
+    //console.log(listFilenamesFromBucket());
+    const imageIds = await getImages('54');
+    ccnsole.log(imageIds);
+
+    console.log("going for number two")
+
+    const imageLinks = await getImageLinks('54');
+    console.log(imageLinks);
+
+  } catch {
+    //
+  }
+})();
