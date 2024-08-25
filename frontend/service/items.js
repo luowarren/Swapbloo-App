@@ -1,17 +1,19 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
-const { createClient, SupabaseClient } = pkg;
-import twilio from "twilio";
+import { createClient } from '@supabase/supabase-js'; // Correct named import
 
 // Load environment variables from .env file
-dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
-import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
-import { get } from "https";
-import { error } from "console";
+// dotenv.config({ path: ".env" }); // Optional: specify the path to .env
 
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
+const SUPABASE_URL='https://nuynivbpnulznjcmtvpq.supabase.co'
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = SUPABASE_URL;
+const supabaseKey = SUPABASE_KEY;
+
+// Log the environment variables to check their values
+//console.log('Supabase URL:', supabaseUrl);
+//console.log('Supabase Key:', supabaseKey);
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -192,6 +194,7 @@ export async function listFilenamesFromBucket() {
 export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
+  console.log('starting');
   
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
@@ -212,10 +215,10 @@ export async function getItemImages(imageIds) {
       return { data: null, error: error };
     }
     // Convert the image data to a URL or Blob (if needed)
-    const imageUrl = URL.createObjectURL(imageData);
-    images.push(imageUrl);
+    images.push(data);
   }
 
+  console.log(images)
   return { data: images, error: null };
 }
 
@@ -230,6 +233,7 @@ export async function getItemImageLinks(imageIds) {
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
+    console.log('Path:' + imagePath)
 
     // Log the image path to verify it's correct
     console.log('Attempting to download image from path:', imagePath);
@@ -246,25 +250,32 @@ export async function getItemImageLinks(imageIds) {
       return { data: null, error: error };
     }
     // Convert the image data to a URL or Blob (if needed)
-    const imageUrl = URL.createObjectURL(imageData);
-    images.push(imageUrl);
+    //const imageUrl = URL.createObjectURL(data);
+    images.push(data);
   }
+  console.log('done')
+  console.log(images);
 
-  return { data: images, error: null };
+  return { data, error: null };
 }
 
 export async function getImages(id) {
+ 
   const imageIds = await getItemImageIds(id);
-  console.log(imageIds);
+  //console.log(imageIds);
   if (imageIds.error) {
     return {data: null, error: imageIds.error};
   } 
+  console.log('ligm')
   const itemImages = await getItemImages(imageIds.data);
+  console.log(itemImages);
+  console.log('Type of data:', typeof itemImages);
+
   if (itemImages.error) {
     return {data: null, error: itemImages.error};
   } 
-
-  return {data: itemImages, error: null};
+  console.log('sgi')
+  return {data: itemImages.data, error: null};
 }
 
 
@@ -280,26 +291,32 @@ export async function getImageLinks(id) {
     return {data: null, error: itemImages.error};
   } 
 
-  return {data: itemImages, error: null};
+  return {data: itemImages.data, error: null};
 }
 //await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
 //let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
 //console.log(x["data"]);
 
+async function runTest() {
+  
+  (async () => {
+    try {
+      console.log('attemping');
+      //console.log(listFilenamesFromBucket());
+      const ims = await getImages('54');
+      console.log('wowo')
+      console.log(ims);
 
-(async () => {
-  try {
-    console.log('attemping');
-    //console.log(listFilenamesFromBucket());
-    const imageIds = await getImages('54');
-    ccnsole.log(imageIds);
+      console.log("going for number two")
 
-    console.log("going for number two")
+      const imageLinks = await getImageLinks('54');
+      console.log(imageLinks);
 
-    const imageLinks = await getImageLinks('54');
-    console.log(imageLinks);
+    } catch {
+      //
+    }
+  })();
 
-  } catch {
-    //
-  }
-})();
+}
+
+//runTest()
