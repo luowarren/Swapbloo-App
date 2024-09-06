@@ -48,11 +48,13 @@ const Item = () => {
 
         // Fetch profile picture using owner_id and handle undefined return values
         const profilePicBlob = await getUserProfileImageUrl(data.owner_id);
-
+        console.log(profilePicBlob);
+        console.log("pROFILE PICS ABOVE")
         if (profilePicBlob) { // Only create URL if profilePicBlob is not null or undefined
           const profilePicUrl = URL.createObjectURL(profilePicBlob);
           setProfilePic(profilePicUrl); // Set the profile picture URL in the state
         } else {
+          console.log('NO PRIFLE PICS !!!!!!!!!')
           setProfilePic(null); // Handle the case where no profile picture is available
         }
     }
@@ -102,15 +104,14 @@ const Item = () => {
 
         <div className="flex justify-between items-center mt-4">
           <button className="bg-green-500 text-white px-4 py-2 rounded">Map</button>
-          <div className="flex items-center space-x-2">
-            
-            {profilePic && <img src={profilePic} alt={itemData.ownerName} className="w-8 h-8 rounded-full" />}
-            <div>
+         
+        </div>
+        
+        <div className="items-center space-x-2">
+              {profilePic && <img src={profilePic} alt={itemData.ownerName} className="w-16 h-16 rounded-full" />}
               <p className="text-sm font-bold">{itemData.ownerName}</p>
               <p className="text-xs text-gray-500">{itemData.ownerRating} ⭐</p>
             </div>
-          </div>
-        </div>
       </div>
     </div>
   );

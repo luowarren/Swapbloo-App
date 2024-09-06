@@ -191,12 +191,18 @@ export async function listFilenamesFromBucket() {
 }
 
 export async function getImageFromId(imageId, bucket) {
+  console.log("image id and bucket:", bucket, imageId);
   const { data, error } = await supabase
-  .storage
-  .from(bucket)
-  .download(imageId);
+    .storage
+    .from("images")
+    .download("Steve_(Minecraft).png");
+  console.log(data);
 
-  return {data, error}
+  if (error) {
+    return error;
+  }
+
+  return data;
 }
 
 export async function getItemImages(imageIds) {
@@ -287,10 +293,10 @@ export async function getUserProfileImageUrl(userId) {
     console.log(data.image);
 
     if (!error) {
-      const { image, error1} = await getImageFromId(data.image, "profilePictures");
-      console.log(image);
+      const image = await getImageFromId(data.image, "profilePictures");
+      console.log("imagee", image);
       if (image instanceof Blob) {
-        return image[0];
+        return image;
       } else {
         console.error('Element is not a Blob:', error1);
         return null;
