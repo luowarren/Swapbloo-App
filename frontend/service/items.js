@@ -190,6 +190,14 @@ export async function listFilenamesFromBucket() {
   return filenames;
 }
 
+export async function getImageFromId(imageId, bucket) {
+  const { data, error } = await supabase
+  .storage
+  .from(bucket)
+  .download(imageId);
+
+  return {data, error}
+}
 
 export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
@@ -259,10 +267,45 @@ export async function getItemImageLinks(imageIds) {
   return { data, error: null };
 }
 
+
+export async function getItem(itemId) {
+  let { data: Item, error } = await supabase
+    .from("Items")
+    .select("*")
+    .eq("id", itemId)
+    .single();
+  return { data: Item, error };
+}
+
+export async function getUserProfileImageUrl(userId) {
+  let { data, error } = await supabase
+    .from("Users")
+    .select("image")
+    .eq("id", userId)
+    .single();
+    console.log('SIGJSKJDHKJHDLIJFHSLKJDFLISHJDFILJKDFHILJKSDHFLIKJH');
+    console.log(data.image);
+
+    if (!error) {
+      const { image, error1} = await getImageFromId(data.image, "profilePictures");
+      console.log(image);
+      if (image instanceof Blob) {
+        return image[0];
+      } else {
+        console.error('Element is not a Blob:', error1);
+        return null;
+      }
+
+    } else {
+      console.error('no profile pic:', error); 
+    }
+    
+}
+
 export async function getImages(id) {
- 
+  console.log('itemId is this:', id);
   const imageIds = await getItemImageIds(id);
-  //console.log(imageIds);
+  console.log(imageIds);
   if (imageIds.error) {
     return {data: null, error: imageIds.error};
   } 
