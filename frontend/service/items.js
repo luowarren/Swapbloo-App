@@ -194,9 +194,9 @@ export async function getImageFromId(imageId, bucket) {
   console.log("image id and bucket:", bucket, imageId);
   const { data, error } = await supabase
     .storage
-    .from("images")
-    .download("Steve_(Minecraft).png");
-  console.log(data);
+    .from(bucket)
+    .download(imageId);
+  console.log("getting data from buckets", data);
 
   if (error) {
     return error;
