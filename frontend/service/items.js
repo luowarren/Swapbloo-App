@@ -82,6 +82,7 @@ export async function getfilteredItems(sizes, categories, conditions, demographi
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
  * @param {Array<string???>} images - images of the item TODO figure out data type
+ * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
  * @returns

@@ -133,7 +133,7 @@ export default function Home() {
                 <p className="my-3 text-indigo-900 text-xs mt-0">Snap a pic of items you want to swap and upload with descriptors through QR codes. It takes less than 60 seconds!</p>
               </div>
               <div className="flex flex-col items-center text-center">
-                <img src="flower.png" alt="Facebook" className="w-40 h-40" />
+                <Image src='https://nuynivbpnulznjcmtvpq.supabase.co/storage/v1/object/public/images/image_adeline.png' width={400} height={400} alt="Facebook" className="w-40 h-40" />
                 <p className="my-3 text-indigo-900 text-3xl mb-0">Swipe!</p>
                 <p className="my-3 text-indigo-900 text-xs mt-0">Browse items through tags, search or swipe through options to find your perfect swap.</p>
               </div>
