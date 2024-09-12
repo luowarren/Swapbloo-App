@@ -170,6 +170,7 @@ export async function getItemImageIds(itemId) {
     .select("*")
     .eq("item_id", itemId);
 
+
   return { data, error };
 }
 
@@ -208,7 +209,7 @@ export async function getItemImages(imageIds) {
       .storage
       .from('images')
       .download(imagePath);
-
+    
     console.log(data);
     if (error) {
       console.log("error" + error);
@@ -216,6 +217,7 @@ export async function getItemImages(imageIds) {
     }
     // Convert the image data to a URL or Blob (if needed)
     const imageUrl = URL.createObjectURL(imageData);
+
     images.push(imageUrl);
   }
 
