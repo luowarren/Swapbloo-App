@@ -112,11 +112,11 @@ const Item = () => {
             <img src="flower.png" className="w-6 h-6" alt="flower icon" />
           </button>
 
-          <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-full">
+          <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
             <img src="flower.png" className="w-6 h-6" ></img>
           </button>
 
-          <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-full">
+          <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
             <img src="flower.png" className="w-6 h-6" ></img>
           </button>
 
@@ -156,6 +156,15 @@ const Item = () => {
                 <span className="ml-1">(8)</span>
               </div>
             </div>
+          </div>
+
+          <div className="flex space-x-2">
+            <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg mr-2 hover:bg-indigo-50">
+              Visit Shop
+            </button>
+            <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg hover:bg-indigo-50">
+              Ask a question
+            </button>
           </div>
 
           <div className="flex space-x-2">
