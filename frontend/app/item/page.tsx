@@ -57,10 +57,9 @@ const timeAgo = (dateString: string) => {
   return `Listed just now`;
 };
 
-const ItemRating: React.FC<ItemData> = ({ ownerRating }) => {
-  // Generate the stars string
+const UserRating: React.FC<ItemData> = ({ ownerRating }) => {
   const filledStars = "✭".repeat(ownerRating);
-  const emptyStars = "✩".repeat(5 - ownerRating); // Assuming a 5-star system
+  const emptyStars = "✩".repeat(5 - ownerRating);
 
   return (
     <div className="text-xl">
@@ -131,7 +130,7 @@ const Item = () => {
             <div>
               <p className="text-black font-semibold">{MockData.ownerName}</p>
               <div className="flex items-center text-sm text-gray-700">
-                <ItemRating ownerRating={MockData.ownerRating} />
+                <UserRating ownerRating={MockData.ownerRating} />
                 <span className="ml-1">(8)</span>
               </div>
             </div>
