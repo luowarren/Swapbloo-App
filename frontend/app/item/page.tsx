@@ -32,7 +32,7 @@ interface ItemRatingProps {
 const ItemRating: React.FC<ItemRatingProps> = ({ ownerRating }) => {
   // Generate the stars string
   const filledStars = "✭".repeat(ownerRating);
-  const emptyStars = "✩".repeat(5 - ownerRating); // Assuming a 5-star system
+  const emptyStars = "✩".repeat(5 - ownerRating);
 
   return (
     <div className="text-xl">
