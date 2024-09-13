@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { createClient } from '@supabase/supabase-js'; // Correct named import
 
 // Load environment variables from .env file
+// dotenv.config({ path: ".env" }); // Optional: specify the path to .env
 dotenv.config({ path: ".env" }); // Optional: specify the path to .env
 
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
@@ -81,6 +82,7 @@ export async function getfilteredItems(sizes, categories, conditions, demographi
  * @param {string} category - type of clothing the item is
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
+ * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
@@ -222,6 +224,7 @@ export async function getItemImages(imageIds) {
       .storage
       .from('images')
       .download(imagePath);
+
 
     console.log(data);
     if (error) {
