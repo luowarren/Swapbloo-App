@@ -1,20 +1,19 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
-const { createClient, SupabaseClient } = pkg;
-import twilio from "twilio";
+import { createClient } from '@supabase/supabase-js'; // Correct named import
 
 // Load environment variables from .env file
-const result = dotenv.config(); // Optional: specify the path to .env
-if (result.error) {
-  throw result.error;
-}
-import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
-import { get } from "https";
-import { error } from "console";
+// dotenv.config({ path: ".env" }); // Optional: specify the path to .env
 
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
+const SUPABASE_URL='https://nuynivbpnulznjcmtvpq.supabase.co'
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = SUPABASE_URL;
+const supabaseKey = SUPABASE_KEY;
+
+// Log the environment variables to check their values
+//console.log('Supabase URL:', supabaseUrl);
+//console.log('Supabase Key:', supabaseKey);
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -170,7 +169,6 @@ export async function getItemImageIds(itemId) {
     .select("*")
     .eq("item_id", itemId);
 
-
   return { data, error };
 }
 
@@ -192,10 +190,25 @@ export async function listFilenamesFromBucket() {
   return filenames;
 }
 
+export async function getImageFromId(imageId, bucket) {
+  console.log("image id and bucket:", bucket, imageId);
+  const { data, error } = await supabase
+    .storage
+    .from(bucket)
+    .download(imageId);
+  console.log("getting data from buckets", data);
+
+  if (error) {
+    return error;
+  }
+
+  return data;
+}
 
 export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
+  console.log('starting');
   
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
@@ -209,18 +222,17 @@ export async function getItemImages(imageIds) {
       .storage
       .from('images')
       .download(imagePath);
-    
+
     console.log(data);
     if (error) {
       console.log("error" + error);
       return { data: null, error: error };
     }
     // Convert the image data to a URL or Blob (if needed)
-    const imageUrl = URL.createObjectURL(imageData);
-
-    images.push(imageUrl);
+    images.push(data);
   }
 
+  console.log(images)
   return { data: images, error: null };
 }
 
@@ -235,6 +247,7 @@ export async function getItemImageLinks(imageIds) {
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
+    console.log('Path:' + imagePath)
 
     // Log the image path to verify it's correct
     console.log('Attempting to download image from path:', imagePath);
@@ -251,25 +264,67 @@ export async function getItemImageLinks(imageIds) {
       return { data: null, error: error };
     }
     // Convert the image data to a URL or Blob (if needed)
-    const imageUrl = URL.createObjectURL(imageData);
-    images.push(imageUrl);
+    //const imageUrl = URL.createObjectURL(data);
+    images.push(data);
   }
+  console.log('done')
+  console.log(images);
 
-  return { data: images, error: null };
+  return { data, error: null };
+}
+
+
+export async function getItem(itemId) {
+  let { data: Item, error } = await supabase
+    .from("Items")
+    .select("*")
+    .eq("id", itemId)
+    .single();
+  return { data: Item, error };
+}
+
+export async function getUserProfileImageUrl(userId) {
+  let { data, error } = await supabase
+    .from("Users")
+    .select("image")
+    .eq("id", userId)
+    .single();
+    console.log('SIGJSKJDHKJHDLIJFHSLKJDFLISHJDFILJKDFHILJKSDHFLIKJH');
+    console.log(data.image);
+
+    if (!error) {
+      const image = await getImageFromId(data.image, "profilePictures");
+      console.log("imagee", image);
+      if (image instanceof Blob) {
+        return image;
+      } else {
+        console.error('Element is not a Blob:', error1);
+        return null;
+      }
+
+    } else {
+      console.error('no profile pic:', error); 
+    }
+    
 }
 
 export async function getImages(id) {
+  console.log('itemId is this:', id);
   const imageIds = await getItemImageIds(id);
   console.log(imageIds);
   if (imageIds.error) {
     return {data: null, error: imageIds.error};
   } 
+  console.log('ligm')
   const itemImages = await getItemImages(imageIds.data);
+  console.log(itemImages);
+  console.log('Type of data:', typeof itemImages);
+
   if (itemImages.error) {
     return {data: null, error: itemImages.error};
   } 
-
-  return {data: itemImages, error: null};
+  console.log('sgi')
+  return {data: itemImages.data, error: null};
 }
 
 
@@ -285,27 +340,32 @@ export async function getImageLinks(id) {
     return {data: null, error: itemImages.error};
   } 
 
-  return {data: itemImages, error: null};
+  return {data: itemImages.data, error: null};
 }
 //await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
 //let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
 //console.log(x["data"]);
 
+async function runTest() {
+  
+  (async () => {
+    try {
+      console.log('attemping');
+      //console.log(listFilenamesFromBucket());
+      const ims = await getImages('54');
+      console.log('wowo')
+      console.log(ims);
 
-(async () => {
-  try {
-    console.log('attemping');
-    //console.log(listFilenamesFromBucket());
-    // const imageIds = await getImages('5');
-    ccnsole.log(imageIds);
+      console.log("going for number two")
 
-    console.log("going for number two")
+      const imageLinks = await getImageLinks('54');
+      console.log(imageLinks);
 
-    const imageLinks = await getImageLinks('5');
-    console.log(imageLinks);
+    } catch {
+      //
+    }
+  })();
 
-  } catch {
-    //
-    console.log("something went wrong")
-  }
-})();
+}
+
+//runTest()
