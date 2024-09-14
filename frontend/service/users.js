@@ -1,11 +1,10 @@
 import dotenv from "dotenv";
 import pkg from "@supabase/supabase-js";
-const { createClient, SupabaseClient } = pkg;
+const { createClient } = pkg;
 import twilio from "twilio";
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
-import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
 import { get } from "https";
 
 // Initialize Supabase client
