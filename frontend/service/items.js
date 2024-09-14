@@ -36,12 +36,29 @@ export async function getActiveListings() {
     .from("Items")
     .select("*")
     .eq("swapped", "false");
+
+  console.log('data trip', Items);  
   if (error) {
     console.error("Error Items:", error.message);
+    return { data: null, error };;
+  }
+  return { data: Items, error };
+}
+
+export async function getListingsByUsers(userIds) {
+  let { data: Items, error } = await supabase
+    .from("Items")
+    .select("*")
+    .in("owner_id", userIds)
+    .eq("swapped", "false");
+    
+  if (error) {
+    console.error("Error fetching listings by users:", error.message);
     return;
   }
   return { data: Items, error };
 }
+
 
 /**
  * Filters items by sizes, categories, conditions, demographics. For full
@@ -79,6 +96,7 @@ export async function getfilteredItems(sizes, categories, conditions, demographi
  * @param {string} category - type of clothing the item is
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
+ * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
@@ -220,6 +238,7 @@ export async function getItemImages(imageIds) {
       .storage
       .from('images')
       .download(imagePath);
+
 
     console.log(data);
     if (error) {
