@@ -25,6 +25,46 @@ export async function loginUser(email, password) {
   });
 }
 
+/**
+ * Retrieves all the active listings (active meaning, they have not yet been
+ * swapped, but could be pending).
+ *
+ * @returns Items is a list of Item types, where swapped = false
+ */
+export async function getActiveListings() {
+  let { data: Items, error } = await supabase
+    .from("Items")
+    .select("*")
+    .eq("swapped", "false");
+
+  console.log('data trip', Items);  
+  if (error) {
+    console.error("Error Items:", error.message);
+    return { data: null, error };;
+  }
+  return { data: Items, error };
+}
+
+async function runTest() {
+  (async () => {
+    try {
+      console.log("attempting search");
+      let { data: Items, error } = await search("blue casual shirt");
+      if (error) {
+        console.log(error);
+      }
+      for (let i = 0; i < Items.length; i++) {
+        console.log("title: ", Items[i]["title"]);
+        // console.log("caption: ", Items[i]["caption"]);
+      }
+      console.log("concluding search");
+    } catch (error) {
+      console.log(error);
+    }
+  })();
+}
+runTest();
+
 export async function getListingsByUsers(userIds) {
   let { data: Items, error } = await supabase
     .from("Items")
