@@ -25,26 +25,6 @@ export async function loginUser(email, password) {
   });
 }
 
-/**
- * Retrieves all the active listings (active meaning, they have not yet been
- * swapped, but could be pending).
- *
- * @returns Items is a list of Item types, where swapped = false
- */
-export async function getActiveListings() {
-  let { data: Items, error } = await supabase
-    .from("Items")
-    .select("*")
-    .eq("swapped", "false");
-
-  console.log('data trip', Items);  
-  if (error) {
-    console.error("Error Items:", error.message);
-    return { data: null, error };;
-  }
-  return { data: Items, error };
-}
-
 export async function getListingsByUsers(userIds) {
   let { data: Items, error } = await supabase
     .from("Items")
@@ -56,33 +36,6 @@ export async function getListingsByUsers(userIds) {
     console.error("Error fetching listings by users:", error.message);
     return;
   }
-  return { data: Items, error };
-}
-
-
-/**
- * Filters items by sizes, categories, conditions, demographics. For full
- * list what possible types for these, refer to ./constants.js
- *
- * Example: if sizes = ["XS", "XXS"], this will only return items of size XS and
- * XSS. Essentially, the array must contain the criteria you DONT want filtered
- * out.
- *
- * @param {Array<string>} sizes - the sizes users want to filter by
- * @param {Array<string>} categories - the categories users want to filter by
- * @param {Array<string>} conditions - the conditions users want to filter by
- * @param {Array<string>} demographics - the sizes users want to filter by
- * @returns Items is a list of Item types where the filtered criteria is met
- */
-export async function getfilteredItems(sizes, categories, conditions, demographics) {
-  let { data: Items, error } = await supabase
-    .from("Items")
-    .select("*")
-    .eq("swapped", "false")
-    .in("size", sizes)
-    .in("category", categories)
-    .in("condition", conditions)
-    .in("demographic", demographics);
   return { data: Items, error };
 }
 
