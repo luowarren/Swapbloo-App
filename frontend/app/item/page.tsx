@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import ItemImages from '../components/ItemImages';
-import { getItem, getUserProfileImageUrl } from '../../service/items';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import ItemImages from "../components/ItemImages";
+import { getItem, getUserProfileImageUrl } from "../../service/items";
 
 interface ItemData {
   id: number;
@@ -44,8 +44,8 @@ const ItemRating: React.FC<ItemRatingProps> = ({ ownerRating }) => {
 
 const Item = () => {
   const searchParams = useSearchParams(); // Use useSearchParams to get query params
-  const itemId = searchParams.get('itemId'); // Get the itemId from the URL search params
-  
+  const itemId = searchParams.get("itemId"); // Get the itemId from the URL search params
+
   const [itemData, setItemData] = useState<ItemData | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
   const [loading, setLoading] = useState<boolean>(true);
@@ -62,7 +62,7 @@ const Item = () => {
       const { data, error } = await getItem(itemId);
 
       if (error) {
-        console.error('Error fetching item:', error);
+        console.error("Error fetching item:", error);
       } else {
         data.ownerRating = 5;
         setItemData(data);
@@ -70,15 +70,16 @@ const Item = () => {
         // Fetch profile picture using owner_id and handle undefined return values
         const profilePicBlob = await getUserProfileImageUrl(data.owner_id);
         console.log(profilePicBlob);
-        console.log("pROFILE PICS ABOVE")
-        if (profilePicBlob) { // Only create URL if profilePicBlob is not null or undefined
+        console.log("pROFILE PICS ABOVE");
+        if (profilePicBlob) {
+          // Only create URL if profilePicBlob is not null or undefined
           const profilePicUrl = URL.createObjectURL(profilePicBlob);
           setProfilePic(profilePicUrl); // Set the profile picture URL in the state
         } else {
-          console.log('NO PRIFLE PICS !!!!!!!!!')
+          console.log("NO PRIFLE PICS !!!!!!!!!");
           setProfilePic(null); // Handle the case where no profile picture is available
         }
-    }
+      }
 
       setLoading(false);
     };
@@ -97,12 +98,14 @@ const Item = () => {
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
-        <ItemImages itemId={itemData.id} /> 
+        <ItemImages itemId={itemData.id} />
       </div>
 
       <div className="p-4 w-1/2 my-20">
         <h1 className="text-3xl font-bold">{itemData.title}</h1>
-        <p className="text-m my-2 text-gray-600">{itemData.size} • {itemData.condition} • {itemData.brand}</p>
+        <p className="text-m my-2 text-gray-600">
+          {itemData.size} • {itemData.condition} • {itemData.brand}
+        </p>
         <div className="flex space-x-2">
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full">
             Make offer
@@ -113,13 +116,12 @@ const Item = () => {
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
-            <img src="flower.png" className="w-6 h-6" ></img>
+            <img src="flower.png" className="w-6 h-6"></img>
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
-            <img src="flower.png" className="w-6 h-6" ></img>
+            <img src="flower.png" className="w-6 h-6"></img>
           </button>
-
         </div>
 
         <hr className="border-gray-600 w-3/4 mt-2"></hr>
@@ -127,14 +129,15 @@ const Item = () => {
 
         {itemData.damage && (
           <div className="flex items-center text-sm text-gray-800 mt-2">
-            <img src="exclamation-mark.png" className="w-6 h-6 mr-3" ></img>
+            <img src="exclamation-mark.png" className="w-6 h-6 mr-3"></img>
             <span>Damage: {itemData.damage}</span>
           </div>
         )}
-         <p className="text-xs text-gray-500 mt-2">Listed {new Date(itemData.created_at).toLocaleString()}</p>
+        <p className="text-xs text-gray-500 mt-2">
+          Listed {new Date(itemData.created_at).toLocaleString()}
+        </p>
 
-
-         <div className="mt-4">
+        <div className="mt-4">
           <div className="bg-green-300 rounded-lg w-3/4 h-24 flex items-center justify-center text-center mb-2">
             <span className="text-black font-bold">Map</span>
           </div>
@@ -142,13 +145,13 @@ const Item = () => {
           <hr className="border-gray-600 w-3/4"></hr>
 
           <div className="flex items-center my-4">
-          {profilePic && 
-            <img
-            src={profilePic}
-            alt="Owner Avatar"
-            className="w-12 h-12 rounded-full mr-4"
-          />
-          }
+            {profilePic && (
+              <img
+                src={profilePic}
+                alt="Owner Avatar"
+                className="w-12 h-12 rounded-full mr-4"
+              />
+            )}
             <div>
               <p className="text-black font-semibold">{itemData.ownerName}</p>
               <div className="flex items-center text-sm text-gray-700">
