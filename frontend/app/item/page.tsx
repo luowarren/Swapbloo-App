@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ItemImages from '../components/ItemImages';
 import { getItem, getUserProfileImageUrl } from '../../service/items';
+import { useRouter } from 'next/navigation'; // Import useRouter to handle navigation
 
-interface ItemData {
+export interface ItemData {
   id: number;
   created_at: string;
   size: string;
@@ -49,7 +50,8 @@ const Item = () => {
   const [itemData, setItemData] = useState<ItemData | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
   const [loading, setLoading] = useState<boolean>(true);
-
+  const router = useRouter(); // Initialize the router for navigation
+  
   /**
    *  {profilePic && <img src={profilePic} alt={itemData.ownerName} className="w-16 h-16 rounded-full" />}
    */
@@ -94,6 +96,10 @@ const Item = () => {
     return <p>Item not found.</p>;
   }
 
+  const handleMakeOffer = () => {
+    router.push(`/offer?itemId=${itemData.id}`);
+  };
+
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
@@ -104,8 +110,11 @@ const Item = () => {
         <h1 className="text-3xl font-bold">{itemData.title}</h1>
         <p className="text-m my-2 text-gray-600">{itemData.size} • {itemData.condition} • {itemData.brand}</p>
         <div className="flex space-x-2">
-          <button className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full">
-            Make offer
+        <button
+            onClick={handleMakeOffer}
+            className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full"
+          >
+            Make Offer
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-full">
@@ -167,14 +176,6 @@ const Item = () => {
             </button>
           </div>
 
-          <div className="flex space-x-2">
-            <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg mr-2 hover:bg-indigo-50">
-              Visit Shop
-            </button>
-            <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg hover:bg-indigo-50">
-              Ask a question
-            </button>
-          </div>
         </div>
       </div>
     </div>

@@ -59,7 +59,7 @@ export default function Login() {
         <div className="min-h-screen bg-white">
             {/* New listings by people you follow */}
             <section className="my-8 mx-4">
-                <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">New listings by people you follow</h2>
+                <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">New listings</h2>
                 <div className="flex justify-center overflow-x-scroll">
                     {listings.slice(0, 5).map(listing => (
                         <Card 
