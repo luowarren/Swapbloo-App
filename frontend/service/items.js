@@ -1,16 +1,16 @@
 import dotenv from "dotenv";
-import { createClient } from '@supabase/supabase-js'; // Correct named import
+import { createClient } from "@supabase/supabase-js"; // Correct named import
 
 // Load environment variables from .env file
-// dotenv.config({ path: ".env" }); // Optional: specify the path to .env
-dotenv.config({ path: ".env" }); // Optional: specify the path to .env
+dotenv.config({ path: "./.env" }); // Optional: specify the path to .env
 
+// Initialize Supabase client
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
 const SUPABASE_URL='https://nuynivbpnulznjcmtvpq.supabase.co'
 // Initialize Supabase client
 const supabaseUrl = SUPABASE_URL;
 const supabaseKey = SUPABASE_KEY;
-
+console.log('sigma rizz', supabaseUrl, supabaseKey)
 // Log the environment variables to check their values
 //console.log('Supabase URL:', supabaseUrl);
 //console.log('Supabase Key:', supabaseKey);
@@ -59,33 +59,6 @@ export async function getListingsByUsers(userIds) {
     console.error("Error fetching listings by users:", error.message);
     return { data: null, error: error };;
   }
-  return { data: Items, error };
-}
-
-
-/**
- * Filters items by sizes, categories, conditions, demographics. For full
- * list what possible types for these, refer to ./constants.js
- *
- * Example: if sizes = ["XS", "XXS"], this will only return items of size XS and
- * XSS. Essentially, the array must contain the criteria you DONT want filtered
- * out.
- *
- * @param {Array<string>} sizes - the sizes users want to filter by
- * @param {Array<string>} categories - the categories users want to filter by
- * @param {Array<string>} conditions - the conditions users want to filter by
- * @param {Array<string>} demographics - the sizes users want to filter by
- * @returns Items is a list of Item types where the filtered criteria is met
- */
-export async function getfilteredItems(sizes, categories, conditions, demographics) {
-  let { data: Items, error } = await supabase
-    .from("Items")
-    .select("*")
-    .eq("swapped", "false")
-    .in("size", sizes)
-    .in("category", categories)
-    .in("condition", conditions)
-    .in("demographic", demographics);
   return { data: Items, error };
 }
 
@@ -387,5 +360,5 @@ async function runTest() {
   })();
 
 }
+runTest()
 
-//runTest()

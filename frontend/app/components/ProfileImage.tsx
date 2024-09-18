@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getUserProfileImageUrl } from '../../service/items'; // Import your existing service function
+import React, { useEffect, useState } from "react";
+import { getUserProfileImageUrl } from "../../service/items"; // Import your existing service function
 
 interface ProfileImageProps {
   userId: string;
@@ -25,7 +25,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ userId }) => {
           setProfilePicUrl(null); // No image available
         }
       } catch (error) {
-        console.error('Error fetching profile image:', error);
+        console.error("Error fetching profile image:", error);
         setProfilePicUrl(null); // Handle any error by not displaying the image
       }
 
