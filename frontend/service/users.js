@@ -4,7 +4,6 @@ import twilio from "twilio";
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
-import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
 import { get } from "https";
 
 // Initialize Supabase client
