@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
-const { createClient, SupabaseClient } = pkg;
+import { createClient } from '@supabase/supabase-js'; // Correct named import
 import twilio from "twilio";
 
 // Load environment variables from .env file
@@ -24,6 +23,9 @@ async function loginUser(email, password) {
   });
 }
 
+export async function getUserId() {
+  return await supabase.auth.getUser();
+}
 /**
  * Retrieves user data from the 'Users' table by user ID.
  *

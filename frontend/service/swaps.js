@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
-const { createClient } = pkg;
+import { createClient } from '@supabase/supabase-js'; // Correct named import
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
@@ -8,8 +7,13 @@ dotenv.config({ path: "../.env" });
 import { SWAP_STATUS } from "./constants.js";
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+//const supabaseUrl = process.env.SUPABASE_URL;
+//const supabaseKey = process.env.SUPABASE_KEY;
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
+const SUPABASE_URL='https://nuynivbpnulznjcmtvpq.supabase.co'
+// Initialize Supabase client
+const supabaseUrl = SUPABASE_URL;
+const supabaseKey = SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -23,7 +27,7 @@ export async function createSwapItem(swapInfo) {
     .insert([{
       swap_id: swapInfo.swap_id,
       item_id: swapInfo.item_id,
-      owner_id: swapInfo.ownerId
+      owner_id: swapInfo.owner_id
     }]);
 
   if (error) {
@@ -38,8 +42,8 @@ export async function createSwapItem(swapInfo) {
  * Creates a new swap record in the 'Swaps' table.
  *
  * @param {number} itemId - The ID of the item being swapped.
- * @param {number} requesterId - The ID of the user requesting the swap.
- * @param {number} accepterId - The ID of the user who owns the item.
+ * @param {string} requesterId - The ID of the user requesting the swap.
+ * @param {string} accepterId - The ID of the user who owns the item.
  * @returns {Promise}
  * 
  * Example response:
@@ -54,12 +58,13 @@ export async function createSwapItem(swapInfo) {
  */
 export async function createSwapRequest(myItems, requestingItems, ownerId, requesterId) {
   // First, add to swaps table with a pending status
+  console.log('creating swap requests: ', myItems, requestingItems, ownerId, requesterId);
   const { data, error } = await supabase
     .from("Swaps")
     .insert([{ 
       requester_id: requesterId, 
       accepter_id: ownerId,
-      status: SWAP_STATUS[0] 
+      status: SWAP_STATUS[2] 
     }])
     .select();
 

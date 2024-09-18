@@ -68,6 +68,7 @@ const Item = () => {
       } else {
         data.ownerRating = 5;
         setItemData(data);
+        console.log('item data', data);
 
         // Fetch profile picture using owner_id and handle undefined return values
         const profilePicBlob = await getUserProfileImageUrl(data.owner_id);
@@ -97,7 +98,7 @@ const Item = () => {
   }
 
   const handleMakeOffer = () => {
-    router.push(`/offer?itemId=${itemData.id}`);
+    router.push(`/offer?itemId=${itemData.id}&ownerId=${itemData.owner_id}`);
   };
 
   return (
