@@ -1,20 +1,19 @@
-import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js"; // Correct named import
+import dotenv from 'dotenv'; // Import dotenv
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
+dotenv.config(); // Load environment variables from .env file
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
 // const supabaseUrl = process.env.SUPABASE_URL;
 // const supabaseKey = process.env.SUPABASE_KEY;
 
 console.log('sigma rizz', supabaseUrl, supabaseKey)
 // Log the environment variables to check their values
-//console.log('Supabase URL:', supabaseUrl);
-//console.log('Supabase Key:', supabaseKey);
+console.log('Supabase URL:', supabaseUrl);
+console.log('Supabase Key:', supabaseKey);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -67,7 +66,7 @@ async function runTest() {
     }
   })();
 }
-runTest();
+// runTest();
 
 export async function getListingsByUsers(userIds) {
   let { data: Items, error } = await supabase
@@ -360,7 +359,7 @@ export async function getImageLinks(id) {
 //let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
 //console.log(x["data"]);
 
-async function runTest() {
+async function runTest1() {
   
   (async () => {
     try {
@@ -381,7 +380,7 @@ async function runTest() {
   })();
 
 }
-runTest()
+// runTest()
 
 runTest()
 

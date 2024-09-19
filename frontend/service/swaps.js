@@ -7,47 +7,49 @@ dotenv.config({ path: "../.env" });
 import { SWAP_STATUS } from "./constants.js";
 
 // Initialize Supabase client
-//const supabaseUrl = process.env.SUPABASE_URL;
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
-const SUPABASE_URL='https://nuynivbpnulznjcmtvpq.supabase.co'
-// Initialize Supabase client
-const supabaseUrl = SUPABASE_URL;
-const supabaseKey = SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
-// const supabaseUrl = process.env.SUPABASE_URL;
-// const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
+/**
+ * NOTE: does not follow function protocals, only used internally
+ *
+ * @param {Object} swapInfo - json containing item_id, owner_id, swap_id all as
+ * numbers
+ * @returns
+ */
 export async function createSwapItem(swapInfo) {
-  console.log(`Itemid ${swapInfo.item_id} owner ${swapInfo.owner_id} swap ${swapInfo.swap_id}`)
-  const { data, error } = await supabase
-    .from("SwapItems")
-    .insert([{
+  console.log(
+    `Itemid ${swapInfo.item_id} owner ${swapInfo.owner_id} swap ${swapInfo.swap_id}`
+  );
+  const { data, error } = await supabase.from("SwapItems").insert([
+    {
       swap_id: swapInfo.swap_id,
       item_id: swapInfo.item_id,
-      owner_id: swapInfo.owner_id
-    }]);
+      owner_id: swapInfo.owner_id,
+    },
+  ]);
 
-  if (error) {
-    console.error("Error adding swap item:", error.message);
-    throw error;
-  }
+  // if (error) {
+  //   console.error("Error adding swap item:", error.message);
+  //   throw error;
+  // }
   console.log(data);
-  return data;
+  return error;
 }
 
 /**
  * Creates a new swap record in the 'Swaps' table.
- *
- * @param {number} itemId - The ID of the item being swapped.
- * @param {string} requesterId - The ID of the user requesting the swap.
- * @param {string} accepterId - The ID of the user who owns the item.
- * @returns {Promise}
  * 
+ * @param {Array<string>} myItems - array of item ids 
+ * @param {Array<string>} requestingItems - array of item ids
+ * @param {number} ownerId - id of the owner
+ * @param {number} requesterId - id of the requester
  * Example response:
  *   {
     id: 50,
@@ -58,19 +60,26 @@ export async function createSwapItem(swapInfo) {
     item_id: 54
   }
  */
-export async function createSwapRequest(myItems, requestingItems, ownerId, requesterId) {
+export async function createSwapRequest(
+  myItems,
+  requestingItems,
+  ownerId,
+  requesterId
+) {
   // First, add to swaps table with a pending status
   console.log('creating swap requests: ', myItems, requestingItems, ownerId, requesterId);
   const { data, error } = await supabase
     .from("Swaps")
-    .insert([{ 
-      requester_id: requesterId, 
-      accepter_id: ownerId,
-      status: SWAP_STATUS[2] 
-    }])
+    .insert([
+      {
+        requester_id: requesterId,
+        accepter_id: ownerId,
+        status: SWAP_STATUS[0],
+      },
+    ])
     .select();
 
-  console.log(data)
+  console.log(data);
   if (error) {
     console.error("Error creating swap:", error.message);
     throw error;
@@ -79,34 +88,94 @@ export async function createSwapRequest(myItems, requestingItems, ownerId, reque
   const swapId = data[0].id;
 
   // Insert rows for the owner's items
-  const ownerItems = myItems.map(itemId => ({
+  const ownerItems = myItems.map((itemId) => ({
     swap_id: swapId,
     item_id: itemId,
-    owner_id: ownerId
+    owner_id: ownerId,
   }));
 
   // Insert rows for the requester's items
-  const requesterItems = requestingItems.map(itemId => ({
+  const requesterItems = requestingItems.map((itemId) => ({
     swap_id: swapId,
     item_id: itemId,
-    owner_id: requesterId
+    owner_id: requesterId,
   }));
 
   // Combine both arrays and insert into SwapItems table
   // Insert each of the owner's items
-  for (const itemId of ownerItems) {
-    await createSwapItem(itemId);
+  for (const item of ownerItems) {
+    const error = await createSwapItem(item);
+    if (error) return { data, error };
   }
 
   // Insert each of the requester's items
-  for (const itemId of requesterItems) {
-    await createSwapItem(itemId);
+  for (const item of requesterItems) {
+    const error = await createSwapItem(item);
+    if (error) return { data, error };
   }
 
-  return data[0];
+  // return data[0];
+  return { data, error };
 }
 
+/**
+ * User tries to modify their swap request with another user.
+ *
+ * @param {number} swapId - id of the swap
+ * @param {Array<string>} myItems - array of item ids
+ * @param {Array<string>} requestingItems - array of item ids
+ * @param {number} ownerId - id of the owner
+ * @param {number} requesterId - id of the requester
+ */
+export async function modifySwapRequest(
+  swapId,
+  myItems,
+  requestingItems,
+  ownerId,
+  requesterId
+) {
+  let { data, error } = await supabase
+    .from("Swaps")
+    .select("*")
+    .eq("id", `${swapId}`);
+  if (error) return { data, error };
+  // delete all items that are currently associated with this swap
+  const deleteStatus = await supabase
+    .from("SwapItems")
+    .delete()
+    .eq("swap_id", `${swapId}`);
 
+  if (deleteStatus.error) return { data: null, error: deleteStatus.error };
+
+  // Insert rows for the owner's items
+  const ownerItems = myItems.map((itemId) => ({
+    swap_id: swapId,
+    item_id: itemId,
+    owner_id: ownerId,
+  }));
+
+  // Insert rows for the requester's items
+  const requesterItems = requestingItems.map((itemId) => ({
+    swap_id: swapId,
+    item_id: itemId,
+    owner_id: requesterId,
+  }));
+
+  // Combine both arrays and insert into SwapItems table
+  // Insert each of the owner's items
+  for (const item of ownerItems) {
+    const error = await createSwapItem(item);
+    if (error) return { data, error };
+  }
+
+  // Insert each of the requester's items
+  for (const item of requesterItems) {
+    const error = await createSwapItem(item);
+    if (error) return { data, error };
+  }
+
+  return { data, error };
+}
 
 /**
  * Creates a new swap record in the 'Swaps' table.
@@ -248,7 +317,7 @@ export async function deleteSwap(swapId) {
   //   throw error;
   // }
 
-  return { error };
+  return error;
 }
 
 /**
@@ -358,30 +427,44 @@ async function runTest() {
       console.log("swap created: " + createdSwapId);
       */
       // Create a new swap
-      const newSwap = await createSwapRequest(['54'], ['55'], ownerId, requesterId);
-      console.log(newSwap);
+      let newSwap = await createSwapRequest(
+        ["54"],
+        ["55"],
+        ownerId,
+        requesterId
+      );
+      newSwap = newSwap["data"][0];
+      console.log("og swap: ", newSwap);
       const createdSwapId = newSwap.id;
       console.log("swapp created: " + createdSwapId);
 
+      let modifiedSwap = await modifySwapRequest(
+        createdSwapId,
+        ["54", "87"],
+        ["88"],
+        ownerId,
+        requesterId
+      );
+      console.log("modified swap: ", modifiedSwap);
       //const newSwapItem = await createSwapItem('86', itemId, ownerId);
       // console.log(newSwapItem);
       //const createdSwapItemId = newSwapItem['data'];
-      // console.log("swap item created: " + createdSwapItemId); 
+      // console.log("swap item created: " + createdSwapItemId);
 
       // Get swap by ID
       const swap = await getSwapById(createdSwapId);
-      testResult(createdSwapId, swap['data'].id);
+      testResult(createdSwapId, swap["data"].id);
 
       // Update swap status
       const updatedSwap = await updateSwapStatus(createdSwapId, newStatus);
-      testResult(updatedSwap['data'][0].status, newStatus);
+      testResult(updatedSwap["data"][0].status, newStatus);
 
-      // Delete swap
-      const deletedSwap = await deleteSwap(createdSwapId);
-      console.log(deleteSwap);
+      // // Delete swap
+      // const deletedSwap = await deleteSwap(createdSwapId);
+      // console.log(deletedSwap);
       const checkDeleted = await getSwapById(createdSwapId);
       console.log(checkDeleted);
-      testResult(checkDeleted['data'], null);
+      testResult(checkDeleted["data"], null);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -399,3 +482,5 @@ function testResult(expected, actual) {
     console.error(`Fail: ${expected} !== ${actual}`);
   }
 }
+
+runTest();
