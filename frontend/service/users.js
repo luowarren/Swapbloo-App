@@ -7,8 +7,13 @@ dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
 import { get } from "https";
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = SUPABASE_URL;
+const supabaseKey = SUPABASE_KEY;
+
+
+// const supabaseUrl = process.env.SUPABASE_URL;
+// const supabaseKey = process.env.SUPABASE_KEY;
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {

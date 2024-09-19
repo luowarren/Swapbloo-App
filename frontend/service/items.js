@@ -8,6 +8,10 @@ dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
+// const supabaseUrl = process.env.SUPABASE_URL;
+// const supabaseKey = process.env.SUPABASE_KEY;
+
+console.log('sigma rizz', supabaseUrl, supabaseKey)
 // Log the environment variables to check their values
 //console.log('Supabase URL:', supabaseUrl);
 //console.log('Supabase Key:', supabaseKey);
@@ -377,5 +381,7 @@ async function runTest() {
   })();
 
 }
+runTest()
+
 runTest()
 
