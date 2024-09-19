@@ -5,8 +5,8 @@ import { createClient } from "@supabase/supabase-js"; // Correct named import
 dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -77,7 +77,12 @@ export async function search(searchString) {
  * @param {Array<string>} demographics - the sizes users want to filter by
  * @returns Items is a list of Item types where the filtered criteria is met
  */
-export async function getfilteredItems(sizes, categories, conditions, demographics) {
+export async function getfilteredItems(
+  sizes,
+  categories,
+  conditions,
+  demographics
+) {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
@@ -88,4 +93,3 @@ export async function getfilteredItems(sizes, categories, conditions, demographi
     .in("demographic", demographics);
   return { data: Items, error };
 }
-

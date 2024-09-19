@@ -8,8 +8,8 @@ dotenv.config({ path: "../.env" });
 import { SWAP_STATUS } from "./constants.js";
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -137,7 +137,7 @@ export async function modifySwapRequest(
     .from("Swaps")
     .select("*")
     .eq("id", `${swapId}`);
-  if (error) return error;
+  if (error) return { data, error };
   // delete all items that are currently associated with this swap
   const deleteStatus = await supabase
     .from("SwapItems")

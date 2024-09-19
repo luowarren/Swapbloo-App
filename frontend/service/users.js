@@ -8,8 +8,8 @@ dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
 import { get } from "https";
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -167,27 +167,98 @@ async function getItems() {
   return { data: Items, error };
 }
 
+// /**
+//  *
+//  * @param {string} userId
+//  */
+// export async function getBlockedUsers(userId) {
+//   let { data: Users, error } = await supabase.from("Users").select("blocked");
+//   return { data: Users, error };
+// }
+
+// /**
+//  *
+//  * @param {string} userId
+//  * @param {string} blocked - id of user u want to add too blocked users list
+//  */
+// export async function addBlockedUser(userId, blocked) {
+//   const { data, error } = await supabase
+//   .from('Users')
+//   .update({ blocked: 'otherValue' })
+//   .eq('some_column', 'someValue')
+//   .select()
+// }
+
+/**
+ *
+ * @param {string} userId
+ */
+export async function getRatings(userId) {
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("rating")
+    .eq("id", userId);
+  return { data: Users, error };
+}
+
+/**
+ * calculates a new average based on a rating added
+ *
+ * @param {string} userId
+ * @param {number} rating - rating u want to add
+ */
+export async function addRating(userId, rating) {
+  let ratingData = await getRatings(userId);
+  if (ratingData["error"]) return ratingData;
+
+  let numData = await supabase
+    .from("Users")
+    .select("num_of_ratings")
+    .eq("id", userId);
+  if (numData["error"]) return numData;
+
+  const oldNum = parseInt(numData["data"][0]["num_of_ratings"]);
+  const oldRating = parseInt(ratingData["data"][0]["rating"]);
+  const newRating = (oldRating * oldNum + rating) / (oldNum + 1);
+
+  ratingData = await supabase
+    .from("Users")
+    .update({ rating: `${newRating}` })
+    .eq("id", userId)
+    .select();
+  if (ratingData["error"]) return ratingData;
+
+  numData = await supabase
+    .from("Users")
+    .update({ num_of_ratings: `${oldNum + 1}` })
+    .eq("id", userId)
+    .select();
+  if (numData["error"]) return numData;
+
+  return ratingData;
+}
+
 async function runTest() {
   (async () => {
     try {
       // Your async code here
       const result = await getUserDescription(
-        "29527509-64c9-4798-9144-23773f3ee72c"
+        "74bfae90-2b0c-4c62-be92-1f9fc867b943"
       );
 
-      // console.log(result);
+      console.log(result);
       // const loc = await getUserLocation("29527509-64c9-4798-9144-23773f3ee72c");
       // console.log(loc);
 
       // const items = await getItems();
       // console.log(items);
-
-      const reqesteditems = await viewUser(
-
-      );
-      console.log(reqesteditems);
+      console.log(await addRating("74bfae90-2b0c-4c62-be92-1f9fc867b943", 3))
+      // const reqesteditems = await viewUser();
+      // console.log(reqesteditems);
     } catch (error) {
       console.error("Error:", error);
     }
   })();
 }
+
+runTest()
