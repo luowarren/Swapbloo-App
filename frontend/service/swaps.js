@@ -8,12 +8,14 @@ import { SWAP_STATUS } from "./constants.js";
 
 // Initialize Supabase client
 //const supabaseUrl = process.env.SUPABASE_URL;
-//const supabaseKey = process.env.SUPABASE_KEY;
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eW5pdmJwbnVsem5qY210dnBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMxNTk5MTEsImV4cCI6MjAzODczNTkxMX0.H-2tACfryiR97R5kQjas7RUaTBf2RpdnDgq-OGmfZzU'
 const SUPABASE_URL='https://nuynivbpnulznjcmtvpq.supabase.co'
 // Initialize Supabase client
 const supabaseUrl = SUPABASE_URL;
 const supabaseKey = SUPABASE_KEY;
+
+// const supabaseUrl = process.env.SUPABASE_URL;
+// const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
