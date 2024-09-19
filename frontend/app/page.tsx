@@ -1,5 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 import Image from "next/image";
+import React from "react";
+import ImageDisplay from './components/ImageDisplay';
+import ItemImages from './components/ItemImages';
 
 export default function Home() {
   return (
@@ -201,6 +204,10 @@ export default function Home() {
           </div>
         </footer>
       </div>
+      <div className="lg:w-1/2 mt-10 lg:mt-0">
+              
+            </div>
     </div>
+    
   );
 };

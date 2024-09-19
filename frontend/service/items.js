@@ -1,23 +1,23 @@
-import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
-const { createClient, SupabaseClient } = pkg;
-import twilio from "twilio";
+import dotenv from 'dotenv'; // Import dotenv
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
-import { CONDITIONS, DEMOGRAPHICS, CATEGORIES, SIZES } from "./constants.js";
-import { get } from "https";
+dotenv.config(); // Load environment variables from .env file
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+
+// Log the environment variables to check their values
+console.log('Supabase URL:', supabaseUrl);
+console.log('Supabase Key:', supabaseKey);
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
 }
 
-async function loginUser(email, password) {
+export async function loginUser(email, password) {
   let { data, error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
@@ -30,41 +30,51 @@ async function loginUser(email, password) {
  *
  * @returns Items is a list of Item types, where swapped = false
  */
-async function getActiveListings() {
+export async function getActiveListings() {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
     .eq("swapped", "false");
+
+  console.log('data trip', Items);  
   if (error) {
     console.error("Error Items:", error.message);
-    return;
+    return { data: null, error };;
   }
   return { data: Items, error };
 }
 
-/**
- * Filters items by sizes, categories, conditions, demographics. For full
- * list what possible types for these, refer to ./constants.js
- *
- * Example: if sizes = ["XS", "XXS"], this will only return items of size XS and
- * XSS. Essentially, the array must contain the criteria you DONT want filtered
- * out.
- *
- * @param {Array<string>} sizes - the sizes users want to filter by
- * @param {Array<string>} categories - the categories users want to filter by
- * @param {Array<string>} conditions - the conditions users want to filter by
- * @param {Array<string>} demographics - the sizes users want to filter by
- * @returns Items is a list of Item types where the filtered criteria is met
- */
-async function getfilteredItems(sizes, categories, conditions, demographics) {
+async function runTest() {
+  (async () => {
+    try {
+      console.log("attempting search");
+      let { data: Items, error } = await search("blue casual shirt");
+      if (error) {
+        console.log(error);
+      }
+      for (let i = 0; i < Items.length; i++) {
+        console.log("title: ", Items[i]["title"]);
+        // console.log("caption: ", Items[i]["caption"]);
+      }
+      console.log("concluding search");
+    } catch (error) {
+      console.log(error);
+    }
+  })();
+}
+// runTest();
+
+export async function getListingsByUsers(userIds) {
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
-    .eq("swapped", "false")
-    .in("size", sizes)
-    .in("category", categories)
-    .in("condition", conditions)
-    .in("demographic", demographics);
+    .in("owner_id", userIds)
+    .eq("swapped", "false");
+    
+  if (error) {
+    console.error("Error fetching listings by users:", error.message);
+    return { data: null, error: error };;
+  }
   return { data: Items, error };
 }
 
@@ -78,12 +88,13 @@ async function getfilteredItems(sizes, categories, conditions, demographics) {
  * @param {string} category - type of clothing the item is
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
- * @param {Array<string???>} images - images of the item
+ * @param {Array<string???>} images - images of the item TODO figure out data type
+ * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
  * @returns
  */
-async function createItemListing(
+export async function createItemListing(
   uid,
   size,
   condition,
@@ -121,7 +132,7 @@ async function createItemListing(
  * @param {string} itemId - the itemId of the Item being deleted
  * @returns error | null
  */
-async function deleteItemListing(itemId) {
+export async function deleteItemListing(itemId) {
   let { error } = await supabase.from("Items").delete().eq("itemId", itemId);
   return { error };
 }
@@ -133,7 +144,7 @@ async function deleteItemListing(itemId) {
  * @param {string} itemId - the itemId of the Item being swapped
  * @returns Item is a list containing the Item we just swapped.
  */
-async function itemSwapped(itemId) {
+export async function itemSwapped(itemId) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ swapped: true })
@@ -150,7 +161,7 @@ async function itemSwapped(itemId) {
  * @param {string} caption - the updated caption
  * @returns Item is a list containing the Item we just edited
  */
-async function editItemListing(itemId, title, caption) {
+export async function editItemListing(itemId, title, caption) {
   let { data: Item, error } = await supabase
     .from("Items")
     .update({ title, caption })
@@ -159,6 +170,211 @@ async function editItemListing(itemId, title, caption) {
   return { data: Item, error };
 }
 
-await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
-let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
-console.log(x["data"]);
+export async function getItemImageIds(itemId) {
+  // Fetch the image paths from the database
+  let { data, error } = await supabase
+    .from("ItemImages")
+    .select("*")
+    .eq("item_id", itemId);
+
+  return { data, error };
+}
+
+export async function listFilenamesFromBucket() {
+  const { data, error } = await supabase
+    .storage
+    .from('images') // Replace 'images' with your bucket name
+    .list(''); // Provide the path inside the bucket, '' lists all files in the root
+
+  if (error) {
+    console.error('Error listing files:', error);
+    return null;
+  }
+
+  // Map through the data to get an array of filenames
+  const filenames = data.map(file => file.name);
+  console.log('Filenames:', filenames);
+
+  return filenames;
+}
+
+export async function getImageFromId(imageId, bucket) {
+  console.log("image id and bucket:", bucket, imageId);
+  const { data, error } = await supabase
+    .storage
+    .from(bucket)
+    .download(imageId);
+  console.log("getting data from buckets", data);
+
+  if (error) {
+    return error;
+  }
+
+  return data;
+}
+
+export async function getItemImages(imageIds) {
+  // Assuming `Item` is an array and contains image paths
+  const images = [];
+  console.log('starting');
+  
+  for (let item of imageIds) {
+    // Get the image path or name from the 'image' column
+    const imagePath = item.image;
+
+    // Log the image path to verify it's correct
+    console.log('Attempting to download image from path:', imagePath);
+
+    // Download the image from the Supabase storage bucket
+    const { data, error } = await supabase
+      .storage
+      .from('images')
+      .download(imagePath);
+
+
+    console.log(data);
+    if (error) {
+      console.log("error" + error);
+      return { data: null, error: error };
+    }
+    // Convert the image data to a URL or Blob (if needed)
+    images.push(data);
+  }
+
+  console.log(images)
+  return { data: images, error: null };
+}
+
+
+
+export async function getItemImageLinks(imageIds) {
+  // Assuming `Item` is an array and contains image paths
+  const images = [];
+  // Calculate the expiry time in seconds (1 month = 30 days = 2592000 seconds)
+  const expiresIn = 30 * 24 * 60 * 60;
+  
+  for (let item of imageIds) {
+    // Get the image path or name from the 'image' column
+    const imagePath = item.image;
+    console.log('Path:' + imagePath)
+
+    // Log the image path to verify it's correct
+    console.log('Attempting to download image from path:', imagePath);
+
+    // Download the image from the Supabase storage bucket
+    const { data, error } = await supabase
+      .storage
+      .from('images')
+      .createSignedUrl(imagePath, expiresIn);
+
+    console.log(data);
+    if (error) {
+      console.log("error" + error);
+      return { data: null, error: error };
+    }
+    // Convert the image data to a URL or Blob (if needed)
+    //const imageUrl = URL.createObjectURL(data);
+    images.push(data);
+  }
+  console.log('done')
+  console.log(images);
+
+  return { data, error: null };
+}
+
+
+export async function getItem(itemId) {
+  let { data: Item, error } = await supabase
+    .from("Items")
+    .select("*")
+    .eq("id", itemId)
+    .single();
+  return { data: Item, error };
+}
+
+export async function getUserProfileImageUrl(userId) {
+  let { data, error } = await supabase
+    .from("Users")
+    .select("image")
+    .eq("id", userId)
+    .single();
+    console.log('SIGJSKJDHKJHDLIJFHSLKJDFLISHJDFILJKDFHILJKSDHFLIKJH');
+    console.log(data.image);
+
+    if (!error) {
+      const image = await getImageFromId(data.image, "profilePictures");
+      console.log("imagee", image);
+      if (image instanceof Blob) {
+        return image;
+      } else {
+        console.error('Element is not a Blob:', error1);
+        return null;
+      }
+
+    } else {
+      console.error('no profile pic:', error); 
+    }
+    
+}
+
+export async function getImages(id) {
+  console.log('itemId is this:', id);
+  const imageIds = await getItemImageIds(id);
+  console.log(imageIds);
+  if (imageIds.error) {
+    return {data: null, error: imageIds.error};
+  } 
+  console.log('ligm')
+  const itemImages = await getItemImages(imageIds.data);
+  console.log(itemImages);
+  console.log('Type of data:', typeof itemImages);
+
+  if (itemImages.error) {
+    return {data: null, error: itemImages.error};
+  } 
+  console.log('sgi')
+  return {data: itemImages.data, error: null};
+}
+
+
+export async function getImageLinks(id) {
+  console.log('getting image ids');
+  const imageIds = await getItemImageIds(id);
+  console.log(imageIds);
+  if (imageIds.error) {
+    return {data: null, error: imageIds.error};
+  } 
+  const itemImages = await getItemImageLinks(imageIds.data);
+  if (itemImages.error) {
+    return {data: null, error: itemImages.error};
+  } 
+
+  return {data: itemImages.data, error: null};
+}
+//await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
+//let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
+//console.log(x["data"]);
+
+async function runTest1() {
+  
+  (async () => {
+    try {
+      console.log('attemping');
+      //console.log(listFilenamesFromBucket());
+      const ims = await getImages('54');
+      console.log('wowo')
+      console.log(ims);
+
+      console.log("going for number two")
+
+      const imageLinks = await getImageLinks('54');
+      console.log(imageLinks);
+
+    } catch {
+      //
+    }
+  })();
+
+}
+// runTest()
+

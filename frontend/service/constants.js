@@ -48,4 +48,7 @@ export const SWAP_STATUS = [
   "Pending",
   "Deleted"
 ]
-
+export const CHAT_STATUS = [
+  "Active",
+  "Inactive"
+]
