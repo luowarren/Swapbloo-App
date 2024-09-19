@@ -73,7 +73,7 @@ export async function getListingsByUsers(userIds) {
     
   if (error) {
     console.error("Error fetching listings by users:", error.message);
-    return;
+    return { data: null, error: error };;
   }
   return { data: Items, error };
 }

@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
-const { createClient } = pkg;
+import { createClient } from '@supabase/supabase-js'; // Correct named import
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
@@ -10,6 +9,7 @@ import { SWAP_STATUS } from "./constants.js";
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -67,6 +67,7 @@ export async function createSwapRequest(
   requesterId
 ) {
   // First, add to swaps table with a pending status
+  console.log('creating swap requests: ', myItems, requestingItems, ownerId, requesterId);
   const { data, error } = await supabase
     .from("Swaps")
     .insert([

@@ -56,27 +56,25 @@ export default function Login() {
     fetchListingsAndImages();
   }, []);
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* New listings by people you follow */}
-      <section className="my-8 mx-4">
-        <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">
-          New listings by people you follow
-        </h2>
-        <div className="flex justify-center overflow-x-scroll">
-          {listings.slice(0, 5).map((listing) => (
-            <Card
-              key={listing.id}
-              itemId={listing.id} // Use the imageUrl or a default image
-              brand={listing.brand}
-              size={listing.size}
-              ownerId={listing.owner_id}
-            />
-          ))}
+    return (
+        <div className="min-h-screen bg-white">
+            {/* New listings by people you follow */}
+            <section className="my-8 mx-4">
+                <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">New listings</h2>
+                <div className="flex justify-center overflow-x-scroll">
+                    {listings.slice(0, 5).map(listing => (
+                        <Card 
+                            key={listing.id} 
+                            itemId={listing.id}// Use the imageUrl or a default image
+                            brand={listing.brand} 
+                            size={listing.size} 
+                            ownerId={listing.owner_id}
+                        />
+                    ))}
+                </div>
+            </section>
         </div>
-      </section>
-    </div>
-  );
+    );
 }
 
 // Card Component

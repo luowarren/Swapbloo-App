@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import ItemImages from "../components/ItemImages";
-import { getItem, getUserProfileImageUrl } from "../../service/items";
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import ItemImages from '../components/ItemImages';
+import { getItem, getUserProfileImageUrl } from '../../service/items';
+import { useRouter } from 'next/navigation'; // Import useRouter to handle navigation
 
-interface ItemData {
+export interface ItemData {
   id: number;
   created_at: string;
   size: string;
@@ -49,7 +50,8 @@ const Item = () => {
   const [itemData, setItemData] = useState<ItemData | null>(null);
   const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
   const [loading, setLoading] = useState<boolean>(true);
-
+  const router = useRouter(); // Initialize the router for navigation
+  
   /**
    *  {profilePic && <img src={profilePic} alt={itemData.ownerName} className="w-16 h-16 rounded-full" />}
    */
@@ -66,6 +68,7 @@ const Item = () => {
       } else {
         data.ownerRating = 5;
         setItemData(data);
+        console.log('item data', data);
 
         // Fetch profile picture using owner_id and handle undefined return values
         const profilePicBlob = await getUserProfileImageUrl(data.owner_id);
@@ -95,6 +98,10 @@ const Item = () => {
     return <p>Item not found.</p>;
   }
 
+  const handleMakeOffer = () => {
+    router.push(`/offer?itemId=${itemData.id}&ownerId=${itemData.owner_id}`);
+  };
+
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
@@ -107,8 +114,11 @@ const Item = () => {
           {itemData.size} • {itemData.condition} • {itemData.brand}
         </p>
         <div className="flex space-x-2">
-          <button className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full">
-            Make offer
+        <button
+            onClick={handleMakeOffer}
+            className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full"
+          >
+            Make Offer
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-full">
@@ -170,14 +180,6 @@ const Item = () => {
             </button>
           </div>
 
-          <div className="flex space-x-2">
-            <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg mr-2 hover:bg-indigo-50">
-              Visit Shop
-            </button>
-            <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg hover:bg-indigo-50">
-              Ask a question
-            </button>
-          </div>
         </div>
       </div>
     </div>
