@@ -2,58 +2,18 @@
 
 import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
-
-const data = [
-  {
-    username: "Alice",
-    message: "Hey there! How's it going? Just checking in.",
-    date: "2024-09-19T12:30:00Z",
-    viewed: false,
-  },
-  {
-    username: "Bob",
-    message: "Don't forget about our meeting tomorrow at 10 AM.",
-    date: "2024-09-18T09:15:00Z",
-    viewed: true,
-  },
-  {
-    username: "Charlie",
-    message: "I found the information you requested about the project.",
-    date: "2024-09-17T14:00:00Z",
-    viewed: false,
-  },
-  {
-    username: "Diana",
-    message: "Can you send me the updated report when you have a moment?",
-    date: "2024-09-16T08:45:00Z",
-    viewed: true,
-  },
-  {
-    username: "Eve",
-    message: "Looking forward to our weekend trip!",
-    date: "2024-09-15T18:00:00Z",
-    viewed: false,
-  },
-  {
-    username: "Diana",
-    message: "Can you send me the updated report when you have a moment?",
-    date: "2024-09-16T08:45:00Z",
-    viewed: true,
-  },
-  {
-    username: "Eve",
-    message: "Looking forward to our weekend trip!",
-    date: "2024-09-15T18:00:00Z",
-    viewed: false,
-  },
-];
+import { data } from "./data.js";
 
 const ChatPage: React.FC = () => {
-  const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);
+  const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
+    []
+  );
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
-  const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
+  const [selectedMessageIndex, setSelectedMessageIndex] = useState<
+    number | null
+  >(null);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
 
   // Scroll to the bottom of the messageBox when messages change
@@ -67,7 +27,10 @@ const ChatPage: React.FC = () => {
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
     if (meInput.trim()) {
-      setMessages((prevMessages) => [...prevMessages, { text: meInput, sender: 'me' }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: meInput, sender: "me" },
+      ]);
       setMeInput(""); // Clear "Me" input after sending
     }
   };
@@ -76,7 +39,10 @@ const ChatPage: React.FC = () => {
   const handleReceive = (e: FormEvent) => {
     e.preventDefault();
     if (otherGuyInput.trim()) {
-      setMessages((prevMessages) => [...prevMessages, { text: otherGuyInput, sender: 'other' }]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: otherGuyInput, sender: "other" },
+      ]);
       setOtherGuyInput(""); // Clear "Other Guy" input after receiving
     }
   };
@@ -98,7 +64,8 @@ const ChatPage: React.FC = () => {
     <div className="flex h-[85vh]">
       {/* Sidebar for other chats */}
       <div className="w-1/4 bg-gray-100 py-4 border-r overflow-y-auto h-full">
-        <h2 className="text-black font-bold text-3xl p-2 px-4">Chats</h2>
+        <h2 className="text-black font-bold text-3xl p-2 px-4 fixed w-full bg-gray-100">Chats</h2>
+        <h2 className="text-gray-100 font-bold text-3xl p-2 px-4 h-[5vh]"></h2>
         {data.map((msg, index) => (
           <div key={index} onClick={() => toggleMessageSelection(index)}>
             <MessagePreview
@@ -113,63 +80,80 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* Main chat area */}
-      <div className="flex-grow flex flex-col h-full p-4 bg-gray-100">
-      <div
-          ref={messageBoxRef} // Attach the ref here
-          id="messageBox"
-          className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto"
-        >
-          <div className="flex flex-col space-y-2">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`inline-block max-w-[50%] p-2 rounded-full py-2 pl-5 pr-5 break-words ${
-                  msg.sender === 'me' ? "ml-auto text-white" : "mr-auto text-black"
-                }`}
-                style={{
-                  backgroundColor: msg.sender === 'me' ? "#3730A3" : "#C7D2FE",
-                }}
-              >
-                {msg.text}
-              </div>
-            ))}
+      {activeChat !== null && (
+        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100">
+          {/* Banner for active chat */}
+          <div className="w-full bg-white text-black p-4 rounded-t-lg text-2xl text-bold flex flex-row items-center ">
+            <div className="w-12 h-12 bg-yellow-500 rounded-full mr-3"></div>
+            {data[activeChat].username}'s Swap Shop
           </div>
+          <div
+            ref={messageBoxRef} // Attach the ref here
+            id="messageBox"
+            className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative"
+          >
+            <div className="pt-12">
+              {" "}
+              {/* Add padding to prevent overlap */}
+              <div className="flex flex-col space-y-2">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`inline-block max-w-[50%] p-2 rounded-full py-2 pl-5 pr-5 break-words ${
+                      msg.sender === "me"
+                        ? "ml-auto text-white"
+                        : "mr-auto text-black"
+                    }`}
+                    style={{
+                      backgroundColor:
+                        msg.sender === "me" ? "#3730A3" : "#C7D2FE",
+                    }}
+                  >
+                    {msg.text}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Form for sending messages as "Me" */}
+          <form onSubmit={handleSend} className="flex mt-4">
+            <input
+              type="text"
+              value={meInput}
+              onChange={(e) => setMeInput(e.target.value)}
+              className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
+              placeholder="Type your message..."
+            />
+            <button
+              type="submit"
+              className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
+            >
+              Send
+            </button>
+          </form>
+
+          {/* Form for receiving messages from "Other Guy" */}
+          <form onSubmit={handleReceive} className="flex mt-4">
+            <input
+              type="text"
+              value={otherGuyInput}
+              onChange={(e) => setOtherGuyInput(e.target.value)}
+              className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
+              placeholder="Type a response from Other Guy..."
+            />
+            <button
+              type="submit"
+              className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
+            >
+              Receive
+            </button>
+          </form>
         </div>
-
-        {/* Form for sending messages as "Me" */}
-        <form onSubmit={handleSend} className="flex mt-4">
-          <input
-            type="text"
-            value={meInput}
-            onChange={(e) => setMeInput(e.target.value)}
-            className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-            placeholder="Type your message..."
-          />
-          <button
-            type="submit"
-            className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
-          >
-            Send
-          </button>
-        </form>
-
-        {/* Form for receiving messages from "Other Guy" */}
-        <form onSubmit={handleReceive} className="flex mt-4">
-          <input
-            type="text"
-            value={otherGuyInput}
-            onChange={(e) => setOtherGuyInput(e.target.value)}
-            className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-            placeholder="Type a response from Other Guy..."
-          />
-          <button
-            type="submit"
-            className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
-          >
-            Receive
-          </button>
-        </form>
-      </div>
+      )}
+      {activeChat === null && (
+        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100"></div>
+      )}
     </div>
   );
 };

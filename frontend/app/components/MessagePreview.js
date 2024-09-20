@@ -13,7 +13,7 @@ const MessagePreview = ({
   };
 
   return (
-    <div className={`flex items-center p-5 ${isSelected ? 'bg-gray-120' : 'bg-gray-100'}`}>
+    <div className={`flex items-center p-5 ${isSelected ? 'bg-gray-200' : 'bg-gray-100'}`}>
       <div className="w-10 h-10 bg-yellow-500 rounded-full mr-3"></div>
       <div className="flex-grow flex flex-col">
         <div className="flex items-center justify-between">
