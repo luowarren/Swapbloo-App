@@ -34,9 +34,11 @@ const NavBar: React.FC = () => {
         {/* Right side: Action buttons */}
         <div className="flex items-center space-x-4">
           {/* List an item button */}
-          <button className="bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-md">
-            LIST AN ITEM
-          </button>
+          <Link href="/listing">
+            <div className="bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-md">
+                LIST AN ITEM
+            </div>
+            </Link>
 
           {/* Notification icon */}
           <button>
