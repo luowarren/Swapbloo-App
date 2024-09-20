@@ -1,5 +1,12 @@
+import Sidebar from "./sidebar";
+
 const Listings = () => {
-  return <div style={{ color: "red" }}>hi</div>;
+  return (
+    <div className="flex flex-row">
+      <Sidebar filter={null} />
+      <div>main area</div>
+    </div>
+  );
 };
 
 export default Listings;
