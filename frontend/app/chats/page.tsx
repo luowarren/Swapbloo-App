@@ -1,6 +1,6 @@
 "use client"; // This marks the component as a Client Component
 
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
 
 const data = [
@@ -34,22 +34,40 @@ const data = [
     date: "2024-09-15T18:00:00Z",
     viewed: false,
   },
+  {
+    username: "Diana",
+    message: "Can you send me the updated report when you have a moment?",
+    date: "2024-09-16T08:45:00Z",
+    viewed: true,
+  },
+  {
+    username: "Eve",
+    message: "Looking forward to our weekend trip!",
+    date: "2024-09-15T18:00:00Z",
+    viewed: false,
+  },
 ];
 
 const ChatPage: React.FC = () => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<{ text: string; sender: string }[]>([]);
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
-  const [selectedMessageIndex, setSelectedMessageIndex] = useState<
-    number | null
-  >(null);
+  const [selectedMessageIndex, setSelectedMessageIndex] = useState<number | null>(null);
+  const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
+
+  // Scroll to the bottom of the messageBox when messages change
+  useEffect(() => {
+    if (messageBoxRef.current) {
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
     if (meInput.trim()) {
-      setMessages((prevMessages) => [...prevMessages, meInput]);
+      setMessages((prevMessages) => [...prevMessages, { text: meInput, sender: 'me' }]);
       setMeInput(""); // Clear "Me" input after sending
     }
   };
@@ -58,7 +76,7 @@ const ChatPage: React.FC = () => {
   const handleReceive = (e: FormEvent) => {
     e.preventDefault();
     if (otherGuyInput.trim()) {
-      setMessages((prevMessages) => [...prevMessages, otherGuyInput]);
+      setMessages((prevMessages) => [...prevMessages, { text: otherGuyInput, sender: 'other' }]);
       setOtherGuyInput(""); // Clear "Other Guy" input after receiving
     }
   };
@@ -77,9 +95,9 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-[85vh]">
       {/* Sidebar for other chats */}
-      <div className="w-1/4 bg-gray-100 py-4 border-r">
+      <div className="w-1/4 bg-gray-100 py-4 border-r overflow-y-auto h-full">
         <h2 className="text-black font-bold text-3xl p-2 px-4">Chats</h2>
         {data.map((msg, index) => (
           <div key={index} onClick={() => toggleMessageSelection(index)}>
@@ -96,19 +114,23 @@ const ChatPage: React.FC = () => {
 
       {/* Main chat area */}
       <div className="flex-grow flex flex-col h-full p-4 bg-gray-100">
-        <div className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto">
+      <div
+          ref={messageBoxRef} // Attach the ref here
+          id="messageBox"
+          className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto"
+        >
           <div className="flex flex-col space-y-2">
             {messages.map((msg, index) => (
               <div
                 key={index}
                 className={`inline-block max-w-[50%] p-2 rounded-full py-2 pl-5 pr-5 break-words ${
-                  index % 2 === 0 ? "ml-auto text-white" : "mr-auto text-black"
+                  msg.sender === 'me' ? "ml-auto text-white" : "mr-auto text-black"
                 }`}
                 style={{
-                  backgroundColor: index % 2 === 0 ? "#3730A3" : "#C7D2FE",
+                  backgroundColor: msg.sender === 'me' ? "#3730A3" : "#C7D2FE",
                 }}
               >
-                {msg}
+                {msg.text}
               </div>
             ))}
           </div>
