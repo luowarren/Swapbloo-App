@@ -2,11 +2,11 @@
 
 import React from 'react';
 
-const ImageDisplay = ({ imageUrl }) => {
+const ImageDisplay = ({ imageUrl, className }) => {
   return (
     <div>
       {imageUrl ? (
-        <img src={imageUrl} alt="Downloaded from Supabase" style={{ maxWidth: '100%' }} />
+        <img src={imageUrl} alt="Downloaded from Supabase" style={{ maxWidth: '100%' }} className={className}/>
       ) : (
         <p>Loading image...</p>
       )}

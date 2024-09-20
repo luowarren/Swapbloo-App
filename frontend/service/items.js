@@ -7,6 +7,10 @@ dotenv.config(); // Load environment variables from .env file
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
+// const supabaseUrl = process.env.SUPABASE_URL;
+// const supabaseKey = process.env.SUPABASE_KEY;
+
+console.log('sigma rizz', supabaseUrl, supabaseKey)
 // Log the environment variables to check their values
 console.log('Supabase URL:', supabaseUrl);
 console.log('Supabase Key:', supabaseKey);
@@ -170,6 +174,11 @@ export async function editItemListing(itemId, title, caption) {
   return { data: Item, error };
 }
 
+/**
+ * Fetches the image IDs related to a specific item from the "ItemImages" table.
+ * @param {number} itemId - The ID of the item whose images are to be fetched.
+ * @returns {Object} - An object containing either the fetched image data or an error.
+ */
 export async function getItemImageIds(itemId) {
   // Fetch the image paths from the database
   let { data, error } = await supabase
@@ -180,6 +189,10 @@ export async function getItemImageIds(itemId) {
   return { data, error };
 }
 
+/**
+ * Lists all filenames from a specified Supabase storage bucket.
+ * @returns {Array<string>|null} - An array of filenames from the bucket, or null if an error occurred.
+ */
 export async function listFilenamesFromBucket() {
   const { data, error } = await supabase
     .storage
@@ -198,6 +211,12 @@ export async function listFilenamesFromBucket() {
   return filenames;
 }
 
+/**
+ * Fetches a specific image from the Supabase storage bucket by its ID.
+ * @param {string} imageId - The ID of the image to be fetched.
+ * @param {string} bucket - The name of the bucket where the image is stored.
+ * @returns {Blob|Error} - The image data as a Blob or an error if the operation fails.
+ */
 export async function getImageFromId(imageId, bucket) {
   console.log("image id and bucket:", bucket, imageId);
   const { data, error } = await supabase
@@ -213,6 +232,11 @@ export async function getImageFromId(imageId, bucket) {
   return data;
 }
 
+/**
+ * Fetches multiple item images based on the provided image IDs.
+ * @param {Array} imageIds - Array of image objects containing the image paths.
+ * @returns {Object} - An object containing either the fetched image data or an error.
+ */
 export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
@@ -245,8 +269,11 @@ export async function getItemImages(imageIds) {
   return { data: images, error: null };
 }
 
-
-
+/**
+ * Fetches signed URLs for multiple item images based on the provided image IDs.
+ * @param {Array} imageIds - Array of image objects containing the image paths.
+ * @returns {Object} - An object containing signed URLs for the images or an error.
+ */
 export async function getItemImageLinks(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
@@ -282,7 +309,11 @@ export async function getItemImageLinks(imageIds) {
   return { data, error: null };
 }
 
-
+/**
+ * Fetches detailed information about a specific item from the "Items" table.
+ * @param {number} itemId - The ID of the item to be fetched.
+ * @returns {Object} - An object containing either the item data or an error.
+ */
 export async function getItem(itemId) {
   let { data: Item, error } = await supabase
     .from("Items")
@@ -292,14 +323,17 @@ export async function getItem(itemId) {
   return { data: Item, error };
 }
 
+/**
+ * Fetches a user's profile image URL from the "Users" table based on the user ID.
+ * @param {string} userId - The ID of the user whose profile image is to be fetched.
+ * @returns {Blob|null} - The profile image as a Blob, or null if an error occurred.
+ */
 export async function getUserProfileImageUrl(userId) {
   let { data, error } = await supabase
     .from("Users")
     .select("image")
     .eq("id", userId)
     .single();
-    console.log('SIGJSKJDHKJHDLIJFHSLKJDFLISHJDFILJKDFHILJKSDHFLIKJH');
-    console.log(data.image);
 
     if (!error) {
       const image = await getImageFromId(data.image, "profilePictures");
@@ -317,6 +351,12 @@ export async function getUserProfileImageUrl(userId) {
     
 }
 
+
+/**
+ * Fetches item images by first getting their image IDs and then downloading the images from Supabase storage.
+ * @param {number} id - The ID of the item whose images are to be fetched.
+ * @returns {Object} - An object containing either the image data or an error.
+ */
 export async function getImages(id) {
   console.log('itemId is this:', id);
   const imageIds = await getItemImageIds(id);
@@ -336,9 +376,15 @@ export async function getImages(id) {
   return {data: itemImages.data, error: null};
 }
 
-
+/**
+ * Gets image links for an item
+ * @param {number} id - The ID of the item whose image URLs are to be fetched.
+ * @returns {Object} - An object containing either the signed URLs or an error.
+ */
 export async function getImageLinks(id) {
   console.log('getting image ids');
+
+  // gets the imges for the item
   const imageIds = await getItemImageIds(id);
   console.log(imageIds);
   if (imageIds.error) {
@@ -377,4 +423,6 @@ async function runTest1() {
 
 }
 // runTest()
+
+runTest()
 
