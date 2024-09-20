@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { getImages } from "../../service/items"; // Import the getImages function
 import ImageDisplay from "./ImageDisplay"; // Import the ImageDisplay component
 
-const ItemImages = ({ itemId }) => {
+const ItemImages = ({ itemId, className }) => {
   const [imageUrls, setImageUrls] = useState([]); // Use an array to store multiple image URLs
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const ItemImages = ({ itemId }) => {
       {imageUrls.length > 0 ? (
         imageUrls.map((url, index) => (
           <div key={index}>
-            <ImageDisplay imageUrl={url} />
+            <ImageDisplay imageUrl={url} className={className} />
           </div>
         ))
       ) : (
