@@ -49,13 +49,23 @@ const data: Payment[] = [
   },
 ];
 
-const descriptions = {
-  "Brand new": "Unused with original tags/packaging",
-  "Like new": "Unused without original tags",
-  "Used - Excellent": "Lightly used, no noticeable flaws",
-  "Used - Good": "Minor flaws and signs of wear ",
-  "Used - Fair": "Obvious flaws or signs of wear",
+const descriptions: {
+  "Brand new": string;
+  "Like new": string;
+  "Used - Excellent": string;
+  "Used - Good": string;
+  "Used - Fair": string;
+} = {
+  "Brand new": "Brand new condition",
+  "Like new": "Almost like new",
+  "Used - Excellent": "In excellent condition",
+  "Used - Good": "In good condition",
+  "Used - Fair": "Fair condition",
 };
+
+function isConditionKey(value: string): value is keyof typeof descriptions {
+  return value in descriptions;
+}
 
 export type Payment = {
   id: string;
@@ -78,14 +88,20 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "condition",
     header: "condition",
-    cell: ({ row }) => (
-      <div>
-        <div className="text-slate-600">{row.getValue("condition")}</div>
-        <div className="text-slate-400 text-xs">
-          {descriptions[row.getValue("condition")]}
+    cell: ({ row }) => {
+      const condition = row.getValue("condition") as string;
+
+      return (
+        <div>
+          <div className="text-slate-600">{condition}</div>
+          {isConditionKey(condition) && (
+            <div className="text-slate-400 text-xs">
+              {descriptions[condition]}
+            </div>
+          )}
         </div>
-      </div>
-    ),
+      );
+    },
   },
 ];
 

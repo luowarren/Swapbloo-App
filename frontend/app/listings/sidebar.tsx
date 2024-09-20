@@ -10,7 +10,7 @@ const Sidebar = ({ filter }: { filter: any }) => {
   const [sortColl, setSortColl] = useState(true);
 
   return (
-    <div className="h-[100vh] w-80 border-r border-r-slate-300 p-5 overflow-y-scroll">
+    <div className="h-[85vh] w-80 border-r border-r-slate-300 p-5 overflow-y-scroll">
       <div className="flex flex-col p-4 items-center w-full border-b border-b-slate-300">
         <span className="font-bold text-xl text-slate-700">Everything</span>
         <span className="text-slate-500 text-xs">(20 results)</span>

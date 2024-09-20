@@ -15,8 +15,8 @@ const NavBar: React.FC = () => {
       <div className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* Left side: Logo */}
         <div className="flex items-center">
-          <a href="/" className="text-indigo-900 font-bold text-xl">
-            swap<span className="text-blue-600">BLOO!</span>
+          <a href="/" className="text-indigo-700 font-medium text-xl">
+            swap<span className="font-black">BLOO!</span>
           </a>
         </div>
 
@@ -35,10 +35,10 @@ const NavBar: React.FC = () => {
         <div className="flex items-center space-x-4">
           {/* List an item button */}
           <Link href="/listing">
-            <div className="bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-md">
-                LIST AN ITEM
+            <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
+              LIST AN ITEM
             </div>
-            </Link>
+          </Link>
 
           {/* Notification icon */}
           <button>
@@ -99,35 +99,42 @@ const NavBar: React.FC = () => {
       {/* Bottom navigation bar */}
       <div className="bg-white border-t">
         <div className="container mx-auto py-2 px-6 flex justify-center space-x-8">
-        <Link href="/marketplace">
-            <p className={`font-semibold hover:text-pink-700 ${
-              isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
-            }`}>
-                Womanswear
-            </p>
-            </Link>
-            <Link href="/marketplace">
-            <p className={`font-semibold hover:text-pink-700 ${
-              isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
-            }`}>
-                Menswear
-            </p>
-            </Link>
           <Link href="/marketplace">
-            <p className={`font-semibold hover:text-pink-700 ${
-              isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
-            }`}>
-                Sigmawear
+            <p
+              className={`font-semibold hover:text-pink-700 ${
+                isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
+              }`}
+            >
+              Womanswear
             </p>
-            </Link>
-            <Link href="/marketplace">
-            <p className={`font-semibold hover:text-pink-700 ${
-              isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
-            }`}>
-                Explore
+          </Link>
+          <Link href="/marketplace">
+            <p
+              className={`font-semibold hover:text-pink-700 ${
+                isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
+              }`}
+            >
+              Menswear
             </p>
-            </Link>
-        
+          </Link>
+          <Link href="/marketplace">
+            <p
+              className={`font-semibold hover:text-pink-700 ${
+                isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
+              }`}
+            >
+              Sigmawear
+            </p>
+          </Link>
+          <Link href="/marketplace">
+            <p
+              className={`font-semibold hover:text-pink-700 ${
+                isActive("/swipemode") ? "text-pink-500" : "text-indigo-900"
+              }`}
+            >
+              Explore
+            </p>
+          </Link>
         </div>
       </div>
     </nav>

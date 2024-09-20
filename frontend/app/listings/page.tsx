@@ -1,12 +1,13 @@
+import Listings from "./listings";
 import Sidebar from "./sidebar";
 
-const Listings = () => {
+const ListingsPage = () => {
   return (
     <div className="flex flex-row">
       <Sidebar filter={null} />
-      <div>main area</div>
+      <Listings />
     </div>
   );
 };
 
-export default Listings;
+export default ListingsPage;

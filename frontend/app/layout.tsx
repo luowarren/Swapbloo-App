@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import NavBar from './nav/page';
+import NavBar from "./nav/page";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,9 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* Metadata and other head elements go here */}
-      </head>
+      <head>{/* Metadata and other head elements go here */}</head>
       <body className={inter.className}>
         {/* NavBar should be inside the body */}
         <NavBar />
