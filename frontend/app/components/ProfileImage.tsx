@@ -3,9 +3,10 @@ import { getUserProfileImageUrl } from "../../service/items"; // Import your exi
 
 interface ProfileImageProps {
   userId: string;
+  className?: string | null;  // Allow string or null
 }
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ userId }) => {
+const ProfileImage: React.FC<ProfileImageProps> = ({ userId, className = '' }) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -45,7 +46,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ userId }) => {
         <img
           src={profilePicUrl}
           alt="Profile"
-          className="w-12 h-12 rounded-full"
+          className={`w-12 h-12 rounded-full ${className}`}
         />
       ) : (
         <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">

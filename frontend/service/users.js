@@ -127,7 +127,7 @@ async function getUserDescription(uid) {
   return { data: Users, error };
 }
 
-async function getUserName(uid) {
+export async function getUserName(uid) {
   let { data: Users, error } = await supabase
     .from("Users")
     .select("name")
@@ -140,7 +140,7 @@ async function getUserName(uid) {
  * @param {*} uid
  * @returns image
  */
-async function getUserProfilePhoto(uid) {
+export async function getUserProfilePhoto(uid) {
   let { data: Users, error } = await supabase
     .from("Users")
     .select("image")

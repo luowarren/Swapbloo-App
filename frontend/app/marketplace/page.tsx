@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"; // Import the `useRouter` hook from
 import { getActiveListings, getImageFromId } from "../../service/items"; // Import your Supabase function
 import ItemImages from "../components/ItemImages";
 import ProfileImage from "../components/ProfileImage";
+import './page.css';
 
 interface Listing {
   id: number;
@@ -15,7 +16,7 @@ interface Listing {
   owner_id: string;
 }
 
-export default function Login() {
+export default function Home() {
   const [listings, setListings] = useState<Listing[]>([]);
 
   useEffect(() => {
@@ -24,9 +25,6 @@ export default function Login() {
       if (error) {
         console.error("Error fetching listings:", error);
       } else if (data) {
-        // For each listing, we fetch the image
-        console.log("wooo", data);
-
         const listingsWithImages = await Promise.all(
           data.map(async (listing: Listing) => {
             if (listing.image) {
@@ -36,12 +34,9 @@ export default function Login() {
               );
 
               if (imageBlobOrError instanceof Blob) {
-                // Create URL from the image blob if it's a valid Blob
                 const imageUrl = URL.createObjectURL(imageBlobOrError);
-                console.log("imaging", imageUrl);
-                return { ...listing, imageUrl }; // Add the imageUrl to the listing object
+                return { ...listing, imageUrl };
               } else {
-                // Handle the error case and return listing without imageUrl
                 console.error("Error fetching image:", imageBlobOrError);
                 return listing;
               }
@@ -49,32 +44,70 @@ export default function Login() {
             return listing;
           })
         );
-        setListings(listingsWithImages); // Update the state with listings and their image URLs
+        setListings(listingsWithImages);
       }
     }
 
     fetchListingsAndImages();
   }, []);
 
-    return (
-        <div className="min-h-screen bg-white">
-            {/* New listings by people you follow */}
-            <section className="my-8 mx-4">
-                <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">New listings</h2>
-                <div className="flex justify-center overflow-x-scroll">
-                    {listings.slice(0, 5).map(listing => (
-                        <Card 
-                            key={listing.id} 
-                            itemId={listing.id}// Use the imageUrl or a default image
-                            brand={listing.brand} 
-                            size={listing.size} 
-                            ownerId={listing.owner_id}
-                        />
-                    ))}
-                </div>
-            </section>
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Swipe Mode Banner */}
+      <section className="bg-blue-500 text-white text-center py-8">
+        <h1 className="text-3xl font-bold">Explore!</h1>
+        <p className="mt-2">swipe thru stuff to add to ur favourites!</p>
+      </section>
+
+      {/* New listings by people you follow */}
+      <section className="my-8 mx-4">
+        <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">New listings by people you follow</h2>
+        <div className="flex justify-center overflow-x-scroll custom-scrollbar">
+          {listings.slice(0, 5).map((listing) => (
+            <Card
+              key={listing.id}
+              itemId={listing.id}
+              brand={listing.brand}
+              size={listing.size}
+              ownerId={listing.owner_id}
+            />
+          ))}
         </div>
-    );
+      </section>
+
+      {/* New listings near you */}
+      <section className="my-8 mx-4">
+        <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">New listings near you</h2>
+        <div className="flex justify-center overflow-x-scroll custom-scrollbar">
+          {listings.slice(5, 10).map((listing) => (
+            <Card
+              key={listing.id}
+              itemId={listing.id}
+              brand={listing.brand}
+              size={listing.size}
+              ownerId={listing.owner_id}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Swap by type */}
+      <section className="my-8 mx-4">
+        <h2 className="text-xl font-bold text-indigo-900 mb-4 text-center">Swap by type</h2>
+        <div className="flex justify-center overflow-x-scroll custom-scrollbar">
+          {listings.slice(10, 15).map((listing) => (
+            <Card
+              key={listing.id}
+              itemId={listing.id}
+              brand={listing.brand}
+              size={listing.size}
+              ownerId={listing.owner_id}
+            />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }
 
 // Card Component
@@ -84,27 +117,42 @@ interface CardProps {
   size?: string;
   ownerId: string;
 }
-
 const Card: React.FC<CardProps> = ({ brand, itemId, size, ownerId }) => {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
   const handleCardClick = () => {
-    // Navigate to the item page with the itemId as a query param
     router.push(`/item?itemId=${itemId}`);
   };
 
   return (
+    <div>
     <div
-      className="flex flex-col justify-end p-2 relative"
+      className="relative flex flex-col w-40 h-56 mx-2 rounded-md border shadow-md bg-white overflow-hidden"
       onClick={handleCardClick}
       style={{ cursor: "pointer" }}
     >
-      <div className="relative">
-        <ItemImages itemId={itemId} />
-        <ProfileImage userId={ownerId} />
+      {/* Main image area */}
+      <div className="relative w-full h-3/4">  {/* Set height to 75% of the card */}
+        {/* Item image */}
+        <ItemImages
+          itemId={itemId}
+          className="w-full h-full object-cover"
+        />
+
+        {/* Profile image positioned in the very bottom-right */}
+        
       </div>
-      <p className="mt-2 text-sm font-semibold">{brand}</p>
-      <p className="text-xs text-gray-600">{size}</p>
+
+      <ProfileImage
+          userId={ownerId}
+          className="absolute bottom-1 right-1 w-8 h-8 rounded-full border-2 border-white"
+        />
     </div>
+    {/* Text below the image */}
+    <div className="mt-2 text-center">
+    <p className="text-sm font-semibold text-indigo-900">{brand}</p>
+    <p className="text-xs text-gray-600">{size}</p>
+  </div>
+  </div>
   );
 };
