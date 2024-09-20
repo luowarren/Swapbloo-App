@@ -64,8 +64,8 @@ const ChatPage: React.FC = () => {
     <div className="flex h-[85vh]">
       {/* Sidebar for other chats */}
       <div className="w-1/4 bg-gray-100 py-4 border-r overflow-y-auto h-full">
-        <h2 className="text-black font-bold text-3xl p-2 px-4 fixed w-full bg-gray-100">Chats</h2>
-        <h2 className="text-gray-100 font-bold text-3xl p-2 px-4 h-[5vh]"></h2>
+        <h2 className="text-black font-bold text-3xl p-2 m-0 px-4 fixed bg-gray-100">Chats</h2>
+        <h2 className="text-gray-100 font-bold text-3xl p-2 px-4 h-[7vh]"></h2>
         {data.map((msg, index) => (
           <div key={index} onClick={() => toggleMessageSelection(index)}>
             <MessagePreview
