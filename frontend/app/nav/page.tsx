@@ -15,8 +15,8 @@ const NavBar: React.FC = () => {
       <div className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* Left side: Logo */}
         <div className="flex items-center">
-          <a href="/" className="text-indigo-900 font-bold text-xl">
-            swap<span className="text-blue-600">BLOO!</span>
+          <a href="/" className="text-indigo-700 font-medium text-xl">
+            swap<span className="font-black">BLOO!</span>
           </a>
         </div>
 
@@ -35,7 +35,7 @@ const NavBar: React.FC = () => {
         <div className="flex items-center space-x-4">
           {/* List an item button */}
           <Link href="/listing">
-            <div className="bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-md">
+            <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
               LIST AN ITEM
             </div>
           </Link>

@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import pkg from "@supabase/supabase-js";
+import { Filter } from 'bad-words'
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
@@ -7,8 +8,8 @@ dotenv.config({ path: "../.env" });
 const { createClient, SupabaseClient } = pkg;
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
@@ -45,11 +46,24 @@ export async function getMostRecentMessage(chat_id) {
       return messages[messages.length-1];
 }
 
+/**
+ * Censor a message
+ *
+ * @param {string} message - message to censor
+ * @returns returns censored message
+ */
+export function censorMessage(message) {
+  const filter = new Filter();
+  return filter.clean(message);
+}
+
 (async () => {
     try {
       const chat_id = 1
-      const message = await getMostRecentMessage(chat_id);
-      console.log(message);
+      // const message = await getMostRecentMessage(chat_id);
+      // console.log(message);
+      // const message = "hello blah blah";
+      // console.log(censorMessage(message));
     } catch (error) {
       console.error("Error:", error);
     }
