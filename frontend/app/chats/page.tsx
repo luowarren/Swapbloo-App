@@ -2,7 +2,11 @@
 
 import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
+import MessageBubble from "../components/MessageBubble";
+import UserRating from "../components/UserRating";
 import { data } from "./data.js";
+import { sortData } from "./helpers";
+sortData(data);
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
@@ -11,9 +15,6 @@ const ChatPage: React.FC = () => {
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
-  const [selectedMessageIndex, setSelectedMessageIndex] = useState<
-    number | null
-  >(null);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
 
   // Scroll to the bottom of the messageBox when messages change
@@ -26,11 +27,18 @@ const ChatPage: React.FC = () => {
   // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
-    if (meInput.trim()) {
+    if (meInput.trim() && activeChat != null) {
+      data[activeChat]["lastMessage"] = meInput;
+      data[activeChat]["date"] = new Date().toISOString();
+
+      sortData(data);
+      setActiveChat(0);
+
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: meInput, sender: "me" },
+        { text: meInput, sender: "me", date: new Date().toISOString() },
       ]);
+      console.log(messages);
       setMeInput(""); // Clear "Me" input after sending
     }
   };
@@ -38,11 +46,22 @@ const ChatPage: React.FC = () => {
   // Handle receiving messages from "Other Guy"
   const handleReceive = (e: FormEvent) => {
     e.preventDefault();
-    if (otherGuyInput.trim()) {
+    if (otherGuyInput.trim() && activeChat != null) {
+      data[activeChat]["lastMessage"] = otherGuyInput;
+      data[activeChat]["date"] = new Date().toISOString();
+
+      sortData(data);
+      setActiveChat(0);
+
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: otherGuyInput, sender: "other" },
+        {
+          text: otherGuyInput,
+          sender: "other",
+          date: new Date().toISOString(),
+        },
       ]);
+      console.log(messages);
       setOtherGuyInput(""); // Clear "Other Guy" input after receiving
     }
   };
@@ -50,12 +69,11 @@ const ChatPage: React.FC = () => {
   // Switch active chat
   const switchChat = (chat: number) => {
     setActiveChat(chat);
-    setMessages([]); // Clear messages when switching chats
+    setMessages(data[chat]["messages"]); // Clear messages when switching chats
   };
 
-  // Toggle selection of a message preview
+  // Toggle selection of a lastMessage preview
   const toggleMessageSelection = (index: number) => {
-    setSelectedMessageIndex(selectedMessageIndex === index ? null : index);
     switchChat(index);
     data[index]["viewed"] = true;
   };
@@ -63,22 +81,23 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex h-[85vh]">
       {/* Sidebar for other chats */}
-      <div className="w-1/4 bg-gray-100 py-4 border-r overflow-y-auto h-full">
-        <h2 className="flex items-center text-black font-bold text-3xl p-2 m-0 px-4 fixed bg-gray-100">
-          Chats
-        </h2>
-        <h2 className="text-gray-100 font-bold text-3xl p-2 px-4 h-[7vh]"></h2>
-        {data.map((msg, index) => (
-          <div key={index} onClick={() => toggleMessageSelection(index)}>
-            <MessagePreview
-              username={msg.username}
-              message={msg.message}
-              date={msg.date}
-              viewed={msg.viewed}
-              isSelected={selectedMessageIndex === index} // Pass selection state
-            />
-          </div>
-        ))}
+      <div className="flex flex-col w-1/4 py-4 pt-0 border-r overflow-y-auto h-full bg-gray-100">
+        <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
+          <h2>Chats</h2>
+        </div>
+        <div className="flex flex-col h-[75vh] overflow-scroll">
+          {data.map((msg, index) => (
+            <div key={index} onClick={() => toggleMessageSelection(index)}>
+              <MessagePreview
+                name={msg.name}
+                lastMessage={msg.lastMessage}
+                date={msg.date}
+                viewed={msg.viewed}
+                isSelected={activeChat === index} // Pass selection state
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Main chat area */}
@@ -87,7 +106,7 @@ const ChatPage: React.FC = () => {
           {/* Banner for active chat */}
           <div className="w-full bg-white text-black p-4 rounded-t-lg text-2xl text-bold flex flex-row items-center ">
             <div className="w-12 h-12 bg-yellow-500 rounded-full mr-3"></div>
-            {data[activeChat].username}'s Swap Shop
+            {data[activeChat].name}'s Swap Shop
           </div>
           <div
             ref={messageBoxRef} // Attach the ref here
@@ -99,20 +118,11 @@ const ChatPage: React.FC = () => {
               {/* Add padding to prevent overlap */}
               <div className="flex flex-col space-y-2">
                 {messages.map((msg, index) => (
-                  <div
+                  <MessageBubble
                     key={index}
-                    className={`inline-block max-w-[50%] p-2 rounded-full py-2 pl-5 pr-5 break-words ${
-                      msg.sender === "me"
-                        ? "ml-auto text-white"
-                        : "mr-auto text-black"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        msg.sender === "me" ? "#3730A3" : "#C7D2FE",
-                    }}
-                  >
-                    {msg.text}
-                  </div>
+                    sender={msg.sender}
+                    text={msg.text}
+                  />
                 ))}
               </div>
             </div>
@@ -125,7 +135,7 @@ const ChatPage: React.FC = () => {
               value={meInput}
               onChange={(e) => setMeInput(e.target.value)}
               className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-              placeholder="Type your message..."
+              placeholder="Type your lastMessage..."
             />
             <button
               type="submit"
@@ -151,6 +161,21 @@ const ChatPage: React.FC = () => {
               Receive
             </button>
           </form>
+        </div>
+      )}
+      {activeChat !== null && (
+        <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-gray-100 pr-3">
+          
+          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4">
+            <div className="w-16 h-16 bg-yellow-500 rounded-full mb-3"></div>
+            <div>{data[activeChat].name}'s Swap Shop</div>
+            <div className="text-sm text-gray-500">{data[activeChat].username}</div>
+            <UserRating rating={Number(data[activeChat].rating)}/>
+          </div>
+
+          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4">
+        
+          </div>
         </div>
       )}
       {activeChat === null && (

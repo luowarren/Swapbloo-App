@@ -1,8 +1,9 @@
 import React from "react";
+import { displayTime } from "../chats/helpers";
 
 const MessagePreview = ({
-  username,
-  message,
+  name,
+  lastMessage,
   date,
   viewed,
   isSelected,
@@ -13,17 +14,25 @@ const MessagePreview = ({
   };
 
   return (
-    <div className={`flex items-center p-5 ${isSelected ? 'bg-gray-200' : 'bg-gray-100'}`}>
+    <div
+      className={`flex items-center p-5 ${
+        isSelected ? "bg-gray-200" : "bg-gray-100"
+      }`}
+    >
       <div className="w-10 h-10 bg-yellow-500 rounded-full mr-3"></div>
       <div className="flex-grow flex flex-col">
         <div className="flex items-center justify-between">
-          <div className="text-lg font-bold text-black">{username}</div>
+          <div className="text-lg font-bold text-black">{name}</div>
         </div>
-        <div className="text-gray-500 truncate overflow-hidden whitespace-nowrap">
-          {truncateMessage(message)}
+        <div className={`text-gray-700 overflow-hidden whitespace-nowrap
+          ${viewed ? "font-normal" : "font-bold"}`}>
+          {truncateMessage(lastMessage)}
         </div>
-        <div className="text-xs text-gray-500">
-          {new Date(date).toLocaleString()}
+        <div
+          className={`text-xs text-gray-500
+          ${viewed ? "font-normal" : "font-bold"}`}
+        >
+          {displayTime(new Date(date))}
         </div>
       </div>
       <div
@@ -36,3 +45,5 @@ const MessagePreview = ({
 };
 
 export default MessagePreview;
+
+
