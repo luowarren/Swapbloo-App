@@ -1,8 +1,7 @@
 import React from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
-import { faStar as farStar } from '@fortawesome/free-regular-svg-icons'; // Regular star
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faStarHalfAlt } from "@fortawesome/free-solid-svg-icons";
+import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // Regular star
 
 const UserRating = ({ rating }) => {
   // Clamp the rating value to be between 0 and 5
@@ -26,7 +25,8 @@ const UserRating = ({ rating }) => {
         <FontAwesomeIcon
           key={i} // Assign a unique key
           icon={starIcon}
-          className="text-yellow-500 text-sm"
+          className="text-sm"
+          color="#eab308"
         />
       );
     }

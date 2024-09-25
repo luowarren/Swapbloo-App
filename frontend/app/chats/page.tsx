@@ -114,7 +114,6 @@ const ChatPage: React.FC = () => {
             className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative"
           >
             <div className="pt-12">
-              {" "}
               {/* Add padding to prevent overlap */}
               <div className="flex flex-col space-y-2">
                 {messages.map((msg, index) => (
@@ -165,17 +164,16 @@ const ChatPage: React.FC = () => {
       )}
       {activeChat !== null && (
         <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-gray-100 pr-3">
-          
           <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4">
             <div className="w-16 h-16 bg-yellow-500 rounded-full mb-3"></div>
             <div>{data[activeChat].name}'s Swap Shop</div>
-            <div className="text-sm text-gray-500">{data[activeChat].username}</div>
-            <UserRating rating={Number(data[activeChat].rating)}/>
+            <div className="text-sm text-gray-500">
+              {data[activeChat].username}
+            </div>
+            <UserRating rating={Number(data[activeChat].rating)} />
           </div>
 
-          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4">
-        
-          </div>
+          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4"></div>
         </div>
       )}
       {activeChat === null && (
