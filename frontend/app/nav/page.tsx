@@ -11,7 +11,7 @@ const NavBar: React.FC = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav className="bg-white border-b shadow-sm">
+    <nav className="bg-white border-b shadow-sm h-[15vh]">
       <div className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* Left side: Logo */}
         <div className="flex items-center">
