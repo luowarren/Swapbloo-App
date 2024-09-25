@@ -3,36 +3,13 @@ import Image from "next/image";
 import React from "react";
 import ImageDisplay from './components/ImageDisplay';
 import ItemImages from './components/ItemImages';
+import Link from 'next/link';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">
       <div className="w-full max-w-4xl mx-auto px-4">
-        <header className="flex justify-between items-center mt-6 pl-8">
-          <h1 className="text-3xl font-bold text-indigo-700">swapBLOO!</h1>
-          <nav>
-            <ul className="flex space-x-4 pr-8">
-              <li>
-                <a href="#how-it-works" className="text-m text-indigo-800 hover:text-[#000000]">
-                  How it works
-                </a>
-              </li>
-              <li>
-                <a href="#login" className="text-m text-indigo-800 hover:text-[#000000]">
-                  Log in
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#signup"
-                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
-                >
-                  SIGN UP
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </header>
+        
 
         <div className="mt-6 bg-[#F9F3EE] rounded-2xl p-8">
           <main className="flex flex-col lg:flex-row items-center lg:items-start">
@@ -40,18 +17,19 @@ export default function Home() {
               <img src="logo_placeholder.png" className="w-full" />
               <p className=" my-3 text-indigo-900">Snap old. Swap new. SwapBloo!</p>
               <div className="flex w-full gap-x-2 space-x-4">
-                <a
-                  href="#signup"
-                  className="bg-indigo-600 w-2/5 text-white hover:bg-indigo-500 py-2 px-6 rounded-full"
-                >
-                  Sign up
-                </a>
-                <a
-                  href="#signin"
-                  className="bg-yellow-300 w-2/5 text-yellow-950 hover:bg-yellow-200 py-2 px-6 rounded-full"
-                >
-                  Sign in
-                </a>
+              
+                <Link href="/login">
+                  <p className="text-m text-indigo-800 hover:text-[#000000]">
+                    Log in
+                  </p>
+                </Link>
+             
+                <Link href="/signup">
+                  <p className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full">
+                    SIGN UP
+                  </p>
+                </Link>
+             
               </div>
               <div className="flex justify-start mt-6 space-x-6 text-[#4F4F4F]">
                 <div className="flex items-center space-x-2">
