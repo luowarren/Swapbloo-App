@@ -20,6 +20,7 @@ async function loginUser(email, password) {
     email: email,
     password: password,
   });
+  return {data , error};
 }
 
 export async function getUserId() {
