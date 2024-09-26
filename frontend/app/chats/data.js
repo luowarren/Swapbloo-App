@@ -4,21 +4,30 @@ export const data = [
     username: "@emmamemma69",
     rating: "1.5",
     messages: [
-        {
-            "text": "speak again",
-            "sender": "me",
-            "date": "2024-09-25T03:25:17.478Z"
-        },
-        {
-            "text": "what did u say",
-            "sender": "me",
-            "date": "2024-09-25T03:25:22.004Z"
-        },
-        {
-            "text": "nothing...",
-            "sender": "other",
-            "date": "2024-09-25T03:25:25.926Z"
-        }
+      {
+        type: "text",
+        text: "speak again",
+        sender: "me",
+        date: "2024-09-25T03:25:17.478Z",
+      },
+      {
+        type: "notification",
+        text: "Updated a swap",
+        sender: "other",
+        date: "2024-09-25T03:25:25.926Z",
+      },
+      {
+        type: "text",
+        text: "what did u say",
+        sender: "me",
+        date: "2024-09-25T03:25:22.004Z",
+      },
+      {
+        type: "text",
+        text: "nothing...",
+        sender: "other",
+        date: "2024-09-25T03:25:25.926Z",
+      },
     ],
     lastMessage: "Hey there! How's it going? Just checking in.",
     date: "2023-09-19T12:30:00Z",
@@ -29,7 +38,7 @@ export const data = [
     username: "@siarrakachow",
     rating: "4.5",
     messages: [],
-    lastMessage: "Don't forget about our meeting tomorrow at 10 AM.",
+    lastMessage: "",
     date: "2024-09-18T09:15:00Z",
     viewed: true,
   },
