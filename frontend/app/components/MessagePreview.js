@@ -14,11 +14,13 @@ const MessagePreview = ({
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
   };
 
+  if (lastMessage == "") {
+    lastMessage = "Start Chatting!";
+  }
+
   return (
     <div
-      className={`flex items-center p-5 ${
-        isSelected ? "bg-gray-200" : "bg-gray-100"
-      }`}
+      className={`flex items-center p-5 ${isSelected ? "bg-gray-100" : null}`}
     >
       <div className="w-12 h-12 bg-yellow-500 rounded-full mr-3" />
       <div className="flex-grow flex flex-col">

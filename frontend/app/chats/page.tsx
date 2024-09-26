@@ -4,14 +4,19 @@ import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
 import MessageBubble from "../components/MessageBubble";
 import UserRating from "../components/UserRating";
+import Map from "../components/Map";
+import ItemPreview from "../components/ItemPreview";
+import LocationSelector from "../components/Location";
+import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
-import { sortData } from "./helpers";
+import { sortData, placeholder } from "./helpers";
+import { ArrowRightLeft } from "lucide-react";
 sortData(data);
 
 const ChatPage: React.FC = () => {
-  const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<
+    { type: string; text: string; sender: string }[]
+  >([]);
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -23,6 +28,27 @@ const ChatPage: React.FC = () => {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const setNotification = (notif: string) => {
+    if (activeChat != null) {
+      data[activeChat]["lastMessage"] = notif;
+      data[activeChat]["date"] = new Date().toISOString();
+
+      sortData(data);
+      setActiveChat(0);
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          type: "notification",
+          text: notif,
+          sender: "me",
+          date: new Date().toISOString(),
+        },
+      ]);
+      console.log(messages);
+    }
+  };
 
   // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
@@ -36,7 +62,12 @@ const ChatPage: React.FC = () => {
 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: meInput, sender: "me", date: new Date().toISOString() },
+        {
+          type: "text",
+          text: meInput,
+          sender: "me",
+          date: new Date().toISOString(),
+        },
       ]);
       console.log(messages);
       setMeInput(""); // Clear "Me" input after sending
@@ -56,6 +87,7 @@ const ChatPage: React.FC = () => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
+          type: "text",
           text: otherGuyInput,
           sender: "other",
           date: new Date().toISOString(),
@@ -81,7 +113,7 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex h-[85vh]">
       {/* Sidebar for other chats */}
-      <div className="flex flex-col w-1/4 py-4 pt-0 border-r overflow-y-auto h-full bg-gray-100">
+      <div className="flex flex-col w-1/4 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
         <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
           <h2>Chats</h2>
         </div>
@@ -102,27 +134,127 @@ const ChatPage: React.FC = () => {
 
       {/* Main chat area */}
       {activeChat !== null && (
-        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100">
+        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%]">
           {/* Banner for active chat */}
-          <div className="w-full bg-white text-black p-4 rounded-t-lg text-2xl text-bold flex flex-row items-center ">
-            <div className="w-12 h-12 bg-yellow-500 rounded-full mr-3"></div>
-            {data[activeChat].name}'s Swap Shop
-          </div>
+
           <div
             ref={messageBoxRef} // Attach the ref here
             id="messageBox"
-            className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative"
+            className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative border"
           >
-            <div className="pt-12">
+            <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl text-bold flex flex-col items-center border mb-4">
+              <div className="font-bold text-2xl mb-4">Swap Details</div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: "1em",
+                  width: "100%",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                    maxWidth: "80%",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <ItemPreview text="dress xs" />
+                  <ItemPreview />
+                  <ArrowRightLeft />
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                    maxWidth: "80%",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <ItemPreview text="bucket hat" />
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  width: "50%",
+                }}
+              >
+                <GenericButton
+                  text="Update Offer"
+                  click={() => {
+                    setNotification(
+                      `You updated the offer with ${data[activeChat].name}`
+                    );
+                  }}
+                />
+                <GenericButton
+                  text="Accept Offer"
+                  click={() => {
+                    setNotification(
+                      `You accepted the offer with ${data[activeChat].name}!`
+                    );
+                    const newDiv = document.createElement("div");
+                    newDiv.textContent = `You accepted this offer, Leave a review`;
+                    newDiv.style.border = "1px solid black";
+                    newDiv.style.margin = "5px";
+                    newDiv.style.padding = "10px";
+                    if (messageBoxRef.current) {
+                      messageBoxRef.current.appendChild(newDiv);
+                    }
+                    // messageBoxRef.current.appendChild(newDiv);
+                  }}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                color: "gray",
+                marginBottom: "7px",
+              }}
+            >
+              This is the start of your chat with {data[activeChat]["name"]}
+            </div>
+            <div>
               {/* Add padding to prevent overlap */}
               <div className="flex flex-col space-y-2">
-                {messages.map((msg, index) => (
-                  <MessageBubble
-                    key={index}
-                    sender={msg.sender}
-                    text={msg.text}
-                  />
-                ))}
+                {messages.map((msg, index) =>
+                  msg.type == "text" ? (
+                    <MessageBubble
+                      key={index}
+                      sender={msg.sender}
+                      text={msg.text}
+                    />
+                  ) : (
+                    <div
+                      key={index}
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        color: "gray",
+                      }}
+                    >
+                      {msg.text}
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -132,7 +264,9 @@ const ChatPage: React.FC = () => {
             <input
               type="text"
               value={meInput}
-              onChange={(e) => setMeInput(e.target.value)}
+              onChange={(e) => {
+                setMeInput(e.target.value);
+              }}
               className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
               placeholder="Type your lastMessage..."
             />
@@ -149,7 +283,9 @@ const ChatPage: React.FC = () => {
             <input
               type="text"
               value={otherGuyInput}
-              onChange={(e) => setOtherGuyInput(e.target.value)}
+              onChange={(e) => {
+                setOtherGuyInput(e.target.value);
+              }}
               className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
               placeholder="Type a response from Other Guy..."
             />
@@ -162,18 +298,25 @@ const ChatPage: React.FC = () => {
           </form>
         </div>
       )}
+      {/* Other users info and meetup info */}
       {activeChat !== null && (
         <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-gray-100 pr-3">
-          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4">
+          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl flex flex-col items-center mt-4 border">
             <div className="w-16 h-16 bg-yellow-500 rounded-full mb-3"></div>
-            <div>{data[activeChat].name}'s Swap Shop</div>
+            <div className="font-bold overflow-auto text-center">
+              {data[activeChat].name}'s Swap Shop
+            </div>
             <div className="text-sm text-gray-500">
               {data[activeChat].username}
             </div>
-            <UserRating rating={Number(data[activeChat].rating)} />
+            <UserRating rating={Number(data[activeChat].rating)} num={8} />
+            <GenericButton text="Visit Shop" inverse={true} />
           </div>
-
-          <div className="w-full bg-white text-black p-4 rounded-lg text-2xl text-bold flex flex-col items-center mt-4"></div>
+          <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+            <div className="font-bold text-2xl">Meetup Info</div>
+            {/* <Map/> */}
+            <LocationSelector />
+          </div>
         </div>
       )}
       {activeChat === null && (
