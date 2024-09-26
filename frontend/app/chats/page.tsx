@@ -205,14 +205,14 @@ const ChatPage: React.FC = () => {
                     setNotification(
                       `You accepted the offer with ${data[activeChat].name}!`
                     );
-                    const newDiv = document.createElement("div");
-                    newDiv.textContent = `You accepted this offer, Leave a review`;
-                    newDiv.style.border = "1px solid black";
-                    newDiv.style.margin = "5px";
-                    newDiv.style.padding = "10px";
-                    if (messageBoxRef.current) {
-                      messageBoxRef.current.appendChild(newDiv);
-                    }
+                    // const newDiv = document.createElement("div");
+                    // newDiv.textContent = `You accepted this offer, Leave a review`;
+                    // newDiv.style.border = "1px solid black";
+                    // newDiv.style.margin = "5px";
+                    // newDiv.style.padding = "10px";
+                    // if (messageBoxRef.current) {
+                    //   messageBoxRef.current.appendChild(newDiv);
+                    // }
                     // messageBoxRef.current.appendChild(newDiv);
                   }}
                 />
