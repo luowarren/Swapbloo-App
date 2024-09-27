@@ -73,7 +73,7 @@ const UserRating = ({ rating = 0, num = -1, size = "text-sm" }) => {
         />
       ) : null}
       {num === -1 && currentRating === 0 ? (
-        <GenericButton text="Leave a review" inverse={true} />
+        <GenericButton text="Leave a review" inverse={true} noClick={true} />
       ) : null}
     </div>
   );

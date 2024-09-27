@@ -80,7 +80,7 @@ const LocationSelector = ({ click }) => {
           boxSizing:
             "border-box" /* Ensures padding and border are included in total width/height */,
           padding: "0.5em",
-          height: "auto"
+          height: "auto",
         }}
       >
         <GenericButton text="Update Meetup" inverse={true} />

@@ -21,7 +21,7 @@ const inverseCSS = {
   fontWeight: "bold", // font-bold
 };
 
-const notInverseNoClick = {
+const inverseNoClick = {
   color: "#C7D2FE", 
   fontSize: "0.875rem", // text-sm
   border: "2px solid #C7D2FE", 
@@ -30,7 +30,7 @@ const notInverseNoClick = {
   fontWeight: "bold", // font-bold
 };
 
-const inverseNoClick = {
+const notInverseNoClick = {
   color: "#FFFFFF", // text-white
   backgroundColor: "#C7D2FE", 
   fontSize: "0.875rem", // text-sm
