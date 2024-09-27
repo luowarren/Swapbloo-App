@@ -4,14 +4,21 @@ import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
 import MessageBubble from "../components/MessageBubble";
 import UserRating from "../components/UserRating";
+
+import { useRouter } from 'next/navigation'; // Next.js router for redirection
 import { data } from "./data.js";
 import { sortData } from "./helpers";
+import { supabase } from "@/service/supabaseClient";
+
 sortData(data);
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<{ text: string; sender: string }[]>(
     []
   );
+  const [user, setUser] = useState<any>(null); // State for user
+  const [loading, setLoading] = useState(true); // For handling the loading state
+  const router = useRouter();
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -23,6 +30,19 @@ const ChatPage: React.FC = () => {
       messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        setUser(data.user);
+      } else {
+        router.push('/login'); // Redirect to /login if no user is found
+      }
+      setLoading(false);
+    };
+    checkUser();
+  }, [router]);
 
   // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
