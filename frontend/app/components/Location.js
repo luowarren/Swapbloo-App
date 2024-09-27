@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import locations from "../chats/locations";
 import GenericButton from "./GenericButton";
 
-const LocationSelector = () => {
+const LocationSelector = ({ click }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -25,54 +25,50 @@ const LocationSelector = () => {
     if ((selectedLocation && selectedDate && selectedTime) == "") {
       alert("Something is empty...");
     } else {
-      alert(
-        `New meetup set!
-        Location: ${selectedLocation}, Date: ${selectedDate}, Time: ${selectedTime}`
-      );
+      click();
     }
   };
 
   return (
-    
     <form onSubmit={handleSubmit}>
-      <div style={{margin: "0.5em", marginTop: "1em"}}>
-      <div>
-      <label htmlFor="date">Location: </label>
-        <select
-          id="location"
-          value={selectedLocation}
-          onChange={handleLocationChange}
-        >
-          <option value="" style={{}}>
-            None
-          </option>
-          {locations.map((location) => (
-            <option key={location.id} value={location.name}>
-              {location.name}
+      <div style={{ margin: "0.5em", marginTop: "1em" }}>
+        <div>
+          <label htmlFor="date">Location: </label>
+          <select
+            id="location"
+            value={selectedLocation}
+            onChange={handleLocationChange}
+          >
+            <option value="" style={{}}>
+              None
             </option>
-          ))}
-        </select>
-      </div>
+            {locations.map((location) => (
+              <option key={location.id} value={location.name}>
+                {location.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <label htmlFor="date">Date: </label>
-        <input
-          type="date"
-          id="date"
-          value={selectedDate}
-          onChange={handleDateChange}
-        />
-      </div>
+        <div>
+          <label htmlFor="date">Date: </label>
+          <input
+            type="date"
+            id="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+        </div>
 
-      <div>
-        <label htmlFor="time">Time: </label>
-        <input
-          type="time"
-          id="time"
-          value={selectedTime}
-          onChange={handleTimeChange}
-        />
-      </div>
+        <div>
+          <label htmlFor="time">Time: </label>
+          <input
+            type="time"
+            id="time"
+            value={selectedTime}
+            onChange={handleTimeChange}
+          />
+        </div>
       </div>
 
       <div
@@ -86,7 +82,7 @@ const LocationSelector = () => {
           padding: "0.5em",
         }}
       >
-        <GenericButton text="Update Meetup" inverse={true}/>
+        <GenericButton text="Update Meetup" inverse={true} />
       </div>
     </form>
   );

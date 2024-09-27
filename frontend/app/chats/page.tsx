@@ -20,6 +20,7 @@ const ChatPage: React.FC = () => {
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
+  const [accepted, setAccepted] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
 
   // Scroll to the bottom of the messageBox when messages change
@@ -29,7 +30,7 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
-  const setNotification = (notif: string) => {
+  const setNotification = (notif: string, type: string = "notification") => {
     if (activeChat != null) {
       data[activeChat]["lastMessage"] = notif;
       data[activeChat]["date"] = new Date().toISOString();
@@ -40,13 +41,13 @@ const ChatPage: React.FC = () => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          type: "notification",
+          type: type,
           text: notif,
           sender: "me",
           date: new Date().toISOString(),
         },
       ]);
-      console.log(messages);
+      //   console.log(messages);
     }
   };
 
@@ -102,6 +103,7 @@ const ChatPage: React.FC = () => {
   const switchChat = (chat: number) => {
     setActiveChat(chat);
     setMessages(data[chat]["messages"]); // Clear messages when switching chats
+    setAccepted(false);
   };
 
   // Toggle selection of a lastMessage preview
@@ -191,31 +193,33 @@ const ChatPage: React.FC = () => {
                   width: "50%",
                 }}
               >
-                <GenericButton
-                  text="Update Offer"
-                  click={() => {
-                    setNotification(
-                      `You updated the offer with ${data[activeChat].name}`
-                    );
-                  }}
-                />
-                <GenericButton
-                  text="Accept Offer"
-                  click={() => {
-                    setNotification(
-                      `You accepted the offer with ${data[activeChat].name}!`
-                    );
-                    // const newDiv = document.createElement("div");
-                    // newDiv.textContent = `You accepted this offer, Leave a review`;
-                    // newDiv.style.border = "1px solid black";
-                    // newDiv.style.margin = "5px";
-                    // newDiv.style.padding = "10px";
-                    // if (messageBoxRef.current) {
-                    //   messageBoxRef.current.appendChild(newDiv);
-                    // }
-                    // messageBoxRef.current.appendChild(newDiv);
-                  }}
-                />
+                {" "}
+                {accepted ? (
+                  <GenericButton text="Update Offer" inverse={true} />
+                ) : (
+                  <GenericButton
+                    text="Update Offer"
+                    click={() => {
+                      setNotification(
+                        `You updated the offer with ${data[activeChat].name}`
+                      );
+                    }}
+                  />
+                )}
+                {accepted ? (
+                  <GenericButton text="Accept Offer" inverse={true} />
+                ) : (
+                  <GenericButton
+                    text="Accept Offer"
+                    click={() => {
+                      setAccepted(true);
+                      setNotification(
+                        `You accepted the offer with ${data[activeChat].name}!`,
+                        "accept"
+                      );
+                    }}
+                  />
+                )}
               </div>
             </div>
             <div
@@ -233,28 +237,129 @@ const ChatPage: React.FC = () => {
             <div>
               {/* Add padding to prevent overlap */}
               <div className="flex flex-col space-y-2">
-                {messages.map((msg, index) =>
-                  msg.type == "text" ? (
-                    <MessageBubble
-                      key={index}
-                      sender={msg.sender}
-                      text={msg.text}
-                    />
-                  ) : (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: "100%",
-                        color: "gray",
-                      }}
-                    >
-                      {msg.text}
-                    </div>
-                  )
-                )}
+                {messages.map((msg, index) => {
+                  switch (msg.type) {
+                    case "text":
+                      return (
+                        <MessageBubble
+                          key={index}
+                          sender={msg.sender}
+                          text={msg.text}
+                        />
+                      );
+                    case "accept":
+                      console.log(accepted);
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div
+                            key={index}
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              width: "100%",
+                              color: "gray",
+                            }}
+                          >
+                            {msg.text}
+                          </div>
+                          <div
+                            style={{
+                              border: "2px solid black",
+                              borderRadius: "15px",
+                              paddingTop: "20px",
+                              paddingBottom: "10px",
+                              margin: "20px",
+                              marginBottom: "10px",
+                              width: "60%",
+                              textAlign: "center",
+                              color: "#3730A3",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Swap Success!
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-around",
+                                alignItems: "center",
+                                width: "100%",
+                                color: "black",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-around",
+                                  alignItems: "center",
+                                  width: "100%",
+                                  padding: "20px",
+                                }}
+                              >
+                                <div>You and Sohee saved:</div>
+                                <div className="text-yellow-500 text-3xl font-bold">
+                                  220kg
+                                </div>
+                                <div>of CO2 easte</div>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-around",
+                                  alignItems: "center",
+                                  width: "100%",
+                                  padding: "20px",
+                                }}
+                              >
+                                <div>You've made:</div>
+                                <div className="text-yellow-500 text-3xl font-bold">
+                                  21
+                                </div>
+                                <div>successful swaps</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              border: "2px solid black",
+                              borderRadius: "15px",
+                              padding: "5px",
+                              width: "60%",
+                              textAlign: "center",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            <UserRating size="text-2xl"></UserRating>
+                          </div>
+                        </div>
+                      );
+                    default:
+                      console.log(accepted);
+                      return (
+                        <div
+                          key={index}
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "100%",
+                            color: "gray",
+                          }}
+                        >
+                          {msg.text}
+                        </div>
+                      );
+                  }
+                })}
               </div>
             </div>
           </div>
@@ -314,8 +419,13 @@ const ChatPage: React.FC = () => {
           </div>
           <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
             <div className="font-bold text-2xl">Meetup Info</div>
-            {/* <Map/> */}
-            <LocationSelector />
+            <LocationSelector
+              click={() => {
+                setNotification(
+                  `You updated the meetup details with ${data[activeChat].name}`
+                );
+              }}
+            />
           </div>
         </div>
       )}

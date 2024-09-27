@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faStarHalfAlt } from "@fortawesome/free-solid-svg-icons";
 import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // Regular star
+import GenericButton from "./GenericButton";
 
-const UserRating = ({ rating, num }) => {
-  // Clamp the rating value to be between 0 and 5
-  const clampedRating = Math.min(Math.max(rating, 0), 5);
+const UserRating = ({ rating = 0, num = -1, size = "text-sm" }) => {
+  const [currentRating, setCurrentRating] = useState(rating);
+  const clampedRating = Math.min(Math.max(currentRating, 0), 5);
+
+  // Update currentRating when rating prop changes
+  useEffect(() => {
+    setCurrentRating(rating);
+  }, [rating]);
+
+  const handleStarClick = (index) => {
+    if (num === -1) {
+      // Update to the clicked star's whole number rating (1-5)
+      setCurrentRating(index);
+    }
+  };
+
+  const submitReview = (rating) => {
+    alert(`Thank you for you ${rating} star review!`);
+  };
 
   const renderStars = () => {
     const stars = [];
@@ -22,12 +39,14 @@ const UserRating = ({ rating, num }) => {
       }
 
       stars.push(
-        <FontAwesomeIcon
-          key={i} // Assign a unique key
-          icon={starIcon}
-          className="text-sm"
-          color="#eab308"
-        />
+        <div key={i} style={{ cursor: num === -1 ? "pointer" : "default" }}>
+          <FontAwesomeIcon
+            onClick={() => handleStarClick(i)}
+            icon={starIcon}
+            className={size}
+            color="#eab308"
+          />
+        </div>
       );
     }
 
@@ -36,10 +55,26 @@ const UserRating = ({ rating, num }) => {
 
   return (
     <div style={{ textAlign: "center" }} className="my-3 text-sm">
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: num === -1 ? "20px" : null,
+        }}
+      >
         {renderStars()}
-        <div className="ml-3 text-gray-500">({num})</div> 
+        {num === -1 ? null : <div className="ml-3 text-gray-500">({num})</div>}
       </div>
+      {num === -1 && currentRating !== 0 ? (
+        <GenericButton
+          text="Leave a review"
+          click={() => submitReview(currentRating)}
+        />
+      ) : null}
+      {num === -1 && currentRating === 0 ? (
+        <GenericButton text="Leave a review" inverse={true} />
+      ) : null}
     </div>
   );
 };
