@@ -5,7 +5,8 @@ import { getUserId } from '@/service/auth';
 import { getUser } from '../../service/users';
 import { getListingsByUsers } from '@/service/items';
 import ProfileImage from '../components/ProfileImage';
-
+import ItemImages from '../components/ItemImages';
+import { useRouter } from 'next/navigation';
 // Define types for UserData and ItemData
 interface UserData {
   id: string;
@@ -29,7 +30,7 @@ const Login: React.FC = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [items, setItems] = useState<ItemData[]>([]);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     const loadUserData = async () => {
       // Fetch user data
@@ -103,6 +104,7 @@ const Login: React.FC = () => {
               name={item.title}
               size={item.size}
               brand={item.brand || 'Unknown'}
+              id={item.id}
             />
           ))
         ) : (
@@ -112,24 +114,40 @@ const Login: React.FC = () => {
     </div>
   );
 };
-
 interface ListingCardProps {
+  id: number; // Add `id` to the props definition
   name: string;
   size: string;
-  brand: string;
+  brand: string | null;
 }
 
-const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand }) => {
+const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
+    const router = useRouter(); // Move useRouter to the top of the component
+
+  const handleCardClick = (id: number) => {
+    router.push(`/item?itemId=${id}`); // Use router here
+  };
   return (
-    <div className="flex flex-col justify-end p-2 relative">
-      <div className="relative">
-        <img src="purple.jpg" className="w-48 h-48 rounded-lg" />
-        <img src="heart.png" className="absolute bottom-2 right-2 w-5" />
+    <div>
+      <div
+        className="relative flex flex-col w-40 h-56 mx-2 rounded-md border shadow-md bg-white overflow-hidden"
+        onClick={() => handleCardClick(id)} // Wrap the function call in an arrow function
+        style={{ cursor: "pointer" }}
+      >
+        {/* Main image area */}
+        <div className="relative w-full h-3/4"> {/* Set height to 75% of the card */}
+          {/* Item image */}
+          <ItemImages
+            itemId={id}
+            className="w-full h-full object-cover"
+          />
+        </div>
       </div>
-      <p className="mt-2 text-sm font-semibold">{name}</p>
-      <p className="text-xs text-gray-600">
-        {size} · {brand}
-      </p>
+      {/* Text below the image */}
+      <div className="mt-2 text-center">
+        <p className="text-sm font-semibold text-indigo-900">{brand}</p>
+        <p className="text-xs text-gray-600">{size}</p>
+      </div>
     </div>
   );
 };
