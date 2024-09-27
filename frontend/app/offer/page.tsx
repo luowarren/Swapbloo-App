@@ -1,4 +1,3 @@
-// pages/make-offer.tsx
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -9,8 +8,6 @@ import { ItemData } from '../item/page';
 import { getUserId } from '../../service/auth';
 import { useRouter } from 'next/navigation';
 
-
-
 const MakeOffer = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -20,26 +17,39 @@ const MakeOffer = () => {
 
   const [userItems, setUserItems] = useState<Array<ItemData>>([]); // To store the user's own listed items
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
   const [isPopupVisible, setIsPopupVisible] = useState(false); // For popup visibility
-  const requestingUserId = async ()  => {
-    return await getUserId(); // getUserId()
-  }
-
+  
+  // First useEffect: Fetch the user ID
   useEffect(() => {
-    // Fetch the user's items they can offer
+    async function fetchUser() {
+      const id = await getUserId(); // Fetch the user's ID
+      
+      if (id != null) {
+        setUserId(id); // Set userId state once it is fetched
+      }
+    }
+
+    fetchUser();
+  }, []);
+
+  // Second useEffect: Fetch user's listed items once userId is available
+  useEffect(() => {
+    if (!userId) return; // Only fetch items when userId is available
+
     async function fetchUserItems() {
-      const { data, error } = await getListingsByUsers([requestingUserId]); // Fetch the user's listed items
+      const { data, error } = await getListingsByUsers([userId]); // Fetch the user's listed items
       
       if (error || data == null) {
         console.error("Error fetching user items:", error);
       } else {
-        setUserItems(data);
+        setUserItems(data); // Set userItems state
       }
     }
 
     fetchUserItems();
-  }, []);
+  }, [userId]); // Include userId as a dependency
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,13 +60,19 @@ const MakeOffer = () => {
     }
 
     try {
-      // Here you would submit the offer to the backend
-      // Send offer details including `itemId`, `selectedItemId`, and `message`
-      console.log('Submitting offer');
+      // Use the userId as requestingUserId
+      const requestingUserId = userId;
+      
+      if (!requestingUserId) {
+        alert("Unable to retrieve your user information.");
+        return;
+      }
+
+      // Submit the offer to the backend with item details
       const result = await createSwapRequest([selectedItemId], [itemId], ownerId, requestingUserId);
       console.log("Offer Submitted:", result);
 
-      // If the result is successful, show the popup
+      // If successful, show the popup
       setIsPopupVisible(true);
 
     } catch (error) {
@@ -66,7 +82,7 @@ const MakeOffer = () => {
 
   const handlePopupClose = () => {
     setIsPopupVisible(false);
-    // Redirect to the marketplace
+    // Redirect to the marketplace after closing the popup
     router.push('/marketplace');
   };
 

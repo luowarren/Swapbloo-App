@@ -4,9 +4,11 @@ import { fetchUserData, fetchUserItems } from '../../service/users';
 import { getUserId } from '@/service/auth';
 import { getUser } from '../../service/users';
 import { getListingsByUsers } from '@/service/items';
+import { getRequestedItems, getReceivedRequests, getRequestedSwaps, getReceivedSwaps } from '@/service/swaps'; // Import swap functions
 import ProfileImage from '../components/ProfileImage';
 import ItemImages from '../components/ItemImages';
 import { useRouter } from 'next/navigation';
+
 // Define types for UserData and ItemData
 interface UserData {
   id: string;
@@ -29,36 +31,56 @@ interface ItemData {
 const Login: React.FC = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [items, setItems] = useState<ItemData[]>([]);
+  const [outgoingSwaps, setOutgoingSwaps] = useState<ItemData[]>([]); // State to store requested swaps
+  const [incomingSwaps, setIncomingSwaps] = useState<ItemData[]>([]); // State to store incoming swap requests
   const [loading, setLoading] = useState(true);
-  
+  const [activeTab, setActiveTab] = useState<'listings' | 'requested' | 'incoming'>('listings'); // State to manage active tab
+  const router = useRouter(); // Move useRouter outside useEffect
+  const [uid, setUserId] = useState<UserData | null>(null);
   useEffect(() => {
     const loadUserData = async () => {
       // Fetch user data
-      const uid = await getUserId();
-
-      const userBlob = await getUser(uid);
-      console.log("userrrr", userBlob.Users);
-
-      // Safely check if userBlob.Users exists and has items
-      if (userBlob?.Users && userBlob.Users.length > 0) {
-        const user = userBlob.Users[0];
-        setUser(user);
-
-        // Fetch user's items
-        const userItemsBlob = await getListingsByUsers([user.id]);
-        console.log("iteming", userItemsBlob);
-
-        // Handle the case where userItemsBlob.data might be null
-        const userItems = userItemsBlob?.data ?? []; // Default to empty array if null
-        setItems(userItems);
+      const userId = await getUserId();
+      if (userId == null) {
+        router.push("/login"); // Redirect if no user
       } else {
-        console.warn("No user data found");
+        setUserId(userId);
+
+        // Fetch user details using the userId
+        const userBlob = await getUser(userId);
+        console.log("userrrr", userBlob.Users);
+
+        // Safely check if userBlob.Users exists and has items
+        if (userBlob?.Users && userBlob.Users.length > 0) {
+          const user = userBlob.Users[0];
+          setUser(user);
+
+          // Fetch user's items
+          const userItemsBlob = await getListingsByUsers([user.id]);
+          console.log("iteming", userItemsBlob);
+          const userItems = userItemsBlob?.data ?? [];
+          setItems(userItems);
+
+          // Fetch requested swaps (outgoing swaps)
+          const outgoingSwapsBlob = await getRequestedSwaps(user.id);
+          console.log("outgoing swaps:", outgoingSwapsBlob);
+          const outgoingSwaps = outgoingSwapsBlob?.data ?? [];
+          setOutgoingSwaps(outgoingSwaps);
+
+          // Fetch incoming swap requests
+          const incomingSwapsBlob = await getReceivedSwaps(user.id);
+          console.log("incoming swaps:", incomingSwapsBlob);
+          const incomingSwaps = incomingSwapsBlob?.data ?? [];
+          setIncomingSwaps(incomingSwaps);
+        } else {
+          console.warn("No user data found");
+        }
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     loadUserData();
-  }, []);
+  }, [router]); // Include `router` in the dependency array
 
   if (loading) {
     return <p>Loading...</p>;
@@ -67,6 +89,11 @@ const Login: React.FC = () => {
   if (!user) {
     return <p>No user found</p>;
   }
+
+  // Function to switch tabs
+  const handleTabSwitch = (tab: 'listings' | 'requested' | 'incoming') => {
+    setActiveTab(tab);
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-white">
@@ -84,36 +111,81 @@ const Login: React.FC = () => {
         </div>
       </div>
       <hr className="border-gray-600 mx-4" />
+
+      {/* Tab Buttons */}
       <div className="flex space-x-8 mt-5 mx-4">
-        <button className="border border-indigo-800 px-6 font-bold text-indigo-800 rounded-md">
-          Message
+        <button
+          className={`font-semibold pb-2 ${activeTab === 'listings' ? 'underline' : ''}`}
+          onClick={() => handleTabSwitch('listings')}
+        >
+          Listings
+        </button>
+        <button
+          className={`font-semibold pb-2 ${activeTab === 'requested' ? 'underline' : ''}`}
+          onClick={() => handleTabSwitch('requested')}
+        >
+          Requested Swaps
+        </button>
+        <button
+          className={`font-semibold pb-2 ${activeTab === 'incoming' ? 'underline' : ''}`}
+          onClick={() => handleTabSwitch('incoming')}
+        >
+          Incoming Swap Requests
         </button>
       </div>
-      <div className="p-4">
-        <h3 className="text-xl font-semibold">{user.name}’s Swap Shop</h3>
-        <p className="text-gray-700 mt-2 w-3/5">{user.bio}</p>
-      </div>
-      <div className="flex space-x-4 mt-4 px-4">
-        <button className="font-semibold underline pb-2">Listings</button>
-      </div>
+
+      {/* Tab Content */}
       <div className="flex space-x-4 p-4">
-        {items.length > 0 ? (
-          items.map((item) => (
-            <ListingCard
-              key={item.id}
-              name={item.title}
-              size={item.size}
-              brand={item.brand || 'Unknown'}
-              id={item.id}
-            />
-          ))
-        ) : (
-          <p>No items currently listed</p>
+        {activeTab === 'listings' && (
+          <div>
+            {items.length > 0 ? (
+              items.map((item) => (
+                <ListingCard
+                  key={item.id}
+                  name={item.title}
+                  size={item.size}
+                  brand={item.brand || 'Unknown'}
+                  id={item.id}
+                />
+              ))
+            ) : (
+              <p>No items currently listed</p>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'requested' && (
+          <div>
+            {outgoingSwaps.length > 0 ? (
+              outgoingSwaps.map((swapItem) => (
+                <div key={swapItem.id} className="border p-2 mb-2">
+                  <p>{swapItem.title}</p>
+                </div>
+              ))
+            ) : (
+              <p>No requested swaps.</p>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'incoming' && (
+          <div>
+            {incomingSwaps.length > 0 ? (
+              incomingSwaps.map((swapItem) => (
+                <div key={swapItem.id} className="border p-2 mb-2">
+                  <p>{swapItem.title}</p>
+                </div>
+              ))
+            ) : (
+              <p>No incoming swap requests.</p>
+            )}
+          </div>
         )}
       </div>
     </div>
   );
 };
+
 interface ListingCardProps {
   id: number; // Add `id` to the props definition
   name: string;
@@ -122,7 +194,7 @@ interface ListingCardProps {
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
-    const router = useRouter(); // Move useRouter to the top of the component
+  const router = useRouter(); // Move useRouter to the top of the component
 
   const handleCardClick = (id: number) => {
     router.push(`/item?itemId=${id}`); // Use router here
