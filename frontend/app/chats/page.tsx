@@ -195,7 +195,7 @@ const ChatPage: React.FC = () => {
               >
                 {" "}
                 {accepted ? (
-                  <GenericButton text="Update Offer" inverse={true} />
+                  <GenericButton text="Update Offer" inverse={true} noClick={true}/>
                 ) : (
                   <GenericButton
                     text="Update Offer"
