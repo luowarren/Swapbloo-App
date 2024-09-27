@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'; // Import dotenv
 import { createClient } from '@supabase/supabase-js'; // Import Supabase client
+import { search } from "./listings"
 
 dotenv.config(); // Load environment variables from .env file
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { displayTime } from "../chats/helpers";
+import { cn } from "@/lib/utils";
 
 const MessagePreview = ({
   name,
@@ -13,19 +14,23 @@ const MessagePreview = ({
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
   };
 
+  if (lastMessage == "") {
+    lastMessage = "Start Chatting!";
+  }
+
   return (
     <div
-      className={`flex items-center p-5 ${
-        isSelected ? "bg-gray-200" : "bg-gray-100"
-      }`}
+      className={`flex items-center p-5 ${isSelected ? "bg-gray-100" : null}`}
     >
-      <div className="w-10 h-10 bg-yellow-500 rounded-full mr-3"></div>
+      <div className="w-12 h-12 bg-yellow-500 rounded-full mr-3" />
       <div className="flex-grow flex flex-col">
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold text-black">{name}</div>
         </div>
-        <div className={`text-gray-700 overflow-hidden whitespace-nowrap
-          ${viewed ? "font-normal" : "font-bold"}`}>
+        <div
+          className={`text-gray-700 overflow-hidden whitespace-nowrap
+          ${viewed ? "font-normal" : "font-bold"}`}
+        >
           {truncateMessage(lastMessage)}
         </div>
         <div
@@ -36,14 +41,18 @@ const MessagePreview = ({
         </div>
       </div>
       <div
-        className={`bg-blue-500 ${
-          viewed ? "w-0 h-0 rounded-full" : "w-2 h-2 rounded-full"
-        }`}
+        className={cn(
+          "bg-blue-500 min-w-2 min-h-2 rounded-full"
+          // viewed && "opacity-0"
+        )}
+        style={{
+          width: "8px",
+          height: "8px",
+          opacity: viewed ? "0" : "100",
+        }}
       ></div>
     </div>
   );
 };
 
 export default MessagePreview;
-
-
