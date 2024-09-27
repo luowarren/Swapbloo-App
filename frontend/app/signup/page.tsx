@@ -26,6 +26,7 @@ const SignUp: React.FC = () => {
         });
 
         if (signUpError) {
+            console.log(signUpError)
             setError(signUpError.message);
             setLoading(false);
             return;
@@ -47,6 +48,7 @@ const SignUp: React.FC = () => {
             }]);
 
         if (insertError) {
+            console.log("insert error",insertError)
             setError(insertError.message);
         } else {
             router.push('/marketplace');

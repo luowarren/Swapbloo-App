@@ -6,8 +6,9 @@ import { useSearchParams } from 'next/navigation';
 import { getListingsByUsers } from '../../service/items'; // Function to get user's items
 import { createSwapRequest } from '../../service/swaps';
 import { ItemData } from '../item/page';
-import { getUserId } from '../../service/users';
+import { getUserId } from '../../service/auth';
 import { useRouter } from 'next/navigation';
+
 
 
 const MakeOffer = () => {
@@ -21,7 +22,9 @@ const MakeOffer = () => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [message, setMessage] = useState<string>("");
   const [isPopupVisible, setIsPopupVisible] = useState(false); // For popup visibility
-  const requestingUserId = '59cdfdd4-b276-4821-ac28-03b4a23acbd3'; // getUserId()
+  const requestingUserId = async ()  => {
+    return await getUserId(); // getUserId()
+  }
 
   useEffect(() => {
     // Fetch the user's items they can offer
