@@ -1,10 +1,11 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { fetchUserData, fetchUserItems, } from '../../service/users';
+import { fetchUserData, fetchUserItems } from '../../service/users';
 import { getUserId } from '@/service/auth';
 import { getUser } from '../../service/users';
 import { getListingsByUsers } from '@/service/items';
 import ProfileImage from '../components/ProfileImage';
+
 // Define types for UserData and ItemData
 interface UserData {
   id: string;
@@ -35,15 +36,22 @@ const Login: React.FC = () => {
       const uid = await getUserId();
 
       const userBlob = await getUser(uid);
-      console.log("userrrr", userBlob.Users)
-      if (userBlob.Users?.length > 0) {
+      console.log("userrrr", userBlob.Users);
+
+      // Safely check if userBlob.Users exists and has items
+      if (userBlob?.Users && userBlob.Users.length > 0) {
         const user = userBlob.Users[0];
         setUser(user);
+
         // Fetch user's items
         const userItemsBlob = await getListingsByUsers([user.id]);
-        console.log("iteming", userItemsBlob)
-        const userItems = userItemsBlob.data
+        console.log("iteming", userItemsBlob);
+
+        // Handle the case where userItemsBlob.data might be null
+        const userItems = userItemsBlob?.data ?? []; // Default to empty array if null
         setItems(userItems);
+      } else {
+        console.warn("No user data found");
       }
       setLoading(false);
     };
@@ -86,22 +94,20 @@ const Login: React.FC = () => {
       </div>
       <div className="flex space-x-4 mt-4 px-4">
         <button className="font-semibold underline pb-2">Listings</button>
-        
       </div>
       <div className="flex space-x-4 p-4">
-            {items.length > 0 ? (
-        items.map((item) => (
+        {items.length > 0 ? (
+          items.map((item) => (
             <ListingCard
-            key={item.id}
-            name={item.title}
-            size={item.size}
-            brand={item.brand || 'Unknown'}
+              key={item.id}
+              name={item.title}
+              size={item.size}
+              brand={item.brand || 'Unknown'}
             />
-        ))
+          ))
         ) : (
-        <p>No items currently listed</p>
+          <p>No items currently listed</p>
         )}
-
       </div>
     </div>
   );
