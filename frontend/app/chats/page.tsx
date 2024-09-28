@@ -11,9 +11,19 @@ import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
 import { ArrowRightLeft } from "lucide-react";
+import { getUserId } from "../../service/users";
+import { getChats } from "../../service/chat"
 sortData(data);
 
 const ChatPage: React.FC = () => {
+  const [chats, setChats] = useState<Array<{
+    id: string, created_at: string, user1_id: string, user2_id: string, status: string, viewed: boolean, profilePic: string,
+    username: string, latestMessage: {created_at: string, chat_id: string, sender_id: string, content: string}
+  }> | null>(null);
+  //   {id: string, created_at: string, user1_id: string, user2_id: string, status: string, profilePic: string,
+  //     username:string, latestMessage<{}>
+  //    }[]
+  // >([]);
   const [messages, setMessages] = useState<
     { type: string; text: string; sender: string }[]
   >([]);
@@ -21,6 +31,26 @@ const ChatPage: React.FC = () => {
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
+
+  const handleInitialDataFetches = async () => {
+    const uid = await getUserId();
+    console.log(uid);
+    if (uid != null) {
+      const c = await getChats(uid);
+      console.log("allan")
+      setChats(c);
+      // console.log(chats)
+    }
+  }
+
+  useEffect(() => {
+    handleInitialDataFetches();
+  }, []);
+
+  useEffect(() => {
+    console.log("Updated chats:", chats);
+  }, [chats]);
+  
 
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
@@ -106,6 +136,12 @@ const ChatPage: React.FC = () => {
 
   // Toggle selection of a lastMessage preview
   const toggleMessageSelection = (index: number) => {
+    if (chats != null) {
+      console.log('allan', chats[index]);
+      if (chats[index].viewed == false) {
+        // set to viewed!!!!
+      }
+    }
     switchChat(index);
     data[index]["viewed"] = true;
   };
@@ -118,17 +154,20 @@ const ChatPage: React.FC = () => {
           <h2>Chats</h2>
         </div>
         <div className="flex flex-col h-[75vh] overflow-scroll">
-          {data.map((msg, index) => (
-            <div key={index} onClick={() => toggleMessageSelection(index)}>
-              <MessagePreview
-                name={msg.name}
-                lastMessage={msg.lastMessage}
-                date={msg.date}
-                viewed={msg.viewed}
-                isSelected={activeChat === index} // Pass selection state
-              />
-            </div>
-          ))}
+          { chats !== null && (
+            chats.map((msg, index) => (
+              <div key={index} onClick={() => toggleMessageSelection(index)}>
+                <MessagePreview
+                  name={msg.username}
+                  lastMessage={msg.latestMessage.content}
+                  date={msg.latestMessage.created_at}
+                  viewed={msg.viewed}
+                  isSelected={activeChat === index} // Pass selection state
+                />
+              </div>
+            ))
+          )
+          }
         </div>
       </div>
 
