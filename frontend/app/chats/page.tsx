@@ -12,40 +12,99 @@ import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
 import { ArrowRightLeft } from "lucide-react";
 import { getUserId } from "../../service/users";
-import { getChats } from "../../service/chat"
+import { supabase, getChats, getChat, sendMessage } from "../../service/chat"
 sortData(data);
 
 const ChatPage: React.FC = () => {
+  const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
     id: string, created_at: string, user1_id: string, user2_id: string, status: string, viewed: boolean, profilePic: string,
     username: string, latestMessage: {created_at: string, chat_id: string, sender_id: string, content: string}
   }> | null>(null);
-  //   {id: string, created_at: string, user1_id: string, user2_id: string, status: string, profilePic: string,
-  //     username:string, latestMessage<{}>
-  //    }[]
-  // >([]);
-  const [messages, setMessages] = useState<
-    { type: string; text: string; sender: string }[]
-  >([]);
+  const [messages, setMessages] = useState<Array<{
+    type: string, chat_id: string, content: string, created_at: string, sender_id: string
+  }> | null>(null);
+  const [otherUserData, setOtherUserData] = useState<{
+    name: string, chat_id: string
+  } | null> (null);
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
 
+  useEffect(() => {
+    const channel = supabase
+    .channel('chat-room')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Messages' }, payload => {
+      console.log('Change received!', payload)
+
+      // update messages
+      setMessages( (prevMessages) => {
+        if (prevMessages != null) {
+          return [
+            ...prevMessages,
+            {
+            type: "text",
+            content: payload.new.content,
+            chat_id: payload.new.chat_id,
+            created_at: payload.new.created_at,
+            sender_id: payload.new.sender_id
+            }
+          ]
+        } else {
+          return null;
+        }
+      });
+    })
+    .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    }
+  }, [])
+
   const handleInitialDataFetches = async () => {
+    // get all chats
     const uid = await getUserId();
     console.log(uid);
+    setCurrUserId(uid);
     if (uid != null) {
       const c = await getChats(uid);
-      console.log("allan")
       setChats(c);
-      // console.log(chats)
+      console.log("Available chats:", chats);
     }
   }
 
   useEffect(() => {
+    console.log("Available chats2:", chats);
+  }, [chats])
+
+  useEffect(() => {
     handleInitialDataFetches();
   }, []);
+
+  const getAllMessages = async (chat_id: string) => {
+    const c = await getChat(chat_id);
+    console.log("current chat data:", c);
+    setMessages(c);
+  }
+
+  useEffect(() => {
+    if (chats != null && activeChat != null) {
+      // update list of messages
+      const chat_id = chats[activeChat].id
+      console.log("chat id:", chat_id)
+      getAllMessages(chat_id);
+
+      // update otherUserData
+      setOtherUserData((prevObj) => ({
+        ...prevObj,
+        name: chats[activeChat].username,
+        chat_id: chats[activeChat].id
+      }))
+      console.log(otherUserData)
+    }
+  }, [activeChat])
 
   useEffect(() => {
     console.log("Updated chats:", chats);
@@ -67,16 +126,19 @@ const ChatPage: React.FC = () => {
       sortData(data);
       setActiveChat(0);
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          type: "notification",
-          text: notif,
-          sender: "me",
-          date: new Date().toISOString(),
-        },
-      ]);
-      console.log(messages);
+      if (otherUserData != null) {
+        setMessages((prevMessages) => [
+          // ...prevMessages,
+          {
+            type: "notification",
+            chat_id: otherUserData.chat_id,
+            content: notif,
+            sender_id: "me",
+            created_at: new Date().toISOString(),
+          },
+        ]);
+        console.log(messages);
+      }
     }
   };
 
@@ -84,23 +146,34 @@ const ChatPage: React.FC = () => {
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
     if (meInput.trim() && activeChat != null) {
-      data[activeChat]["lastMessage"] = meInput;
-      data[activeChat]["date"] = new Date().toISOString();
+      // sendMessage(uid, chat_id, message)
+      // send message!
+      if (currUserId != null && otherUserData != null) {
+        sendMessage(currUserId, otherUserData.chat_id, meInput);
+        setMeInput("");
+      }
 
-      sortData(data);
-      setActiveChat(0);
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          type: "text",
-          text: meInput,
-          sender: "me",
-          date: new Date().toISOString(),
-        },
-      ]);
-      console.log(messages);
-      setMeInput(""); // Clear "Me" input after sending
+      // data[activeChat]["lastMessage"] = meInput;
+      // data[activeChat]["date"] = new Date().toISOString();
+
+      // sortData(data);
+      // setActiveChat(0);
+
+      // if (otherUserData != null) {
+      //   setMessages((prevMessages) => [
+      //     // ...prevMessages,
+      //     {
+      //       type: "text",
+      //       chat_id: otherUserData.chat_id,
+      //       content: meInput,
+      //       sender_id: "me",
+      //       created_at: new Date().toISOString(),
+      //     },
+      //   ]);
+      //   console.log(messages);
+      //   setMeInput(""); // Clear "Me" input after sending
+      // }
     }
   };
 
@@ -114,24 +187,27 @@ const ChatPage: React.FC = () => {
       sortData(data);
       setActiveChat(0);
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          type: "text",
-          text: otherGuyInput,
-          sender: "other",
-          date: new Date().toISOString(),
-        },
-      ]);
-      console.log(messages);
-      setOtherGuyInput(""); // Clear "Other Guy" input after receiving
+      if (otherUserData != null) {
+        setMessages((prevMessages) => [
+          // ...prevMessages,
+          {
+            type: "text",
+            chat_id: otherUserData.chat_id,
+            content: otherGuyInput,
+            sender_id: "other",
+            created_at: new Date().toISOString(),
+          },
+        ]);
+        console.log(messages);
+        setOtherGuyInput(""); // Clear "Other Guy" input after receiving
+      }
     }
   };
 
   // Switch active chat
   const switchChat = (chat: number) => {
     setActiveChat(chat);
-    setMessages(data[chat]["messages"]); // Clear messages when switching chats
+    // setMessages(data[chat]["messages"]); // Clear messages when switching chats
   };
 
   // Toggle selection of a lastMessage preview
@@ -257,7 +333,7 @@ const ChatPage: React.FC = () => {
                 />
               </div>
             </div>
-            <div
+            {otherUserData != null &&(<div
               style={{
                 display: "flex",
                 justifyContent: "center",
@@ -267,17 +343,18 @@ const ChatPage: React.FC = () => {
                 marginBottom: "7px",
               }}
             >
-              This is the start of your chat with {data[activeChat]["name"]}
-            </div>
+              This is the start of your chat with {otherUserData.name}
+            </div>)}
             <div>
               {/* Add padding to prevent overlap */}
               <div className="flex flex-col space-y-2">
-                {messages.map((msg, index) =>
+                {messages !== null && messages.map((msg, index) =>
                   msg.type == "text" ? (
                     <MessageBubble
                       key={index}
-                      sender={msg.sender}
-                      text={msg.text}
+                      sender={msg.sender_id}
+                      text={msg.content}
+                      uid={currUserId}
                     />
                   ) : (
                     <div
@@ -290,7 +367,7 @@ const ChatPage: React.FC = () => {
                         color: "gray",
                       }}
                     >
-                      {msg.text}
+                      {msg.content}
                     </div>
                   )
                 )}
@@ -318,7 +395,7 @@ const ChatPage: React.FC = () => {
           </form>
 
           {/* Form for receiving messages from "Other Guy" */}
-          <form onSubmit={handleReceive} className="flex mt-4">
+          {/* <form onSubmit={handleReceive} className="flex mt-4">
             <input
               type="text"
               value={otherGuyInput}
@@ -334,7 +411,7 @@ const ChatPage: React.FC = () => {
             >
               Receive
             </button>
-          </form>
+          </form> */}
         </div>
       )}
       {/* Other users info and meetup info */}

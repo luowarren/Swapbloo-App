@@ -12,7 +12,7 @@ dotenv.config({ path: "../.env" });
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
@@ -74,6 +74,13 @@ export async function getChat(chat_id) {
     .from("Messages")
     .select("*")
     .eq("chat_id", chat_id);
+
+  const updatedMessages = messages.map(message => ({
+    ...message,
+    type: "text"
+  }));
+
+  return updatedMessages;
   
   return messages;
 }
