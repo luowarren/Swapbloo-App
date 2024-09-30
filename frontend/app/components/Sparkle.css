@@ -1,0 +1,28 @@
+/* Sparkle.css */
+.sparkle {
+    position: absolute;
+    font-size: 40px; /* Adjust size as necessary */
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    animation: sparkleAnimation 1s forwards; /* Animation remains the same */
+  }
+  
+  .sparkle.active {
+    opacity: 1;
+  }
+  
+  @keyframes sparkleAnimation {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: translateY(-30px) scale(1.5);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-60px) scale(2);
+      opacity: 0;
+    }
+  }
+  
