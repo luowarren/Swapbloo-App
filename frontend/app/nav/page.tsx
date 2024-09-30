@@ -51,14 +51,17 @@ const NavBar: React.FC = () => {
                 {/* Right side: Action buttons */}
                 <div className="flex items-center space-x-4">
                     {/* List an item button */}
-                    <Link href="/listing">
-                        <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
-                            LIST AN ITEM
-                        </div>
-                    </Link>
+                    {user && (
+                        <Link href="/listing">
+                            <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
+                                LIST AN ITEM
+                            </div>
+                        </Link>
+                    )}
 
                     {/* User profile icon or Login/Signup */}
                     {user ? (
+                        
                         <Link href="/profile">
                             <ProfilePic userId={user.id} />
                         </Link>

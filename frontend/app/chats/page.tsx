@@ -4,12 +4,16 @@ import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
 import MessageBubble from "../components/MessageBubble";
 import UserRating from "../components/UserRating";
+
+import { useRouter } from 'next/navigation'; // Next.js router for redirection
 import Map from "../components/Map";
 import ItemPreview from "../components/ItemPreview";
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
+import { supabase } from "@/service/supabaseClient";
+
 import { ArrowRightLeft } from "lucide-react";
 sortData(data);
 
@@ -17,6 +21,9 @@ const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<
     { type: string; text: string; sender: string }[]
   >([]);
+  const [user, setUser] = useState<any>(null); // State for user
+  const [loading, setLoading] = useState(true); // For handling the loading state
+  const router = useRouter();
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -30,7 +37,23 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
+
   const setNotification = (notif: string, type: string = "notification") => {
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        setUser(data.user);
+      } else {
+        router.push('/login'); // Redirect to /login if no user is found
+      }
+      setLoading(false);
+    };
+    checkUser();
+  }, [router]);
+
+
     if (activeChat != null) {
       data[activeChat]["lastMessage"] = notif;
       data[activeChat]["date"] = new Date().toISOString();
