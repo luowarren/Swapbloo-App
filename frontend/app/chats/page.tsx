@@ -40,18 +40,18 @@ const ChatPage: React.FC = () => {
 
   const setNotification = (notif: string, type: string = "notification") => {
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user) {
-        setUser(data.user);
-      } else {
-        router.push('/login'); // Redirect to /login if no user is found
-      }
-      setLoading(false);
-    };
-    checkUser();
-  }, [router]);
+//   useEffect(() => {
+//     const checkUser = async () => {
+//       const { data, error } = await supabase.auth.getUser();
+//       if (data?.user) {
+//         setUser(data.user);
+//       } else {
+//         router.push('/login'); // Redirect to /login if no user is found
+//       }
+//       setLoading(false);
+//     };
+//     checkUser();
+//   }, [router]);
 
 
     if (activeChat != null) {
