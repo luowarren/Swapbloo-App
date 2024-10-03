@@ -34,7 +34,7 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     const channel = supabase
-    .channel('chat-room')
+    .channel('chat-room') //  + activeChat)//  if activeChat is null, this becomes chat-roomnull
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Messages' }, payload => {
       console.log('Change received!', payload)
 

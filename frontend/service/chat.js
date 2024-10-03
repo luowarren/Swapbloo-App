@@ -81,8 +81,6 @@ export async function getChat(chat_id) {
   }));
 
   return updatedMessages;
-  
-  return messages;
 }
 
 /**
