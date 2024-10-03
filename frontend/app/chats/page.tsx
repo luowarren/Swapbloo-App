@@ -31,32 +31,44 @@ const ChatPage: React.FC = () => {
   const [otherGuyInput, setOtherGuyInput] = useState<string>(""); // Input for receiving messages from "Other Guy"
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
+  const otherUserDataRef = useRef(otherUserData);
+  
+  useEffect(() => {
+    otherUserDataRef.current = otherUserData;
+    console.log('changed')
+    console.log(otherUserData)
+  }, [otherUserData])
 
   useEffect(() => {
     const channel = supabase
-    .channel('chat-room') //  + activeChat)//  if activeChat is null, this becomes chat-roomnull
+    .channel('chat-room')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Messages' }, payload => {
       console.log('Change received!', payload)
 
       // update messages
-      setMessages( (prevMessages) => {
-        if (prevMessages != null) {
-          return [
-            ...prevMessages,
-            {
-            type: "text",
-            content: payload.new.content,
-            chat_id: payload.new.chat_id,
-            created_at: payload.new.created_at,
-            sender_id: payload.new.sender_id
-            }
-          ]
-        } else {
-          return null;
-        }
-      });
+      if (otherUserDataRef.current != null && payload.new.chat_id == otherUserDataRef.current.chat_id) {
+        setMessages( (prevMessages) => {
+          if (prevMessages != null) {
+            return [
+              ...prevMessages,
+              {
+              type: "text",
+              content: payload.new.content,
+              chat_id: payload.new.chat_id,
+              created_at: payload.new.created_at,
+              sender_id: payload.new.sender_id
+              }
+            ]
+          } else {
+            return null;
+          }
+        });
+      } else {
+        console.log("not right chat");
+      }
     })
     .subscribe();
+  
 
     return () => {
       channel.unsubscribe();
@@ -76,10 +88,6 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log("Available chats2:", chats);
-  }, [chats])
-
-  useEffect(() => {
     handleInitialDataFetches();
   }, []);
 
@@ -93,24 +101,17 @@ const ChatPage: React.FC = () => {
     if (chats != null && activeChat != null) {
       // update list of messages
       const chat_id = chats[activeChat].id
-      console.log("chat id:", chat_id)
       getAllMessages(chat_id);
 
       // update otherUserData
       setOtherUserData((prevObj) => ({
-        ...prevObj,
+        // ...prevObj,
         name: chats[activeChat].username,
         chat_id: chats[activeChat].id
       }))
-      console.log(otherUserData)
-    }
+    } 
   }, [activeChat])
-
-  useEffect(() => {
-    console.log("Updated chats:", chats);
-  }, [chats]);
   
-
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
     if (messageBoxRef.current) {
@@ -148,10 +149,15 @@ const ChatPage: React.FC = () => {
     if (meInput.trim() && activeChat != null) {
       // sendMessage(uid, chat_id, message)
       // send message!
-      if (currUserId != null && otherUserData != null) {
-        sendMessage(currUserId, otherUserData.chat_id, meInput);
+      // if (currUserId != null && otherUserData != null) {
+      //   sendMessage(currUserId, otherUserData.chat_id, meInput);
+      //   setMeInput("");
+      // }
+      if (currUserId != null && otherUserDataRef.current != null) {
+        sendMessage(currUserId, otherUserDataRef.current.chat_id, meInput);
         setMeInput("");
       }
+      
 
 
       // data[activeChat]["lastMessage"] = meInput;
