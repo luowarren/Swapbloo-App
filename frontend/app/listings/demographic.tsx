@@ -1,25 +1,25 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { SIZES } from "@/service/constants";
+import { DEMOGRAPHICS } from "@/service/constants";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
-const Size = ({
-  size,
-  setSize,
+const Demographic = ({
+  demos,
+  setDemos,
 }: {
-  size: string[];
-  setSize: (size: string[]) => void;
+  demos: string[];
+  setDemos: (demos: string[]) => void;
 }) => {
   const [col, setCol] = useState(true);
 
-  // Function to handle toggle click, adding or removing size
-  const handleToggle = (selectedSize: string) => {
-    if (size.includes(selectedSize)) {
-      // Remove the size if already selected
-      setSize(size.filter((s) => s !== selectedSize));
+  // Function to handle toggle click, adding or removing demos
+  const handleToggle = (demo: string) => {
+    if (demos.includes(demo)) {
+      // Remove the demo if already selected
+      setDemos(demos.filter((d) => d !== demo));
     } else {
-      // Add the size if not selected
-      setSize([...size, selectedSize]);
+      // Add the demo if not selected
+      setDemos([...demos, demo]);
     }
   };
 
@@ -31,7 +31,7 @@ const Size = ({
           setCol((prev) => !prev);
         }}
       >
-        <span className="font-bold text-sm my-1">Size</span>
+        <span className="font-bold text-sm my-1">Demographic</span>
         {col ? (
           <ChevronDown className="h-5 w-4 stroke-[2.5px]" />
         ) : (
@@ -42,19 +42,19 @@ const Size = ({
       {col && (
         <div>
           <ToggleGroup type="multiple" className="justify-start flex-wrap">
-            {SIZES.map((sizeOption) => {
-              const isActive = size.includes(sizeOption);
+            {DEMOGRAPHICS.map((demo) => {
+              const isActive = demos.includes(demo);
 
               return (
                 <ToggleGroupItem
                   className={`border border-slate-200 text-slate-500 ${
                     isActive ? "bg-blue-500 text-white" : ""
                   }`}
-                  value={sizeOption}
-                  key={sizeOption}
-                  onClick={() => handleToggle(sizeOption)}
+                  value={demo}
+                  key={demo}
+                  onClick={() => handleToggle(demo)}
                 >
-                  <div>{sizeOption}</div>
+                  <div>{demo}</div>
                 </ToggleGroupItem>
               );
             })}
@@ -65,4 +65,4 @@ const Size = ({
   );
 };
 
-export default Size;
+export default Demographic;

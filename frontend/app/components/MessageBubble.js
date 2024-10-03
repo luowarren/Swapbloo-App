@@ -9,7 +9,7 @@ const MessageBubble = ({ sender, text }) => {
   return (
     <div
       className={cn(
-        "inline-block rounded-full py-2 px-5 break-words ml-auto mr-0"
+        "inline-block rounded-full py-2 px-4 break-words ml-auto mr-0"
       )}
       style={{
         backgroundColor: isMe ? "#3730A3" : "#C7D2FE",

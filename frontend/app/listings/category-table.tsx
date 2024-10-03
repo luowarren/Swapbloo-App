@@ -15,7 +15,6 @@ import {
 } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
-
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -25,33 +24,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CATEGORIES } from "@/service/constants";
 
-const data: Payment[] = [
-  {
-    id: "Tops",
-    category: "Tops",
-  },
-  {
-    id: "Bottoms",
-    category: "Bottoms",
-  },
-  {
-    id: "Dresses",
-    category: "Dresses",
-  },
-  {
-    id: "Outerwear",
-    category: "Outerwear",
-  },
-  {
-    id: "Accessories",
-    category: "Accessories",
-  },
-  {
-    id: "Shoes",
-    category: "Shoes",
-  },
-];
+const data: Payment[] = CATEGORIES.map((cat) => {
+  return {
+    id: cat,
+    category: cat,
+  };
+});
 
 export type Payment = {
   id: string;
@@ -82,7 +62,13 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export function CategoryTable() {
+export function CategoryTable({
+  cats,
+  setCats,
+}: {
+  cats: string[];
+  setCats: (cats: string[]) => void;
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -90,6 +76,16 @@ export function CategoryTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleRowSelectionChange = (newRowSelection: any) => {
+    setRowSelection(newRowSelection);
+
+    const selectedCategories = Object.keys(newRowSelection(rowSelection)).map(
+      (index) => CATEGORIES[Number(index)]
+    );
+
+    setCats(selectedCategories);
+  };
 
   const table = useReactTable({
     data,
@@ -101,7 +97,7 @@ export function CategoryTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: handleRowSelectionChange,
     state: {
       sorting,
       columnFilters,

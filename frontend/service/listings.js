@@ -93,3 +93,47 @@ export async function getfilteredItems(
     .in("demographic", demographics);
   return { data: Items, error };
 }
+
+export async function searchAndFilter(
+  searchString,
+  sizes,
+  categories,
+  conditions,
+  demographics
+) {
+  var { data: Items, error } = { data: [], error: null };
+  const words = searchString.split(/\s+/);
+  // convert json to string
+  const objectToString = (obj) => JSON.stringify(obj);
+
+  for (let i = 0; i < words.length; i++) {
+    var word = words[i];
+    let temp = await supabase
+      .from("Items")
+      .select("*")
+      // .ilike('title', `%${word}%`));
+      .or(`title.ilike.%${word}%,caption.ilike.%${word}%`)
+      .eq("swapped", "false")
+      .in("size", sizes)
+      .in("category", categories)
+      .in("condition", conditions)
+      .in("demographic", demographics);
+    if (temp["error"]) {
+      return temp;
+    }
+    Items = Items.concat(temp["data"]);
+  }
+
+  // Count frequency of each JSON object
+  const frequencyObject = {};
+  Items.forEach((obj) => {
+    const key = objectToString(obj);
+    if (frequencyObject[key]) {
+      frequencyObject[key]++;
+    } else {
+      frequencyObject[key] = 1;
+    }
+  });
+
+  return { data: Items, error };
+}
