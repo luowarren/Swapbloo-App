@@ -141,22 +141,22 @@ const NavBar: React.FC = () => {
             <div className="bg-white border-t">
                 <div className="container mx-auto py-2 px-6 flex justify-center space-x-8">
                     <Link href="/marketplace">
-                        <p className={`font-semibold hover:text-pink-700 ${isActive("/marketplace") ? "text-pink-500" : "text-indigo-900"}`}>
+                    <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
                             Womanswear
                         </p>
                     </Link>
                     <Link href="/marketplace">
-                        <p className={`font-semibold hover:text-pink-700 ${isActive("/marketplace") ? "text-pink-500" : "text-indigo-900"}`}>
+                    <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
                             Menswear
                         </p>
                     </Link>
                     <Link href="/marketplace">
-                        <p className={`font-semibold hover:text-pink-700 ${isActive("/marketplace") ? "text-pink-500" : "text-indigo-900"}`}>
+                    <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
                             Sigmawear
                         </p>
                     </Link>
                     <Link href="/marketplace">
-                        <p className={`font-semibold hover:text-pink-700 ${isActive("/marketplace") ? "text-pink-500" : "text-indigo-900"}`}>
+                        <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
                             Explore
                         </p>
                     </Link>

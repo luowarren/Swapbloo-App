@@ -4,6 +4,7 @@ import React from "react";
 import ImageDisplay from './components/ImageDisplay';
 import ItemImages from './components/ItemImages';
 import Link from 'next/link';
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export default function Home() {
   return (
@@ -163,9 +164,9 @@ export default function Home() {
             <div>
               <div className="mb-4 text-3xl font-bold">SwapBLOO!</div>
               <div className="flex space-x-4">
-                <img src="flower.png" alt="Facebook" className="w-6 h-6" />
-                <img src="flower.png" alt="Twitter" className="w-6 h-6" />
-                <img src="flower.png" alt="Instagram" className="w-6 h-6" />
+                <Instagram/>
+                <Twitter/>
+                <Facebook/>
               </div>
             </div>
 
