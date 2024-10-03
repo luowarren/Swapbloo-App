@@ -10,8 +10,10 @@ import { signOutUser } from '../../service/auth'; // Import logout function
 const NavBar: React.FC = () => {
     const pathname = usePathname(); // Get the current path
     const [user, setUser] = useState<any>(null); // State for user
+    const [search, setSearch] = useState(''); // State for search input
     const [showTooltip, setShowTooltip] = useState(false); // State for tooltip visibility
     const router = useRouter();
+
     // Fetch the current user
     useEffect(() => {
         const fetchUser = async () => {
@@ -39,6 +41,14 @@ const NavBar: React.FC = () => {
             authListener?.subscription?.unsubscribe();
         };
     }, []);
+
+    // Function to handle the search input submission (pressing Enter)
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && search.trim() !== '') {
+            const encodedSearch = encodeURIComponent(search.trim());
+            router.push(`/listings/${encodedSearch}`);
+        }
+    };
 
     // Function to check if the link matches the current route
     const isActive = (path: string) => pathname === path;
@@ -68,6 +78,9 @@ const NavBar: React.FC = () => {
                             type="text"
                             placeholder="Search"
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={handleSearch} // Handle Enter key
                         />
                     </div>
                 </div>
