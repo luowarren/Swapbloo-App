@@ -4,13 +4,18 @@ import React, { useState, useEffect } from "react";
 import { getImages } from "../../service/items"; // Import the getImages function
 import ImageDisplay from "./ImageDisplay"; // Import the ImageDisplay component
 
-const ItemImages = ({ itemId, className }) => {
-  const [imageUrls, setImageUrls] = useState([]); // Use an array to store multiple image URLs
-
+const ItemImages = ({
+  itemId,
+  className,
+}: {
+  itemId: number;
+  className?: string;
+}) => {
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const blob = await getImages(itemId);
+        const blob: any = await getImages(itemId);
         const data = blob.data;
 
         if (data && Array.isArray(data) && data.length > 0) {
@@ -23,13 +28,13 @@ const ItemImages = ({ itemId, className }) => {
                 return null;
               }
             })
-            .filter((url) => url !== null); // Filter out any null values
+            .filter((url): url is string => url !== null);
 
           setImageUrls(urls);
         } else {
           console.error("Expected an array of Blob objects, but got:", data);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(error.message);
       }
     };

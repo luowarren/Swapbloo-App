@@ -74,7 +74,7 @@ export async function createSwapRequest(
       {
         requester_id: requesterId,
         accepter_id: ownerId,
-        status: SWAP_STATUS[0],
+        status: "Pending",
       },
     ])
     .select();
@@ -331,7 +331,7 @@ export async function deleteSwap(swapId) {
 export async function getRequestedItems(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await getRequestedSwaps(uid);
-
+  console.log('simga', Swaps)
   if (swapError) {
     return { data: Swaps, swapError };
   }
@@ -385,10 +385,11 @@ export async function getRequestedSwaps(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await supabase
     .from("Swaps")
-    .select("item_id")
+    .select("*")
     .eq("requester_id", uid)
     .in("status", ["Pending", "Accepted", "Rejected"]);
-
+  
+  console.log('itemsssss 890', Swaps)
   return { data: Swaps, swapError };
 }
 
@@ -402,7 +403,7 @@ export async function getReceivedSwaps(uid) {
   // Fetch item_ids from Swaps where requester_id matches
   let { data: Swaps, swapError } = await supabase
     .from("Swaps")
-    .select("item_id")
+    .select("*")
     .eq("accepter_id", uid)
     .in("status", ["Pending", "Accepted", "Rejected"]);
 
@@ -483,4 +484,4 @@ function testResult(expected, actual) {
   }
 }
 
-runTest();
+//runTest();
