@@ -1,7 +1,11 @@
 "use client";
 
 import { getActiveListings } from "@/service/items";
-import { getfilteredItems, searchAndFilter } from "@/service/listings";
+import {
+  getfilteredItems,
+  searchAndFilter,
+  searchFilter,
+} from "@/service/listings";
 import { Shirt } from "lucide-react";
 import { useEffect, useState } from "react";
 import ListingCard from "./listing-card";

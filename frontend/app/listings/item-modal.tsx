@@ -12,14 +12,14 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
       <DialogTrigger className="w-full">{children}</DialogTrigger>
       <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
-          <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
-            <ItemImages itemId={item.id} />
+          <div className="w-1/2 flex-col justify-center relative">
+            <ItemImages className="rounded-md" itemId={item.id} />
           </div>
 
-          <div className="p-4 w-1/2 my-20">
-            <h1 className="text-3xl font-bold">{item.title}</h1>
-            <p className="text-m my-2 text-gray-600">
-              {item.size} • {item.condition} • {item.brand}
+          <div className="p-4 w-1/2">
+            <h1 className="text-3xl font-bold text-gray-700">{item.title}</h1>
+            <p className="text-m mb-2 text-gray-500">
+              {item.size} - {item.condition} - {item.brand}
             </p>
             <div className="flex space-x-2">
               <button

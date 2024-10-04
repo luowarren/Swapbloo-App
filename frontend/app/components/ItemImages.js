@@ -4,18 +4,13 @@ import React, { useState, useEffect } from "react";
 import { getImages } from "../../service/items"; // Import the getImages function
 import ImageDisplay from "./ImageDisplay"; // Import the ImageDisplay component
 
-const ItemImages = ({
-  itemId,
-  className,
-}: {
-  itemId: number;
-  className?: string;
-}) => {
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+const ItemImages = ({ itemId, className }) => {
+  const [imageUrls, setImageUrls] = useState([]); // Use an array to store multiple image URLs
+
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const blob: any = await getImages(itemId);
+        const blob = await getImages(itemId);
         const data = blob.data;
 
         if (data && Array.isArray(data) && data.length > 0) {
@@ -28,13 +23,13 @@ const ItemImages = ({
                 return null;
               }
             })
-            .filter((url): url is string => url !== null);
+            .filter((url) => url !== null); // Filter out any null values
 
           setImageUrls(urls);
         } else {
           console.error("Expected an array of Blob objects, but got:", data);
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error(error.message);
       }
     };
@@ -48,7 +43,7 @@ const ItemImages = ({
   }, [itemId]); // Only depend on itemId
 
   return (
-    <div className="">
+    <div>
       {imageUrls.length > 0 ? (
         imageUrls.map((url, index) => (
           <div key={index}>
