@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'; // Import dotenv
 import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 import { search } from "./listings"
+import { data } from '@/app/chats/data';
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -76,6 +77,7 @@ export async function getListingsByUsers(userIds) {
     .in("owner_id", userIds)
     .eq("swapped", "false");
     
+  console.log('itemsssss 90', Items)
   if (error) {
     console.error("Error fetching listings by users:", error.message);
     return { data: null, error: error };;
@@ -424,6 +426,3 @@ async function runTest1() {
 
 }
 // runTest()
-
-runTest()
-

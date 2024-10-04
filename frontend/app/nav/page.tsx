@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { supabase } from '../../service/supabaseClient'; // Adjust the import path as necessary
 import ProfilePic from '../components/ProfileImage'; // Adjust the import path as necessary
+import { signOutUser } from '../../service/auth'; // Import logout function
 
 const NavBar: React.FC = () => {
     const pathname = usePathname(); // Get the current path
     const [user, setUser] = useState<any>(null); // State for user
-
+    const [showTooltip, setShowTooltip] = useState(false); // State for tooltip visibility
+    const router = useRouter();
     // Fetch the current user
     useEffect(() => {
         const fetchUser = async () => {
@@ -22,13 +24,35 @@ const NavBar: React.FC = () => {
         };
 
         fetchUser();
+
+         // Subscribe to auth state changes
+         const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                setUser(session.user); // Update the user state when logged in
+            } else {
+                setUser(null); // Clear the user state when logged out
+            }
+        });
+
+        // Cleanup listener on component unmount
+        return () => {
+            authListener?.subscription?.unsubscribe();
+        };
     }, []);
 
     // Function to check if the link matches the current route
     const isActive = (path: string) => pathname === path;
 
+    // Handle log out
+    const handleLogout = async () => {
+        await signOutUser();
+        setUser(null); // Clear user from state after logout
+        setShowTooltip(false); // Close the tooltip after logout
+        router.push('/')
+    };
+
     return (
-        <nav className="bg-white border-b shadow-sm">
+        <nav className="bg-white border-b shadow-sm relative">
             <div className="container mx-auto flex items-center justify-between py-4 px-6">
                 {/* Left side: Logo */}
                 <div className="flex items-center">
@@ -49,19 +73,42 @@ const NavBar: React.FC = () => {
                 </div>
 
                 {/* Right side: Action buttons */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 relative">
                     {/* List an item button */}
-                    <Link href="/listing">
-                        <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
-                            LIST AN ITEM
-                        </div>
-                    </Link>
+                    {user && (
+                        <Link href="/listing">
+                            <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
+                                LIST AN ITEM
+                            </div>
+                        </Link>
+                    )}
 
                     {/* User profile icon or Login/Signup */}
                     {user ? (
-                        <Link href="/profile">
-                            <ProfilePic userId={user.id} />
-                        </Link>
+                        <div className="relative">
+                            <div
+                                onClick={() => setShowTooltip(!showTooltip)}
+                                className="cursor-pointer"
+                            >
+                                <ProfilePic userId={user.id} />
+                            </div>
+
+                            {showTooltip && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg py-2 z-10">
+                                    <Link href="/profile" onClick={() => setShowTooltip(false)}>
+                                        <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                            View Profile
+                                        </div>
+                                    </Link>
+                                    <div
+                                        onClick={handleLogout}
+                                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        Log Out
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <div className="flex items-center space-x-4">
                             <Link href="/login" className="text-indigo-600 hover:underline">
