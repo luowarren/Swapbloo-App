@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import articlesData from './content.json'; // Import the JSON data
+import ReactMarkdown from 'react-markdown';
 
 type Article = {
     id: number;
@@ -14,8 +15,9 @@ type Article = {
 const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
     return (
         <div className="max-w-lg rounded-lg overflow-hidden shadow-lg bg-white">
+
             <div className="h-60 bg-gray-300">
-                <img src={article.image} alt={article.title} className="w-full h-full object-cover" />
+                <img src={article.image} alt={article.title} className="w-full h-full object-cover rounded-lg" />
             </div>
             <div className="p-6">
                 <p className="text-gray-900 text-xl font-semibold mb-4">{article.title}</p>
@@ -36,8 +38,9 @@ const ResourcesPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 py-6 flex flex-col justify-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className="flex flex-col items-center">
+            <h2 className="mx-20 mt-8 text-2xl font-semibold text-gray-800 mb-6">Resources</h2>
+            <div className="justify-center mx-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
                 {articles.length > 0 ? (
                     articles.map((article, index) => (
                         <ArticleCard key={index} article={article} />
@@ -55,6 +58,7 @@ const ArticleDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [article, setArticle] = useState<Article | undefined>();
 
+
     useEffect(() => {
         const foundArticle = articlesData.find((article) => article.id === parseInt(id!));
         setArticle(foundArticle);
@@ -64,12 +68,14 @@ const ArticleDetail: React.FC = () => {
         return <p className="text-center text-gray-500">Article not found...</p>;
     }
 
+
+
     return (
-        <div className="min-h-screen bg-gray-50 py-6 flex flex-col justify-center">
-            <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <div className="min-h-screen py-6 flex flex-col justify-center">
+            <div className="max-w-2xl mx-auto bg-white rounded-lg p-4">
                 <h1 className="text-3xl font-semibold mb-4">{article.title}</h1>
-                <img src={article.image} alt={article.title} className="w-full h-80 object-cover mb-4" />
-                <div className="text-gray-700 text-lg leading-relaxed">{article.content}</div>
+                <img src={article.image} alt={article.title} className="w-full h-80 object-cover rounded-lg mb-4" />
+                <div className="text-gray-700 text-lg leading-relaxed"><ReactMarkdown>{article.content}</ReactMarkdown></div>
             </div>
         </div>
     );
