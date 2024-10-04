@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getUserProfileImageUrl } from "../../service/items"; // Import your existing service function
-import { User } from "lucide-react";
+import { UserRound } from "lucide-react";
 
 interface ProfileImageProps {
   userId: string;
@@ -43,7 +43,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
   if (loading) {
     return (
       <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
-        <User />
+        <UserRound />
       </div>
     );
   }
@@ -57,8 +57,8 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
           className={`w-12 h-12 rounded-full ${className}`}
         />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
-          No Image
+        <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 ">
+          <UserRound />
         </div>
       )}
     </div>
