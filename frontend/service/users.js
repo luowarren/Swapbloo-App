@@ -1,10 +1,8 @@
 import dotenv from "dotenv";
-import { createClient } from '@supabase/supabase-js'; // Correct named import
-import twilio from "twilio";
+import { createClient } from '@supabase/supabase-js'; 
 
 // Load environment variables from .env file
-dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
-import { get } from "https";
+dotenv.config({ path: "../.env" });
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -136,6 +134,15 @@ export async function getUserName(uid) {
   return { data: Users, error };
 }
 
+
+export async function getUser(uid) {
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .select("*")
+    .eq("id", uid);
+  return { Users , error };
+}
+
 /**
  *
  * @param {*} uid
@@ -169,6 +176,37 @@ async function getItems() {
 
   return { data: Items, error };
 }
+
+
+// Function to fetch user data based on username
+export const fetchUserData = async (username) => {
+  const { data: users, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username);
+
+  if (error) {
+      console.error('Error fetching user data:', error);
+      return null;
+  }
+
+  return users?.[0] || null;
+};
+
+// Function to fetch items owned by the user
+export const fetchUserItems = async (owner_id) => {
+  const { data: items, error } = await supabase
+      .from('items')
+      .select('*')
+      .eq('owner_id', owner_id);
+
+  if (error) {
+      console.error('Error fetching items:', error);
+      return [];
+  }
+
+  return items || [];
+};
 
 // /**
 //  *
