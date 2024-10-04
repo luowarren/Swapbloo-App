@@ -144,7 +144,7 @@ export async function search(searchString) {
  * @returns Items is a list of Item types where the filtered criteria is met
  */
 export async function getfilteredItems(
-{  sizes=SIZES,
+{ sizes=SIZES,
   categories=CATEGORIES,
   conditions=CONDITIONS,
   demographics=DEMOGRAPHICS}
