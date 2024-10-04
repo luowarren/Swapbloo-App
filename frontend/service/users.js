@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
-import { createClient } from '@supabase/supabase-js'; 
+import { createClient } from '@supabase/supabase-js'; // Correct named import
+// import twilio from "twilio";
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
@@ -22,7 +23,12 @@ async function loginUser(email, password) {
 }
 
 export async function getUserId() {
-  return await supabase.auth.getUser();
+  const userBlob = await supabase.auth.getUser();
+  if (userBlob.error || userBlob.data == null) {
+      return null;
+  } else {
+      return userBlob.data.user.id;
+  }
 }
 /**
  * Retrieves user data from the 'Users' table by user ID.
@@ -302,4 +308,4 @@ async function runTest() {
   })();
 }
 
-runTest()
+// runTest()
