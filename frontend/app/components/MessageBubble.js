@@ -2,9 +2,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
+import { getUserId } from "./../../service/users";
 
-const MessageBubble = ({ sender, text }) => {
-  const isMe = sender === "me";
+const MessageBubble = ({ sender, text, uid }) => {
+  // const uid = await getUserId();
+  let isMe = false;
+  if (uid != null) {
+    if (sender == uid) {
+      isMe = true;
+    }
+  }
+
+  // const isMe = sender === "me";
 
   return (
     <div

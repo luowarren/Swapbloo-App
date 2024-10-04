@@ -19,3 +19,10 @@ export async function getUser() {
         return userBlob.data.user;
     }
 }
+
+export const signOutUser = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        console.error('Error logging out:', error);
+    }
+};

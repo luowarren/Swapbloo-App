@@ -1,17 +1,18 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
+// import pkg from "@supabase/supabase-js";
 import { getUserProfilePhoto, getUserName } from './users.js'
 import { getMostRecentMessage, censorMessage } from './messages.js'
+import { createClient } from '@supabase/supabase-js';
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
 
-const { createClient, SupabaseClient } = pkg;
+// const { createClient, SupabaseClient } = pkg;
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase URL and key are required.");
@@ -41,7 +42,15 @@ export async function getChats(uid) {
             userProfilePic = await getUserProfilePhoto(obj.user1_id);
             username = await getUserName(obj.user1_id);
         }
-        const latestMessage = await getMostRecentMessage(obj.id);
+        let latestMessage = await getMostRecentMessage(obj.id);
+        if (latestMessage == null) {
+          latestMessage = {
+            created_at: obj.created_at,
+            chat_id: obj.id,
+            sender_id: null,
+            content: ""
+          }
+        }
         return {
             ...obj,
             profilePic: userProfilePic.data[0].image,
@@ -65,8 +74,13 @@ export async function getChat(chat_id) {
     .from("Messages")
     .select("*")
     .eq("chat_id", chat_id);
-  
-  return messages;
+
+  const updatedMessages = messages.map(message => ({
+    ...message,
+    type: "text"
+  }));
+
+  return updatedMessages;
 }
 
 /**
@@ -104,18 +118,61 @@ export async function deleteChat(chat_id) {
   return {error};
 }
 
+/**
+ * Update chat viewed status
+ * 
+ * @param {string} chat_id - the id of current chat
+ */
+export async function toggleViewed(chat_id) {
+  // get current viewed status
+  const viewed = await getViewedStatus(chat_id);
+
+  const { error } = await supabase
+  .from('Chats')
+  .update({ viewed: !viewed})
+  .eq('id', chat_id);
+
+  if (error) {
+    console.error(`Error updating viewed status for chat_id: ${chat_id}`, error);
+  } else {
+    console.log(`Successfully updated viewed status for chat_id: ${chat_id}`);
+  }
+
+}
+
+/**
+ * 
+ * @param {string} chat_id - the id of current chat
+ * @returns boolean whether latest message in chat has been viewed
+ */
+async function getViewedStatus(chat_id) {
+  let { data: Chats, error: chatError } = await supabase
+      .from("Chats")
+      .select("*")
+      .eq("id", chat_id);
+    
+  return Chats[0].viewed;
+}
+
 (async () => {
     try {
-      const uid = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"
-      const chat_id = "1";
+      // const uid = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"
+      const uid = "797fbccf-0b76-4a60-8406-a3ecd0408e69"
+      const chat_id = "16";
       // const chats = await getChats(uid);
+      // console.log("gaga")
       // console.log(chats);
+      // console.log("gaga")
       // const messsages = await getChat(uid, chat_id);
       // console.log(messages);
-      const s = await sendMessage(uid, chat_id, "test fuck");
+      // const s = await sendMessage(uid, chat_id, "test fuck");
 
       // const d = await deleteChat('15');
       // console.log(d);
+
+      // const v = await getViewedStatus(chat_id);
+      await toggleViewed(chat_id);
+
 
     } catch (error) {
       console.error("Error:", error);
