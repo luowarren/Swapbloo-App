@@ -25,40 +25,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CONDITIONS } from "@/service/constants";
 
-const data: Payment[] = [
-  {
-    id: "Brand new",
-    condition: "Brand new",
-  },
-  {
-    id: "Like new",
-    condition: "Like new",
-  },
-  {
-    id: "Used - Excellent",
-    condition: "Used - Excellent",
-  },
-  {
-    id: "Used - Good",
-    condition: "Used - Good",
-  },
-  {
-    id: "Used - Fair",
-    condition: "Used - Fair",
-  },
-];
+const data: ConditionsType[] = CONDITIONS.map((cond) => {
+  return { id: cond, condition: cond };
+});
 
 const descriptions: {
-  "Brand new": string;
-  "Like new": string;
-  "Used - Excellent": string;
+  New: string;
+  "Used - Like new": string;
   "Used - Good": string;
   "Used - Fair": string;
 } = {
-  "Brand new": "Brand new condition",
-  "Like new": "Almost like new",
-  "Used - Excellent": "In excellent condition",
+  New: "Brand new condition",
+  "Used - Like new": "Almost like new",
   "Used - Good": "In good condition",
   "Used - Fair": "Fair condition",
 };
@@ -67,12 +47,12 @@ function isConditionKey(value: string): value is keyof typeof descriptions {
   return value in descriptions;
 }
 
-export type Payment = {
+export type ConditionsType = {
   id: string;
   condition: string;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<ConditionsType>[] = [
   {
     id: "select",
     cell: ({ row }) => (
@@ -105,7 +85,13 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export function ConditionTable() {
+export function ConditionTable({
+  cond,
+  setCond,
+}: {
+  cond: string[];
+  setCond: (cond: string[]) => void;
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -113,6 +99,16 @@ export function ConditionTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleRowSelectionChange = (newRowSelection: any) => {
+    setRowSelection(newRowSelection);
+
+    const selectedConditions = Object.keys(newRowSelection(rowSelection)).map(
+      (index) => CONDITIONS[Number(index)]
+    );
+
+    setCond(selectedConditions);
+  };
 
   const table = useReactTable({
     data,
@@ -124,7 +120,7 @@ export function ConditionTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: handleRowSelectionChange,
     state: {
       sorting,
       columnFilters,

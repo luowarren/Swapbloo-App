@@ -8,6 +8,7 @@ import { getRequestedItems, getReceivedRequests, getRequestedSwaps, getReceivedS
 import ProfileImage from '../components/ProfileImage';
 import ItemImages from '../components/ItemImages';
 import { useRouter } from 'next/navigation';
+import UserRating from '../components/UserRating';
 
 // Define types for UserData and ItemData
 interface UserData {
@@ -102,10 +103,7 @@ const Login: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold">{user.username}</h2>
           <div className="flex items-center">
-            <UserRating rating={user.rating} />
-            <span className="text-sm ml-2 text-gray-600">
-              ({user.num_of_ratings})
-            </span>
+          <UserRating rating={user.rating} num={8} />
           </div>
           <p className="text-sm text-gray-500">{user.location}</p>
         </div>
@@ -220,22 +218,6 @@ const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
         <p className="text-sm font-semibold text-indigo-900">{brand}</p>
         <p className="text-xs text-gray-600">{size}</p>
       </div>
-    </div>
-  );
-};
-
-interface UserRatingProps {
-  rating: number;
-}
-
-const UserRating: React.FC<UserRatingProps> = ({ rating }) => {
-  const filledStars = '✭'.repeat(rating);
-  const emptyStars = '✩'.repeat(5 - rating);
-
-  return (
-    <div className="text-xl">
-      {filledStars}
-      {emptyStars}
     </div>
   );
 };

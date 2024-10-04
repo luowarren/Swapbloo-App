@@ -12,7 +12,7 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import { supabase } from "@/service/supabaseClient";
+// import { supabase } from "@/service/supabaseClient";
 
 import { ArrowRightLeft } from "lucide-react";
 import { getUserId } from "../../service/users";
@@ -31,9 +31,6 @@ const ChatPage: React.FC = () => {
   const [otherUserData, setOtherUserData] = useState<{
     name: string, chat_id: string
   } | null> (null);
-  const [messages, setMessages] = useState<
-    { type: string; text: string; sender: string }[]
-  >([]);
   const [user, setUser] = useState<any>(null); // State for user
   const [loading, setLoading] = useState(true); // For handling the loading state
   const router = useRouter();
@@ -167,16 +164,16 @@ const ChatPage: React.FC = () => {
         ]);
         console.log(messages);
       }
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          type: type,
-          text: notif,
-          sender: "me",
-          date: new Date().toISOString(),
-        },
-      ]);
-      //   console.log(messages);
+      // setMessages((prevMessages) => [
+      //   // ...prevMessages,
+      //   {
+      //     type: type,
+      //     text: notif,
+      //     sender: "me",
+      //     date: new Date().toISOString(),
+      //   },
+      // ]);
+      // //   console.log(messages);
     }
   };
 
@@ -250,7 +247,7 @@ const ChatPage: React.FC = () => {
   // Switch active chat
   const switchChat = (chat: number) => {
     setActiveChat(chat);
-    setMessages(data[chat]["messages"]); // Clear messages when switching chats
+    // setMessages(data[chat]["messages"]); // Clear messages when switching chats
     setAccepted(false);
   };
 
@@ -402,7 +399,7 @@ const ChatPage: React.FC = () => {
             <div>
               {/* Add padding to prevent overlap */}
               <div className="flex flex-col space-y-2">
-                {messages.map((msg, index) => {
+                {messages?.map((msg, index) => {
                   switch (msg.type) {
                     case "text":
                       return (

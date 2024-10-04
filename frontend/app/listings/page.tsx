@@ -1,19 +1,33 @@
 "use client";
+import { useState, useEffect } from "react";
 import Listings from "./listings";
 import Sidebar from "./sidebar";
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+
+export type filterType = {
+  size: string[];
+  condition: string[];
+  category: string[];
+  demographic: string[];
+};
 import { supabase } from "@/service/supabaseClient";
-import { useRouter } from 'next/navigation'; // Next.js router for redirection
+import { useRouter } from "next/navigation"; // Next.js router for redirection
 
 const ListingsPage = () => {
+  const [filter, setFilter] = useState<filterType>({
+    size: [],
+    condition: [],
+    category: [],
+    demographic: [],
+  });
+
   const [loading, setLoading] = useState(true); // For handling the loading state
   const router = useRouter();
-  
+
   useEffect(() => {
     const checkUser = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!data?.user) {
-        router.push('/login'); // Redirect to /login if no user is found
+        router.push("/login"); // Redirect to /login if no user is found
       }
       setLoading(false);
     };
@@ -22,8 +36,8 @@ const ListingsPage = () => {
 
   return (
     <div className="flex flex-row">
-      <Sidebar filter={null} />
-      <Listings />
+      <Sidebar filter={filter} setFilter={setFilter} />
+      <Listings filter={filter} />
     </div>
   );
 };

@@ -9,7 +9,13 @@ import {
 import { useState } from "react";
 import { ConditionTable } from "./condition-table";
 
-const Condition = () => {
+const Condition = ({
+  cond,
+  setCond,
+}: {
+  cond: string[];
+  setCond: (cond: string[]) => void;
+}) => {
   const [col, setCol] = useState(true);
 
   return (
@@ -27,7 +33,7 @@ const Condition = () => {
           <ChevronRight className="h-5 w-4 stroke-[2.5px]" />
         )}
       </div>
-      {col && <ConditionTable />}
+      {col && <ConditionTable cond={cond} setCond={setCond} />}
     </div>
   );
 };

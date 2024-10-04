@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import ItemImages from '../components/ItemImages';
 import { getItem, getUserProfileImageUrl } from '../../service/items';
 import { useRouter } from 'next/navigation'; // Import useRouter to handle navigation
-import UserRating from '../components/UserRating';
-import { ArrowBigRight, Ellipsis, Heart, Share } from 'lucide-react';
+import ItemImages from '../components/ItemImages';
 
 export interface ItemData {
   id: number;
@@ -27,6 +25,23 @@ export interface ItemData {
   ownerRating: number;
   imageUrl: string;
 }
+
+interface ItemRatingProps {
+  ownerRating: number;
+}
+
+const ItemRating: React.FC<ItemRatingProps> = ({ ownerRating }) => {
+  // Generate the stars string
+  const filledStars = "✭".repeat(ownerRating);
+  const emptyStars = "✩".repeat(5 - ownerRating);
+
+  return (
+    <div className="text-xl">
+      {filledStars}
+      {emptyStars}
+    </div>
+  );
+};
 
 const Item = () => {
   const searchParams = useSearchParams(); // Use useSearchParams to get query params
@@ -107,15 +122,15 @@ const Item = () => {
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-full">
-            <Heart/>
+            <img src="flower.png" className="w-6 h-6" alt="flower icon" />
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
-            <Share/>
+            <img src="flower.png" className="w-6 h-6"></img>
           </button>
 
           <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
-            <Ellipsis/>
+            <img src="flower.png" className="w-6 h-6"></img>
           </button>
         </div>
 
@@ -150,7 +165,8 @@ const Item = () => {
             <div>
               <p className="text-black font-semibold">{itemData.ownerName}</p>
               <div className="flex items-center text-sm text-gray-700">
-                <UserRating rating={itemData.ownerRating} num={8} />
+                <ItemRating ownerRating={itemData.ownerRating} />
+                <span className="ml-1">(8)</span>
               </div>
             </div>
           </div>
