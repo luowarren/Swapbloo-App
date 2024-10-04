@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import { createClient } from '@supabase/supabase-js'; 
 import { createClient } from '@supabase/supabase-js'; // Correct named import
 // import twilio from "twilio";
 
