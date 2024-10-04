@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
-import pkg from "@supabase/supabase-js";
+// import pkg from "@supabase/supabase-js";
 import { Filter } from 'bad-words'
+import { createClient } from '@supabase/supabase-js';
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
 
-const { createClient, SupabaseClient } = pkg;
+// const { createClient, SupabaseClient } = pkg;
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -33,6 +34,11 @@ export async function getMostRecentMessage(chat_id) {
         console.log("found error")
         return messageError
       }
+      if (messages.length == 0) {
+        return null;
+      }
+
+      console.log("chat id", messages)
 
       function compareMessageTimestamp(m1, m2) {
         if (m1.created_at < m2.created_at) {
@@ -59,9 +65,9 @@ export function censorMessage(message) {
 
 (async () => {
     try {
-      const chat_id = 1
-      // const message = await getMostRecentMessage(chat_id);
-      // console.log(message);
+      const chat_id = 16
+      const message = await getMostRecentMessage(chat_id);
+      console.log(message);
       // const message = "hello blah blah";
       // console.log(censorMessage(message));
     } catch (error) {
