@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { getUserProfileImageUrl } from "../../service/items"; // Import your existing service function
+import { User } from "lucide-react";
 
 interface ProfileImageProps {
   userId: string;
-  className?: string | null;  // Allow string or null
+  className?: string | null; // Allow string or null
 }
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ userId, className = '' }) => {
+const ProfileImage: React.FC<ProfileImageProps> = ({
+  userId,
+  className = "",
+}) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -37,7 +41,11 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ userId, className = '' }) =
   }, [userId]);
 
   if (loading) {
-    return <p>Loading profile picture...</p>;
+    return (
+      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+        <User />
+      </div>
+    );
   }
 
   return (
