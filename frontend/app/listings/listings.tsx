@@ -1,20 +1,62 @@
 "use client";
 
 import { getActiveListings } from "@/service/items";
+import {
+  getfilteredItems,
+  searchAndFilter,
+  searchFilter,
+} from "@/service/listings";
 import { Shirt } from "lucide-react";
 import { useEffect, useState } from "react";
 import ListingCard from "./listing-card";
+import { filterType } from "./page";
+import {
+  CATEGORIES,
+  CONDITIONS,
+  DEMOGRAPHICS,
+  SIZES,
+} from "@/service/constants";
 
-const Listings = () => {
+const Listings = ({
+  filter,
+  search,
+}: {
+  filter: filterType;
+  search?: string;
+}) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any[] | null>(null);
   useEffect(() => {
     getActiveListings().then((data) => {
-      console.log(data);
       setLoading(false);
       setData(data.data);
     });
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+
+    const sizes = filter.size.length == 0 ? SIZES : filter.size;
+    const category = filter.category.length == 0 ? CATEGORIES : filter.category;
+    const condition =
+      filter.condition.length == 0 ? CONDITIONS : filter.condition;
+    const demographic =
+      filter.demographic.length == 0 ? DEMOGRAPHICS : filter.demographic;
+
+    if (search) {
+      searchAndFilter(search, sizes, category, condition, demographic).then(
+        (data) => {
+          setLoading(false);
+          setData(data.data);
+        }
+      );
+    } else {
+      getfilteredItems(sizes, category, condition, demographic).then((data) => {
+        setLoading(false);
+        setData(data.data);
+      });
+    }
+  }, [filter]);
 
   if (loading || data == null) {
     return (

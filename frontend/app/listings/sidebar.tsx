@@ -1,19 +1,45 @@
 "use client";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Category from "./category";
 import Condition from "./condition";
 import Size from "./size";
-
-const Sidebar = ({ filter }: { filter: any }) => {
+import Demographic from "./demographic";
+import { filterType } from "./page";
+// import Demographic from "./demographic";
+const Sidebar = ({
+  search,
+  filter,
+  setFilter,
+}: {
+  search?: string;
+  filter: filterType;
+  setFilter: Dispatch<SetStateAction<filterType>>;
+}) => {
   const [sortColl, setSortColl] = useState(true);
+
+  const setNewConditions = (cond: string[]) => {
+    setFilter((prev: any) => ({ ...prev, condition: cond }));
+  };
+  const setNewSize = (size: string[]) => {
+    setFilter((prev: any) => ({ ...prev, size: size }));
+  };
+  const setNewDemographic = (demo: string[]) => {
+    setFilter((prev: any) => ({ ...prev, demographic: demo }));
+  };
+  const setNewCategory = (categ: string[]) => {
+    setFilter((prev: any) => ({ ...prev, category: categ }));
+  };
+
+  console.log(filter);
 
   return (
     <div className="h-[85vh] w-80 border-r border-r-slate-300 p-5 overflow-y-scroll">
       <div className="flex flex-col p-4 items-center w-full border-b border-b-slate-300">
-        <span className="font-bold text-xl text-slate-700">Everything</span>
-        <span className="text-slate-500 text-xs">(20 results)</span>
+        <span className="font-bold text-xl text-slate-700">
+          {search ? `"${search}"` : "Everything"}
+        </span>
       </div>
       <div className="flex flex-col mt-4">
         <span className="font-bold text-sm my-1 text-slate-500">Filters</span>
@@ -50,9 +76,10 @@ const Sidebar = ({ filter }: { filter: any }) => {
             </div>
           </div>
         )}
-        <Category />
-        <Size />
-        <Condition />
+        <Demographic demos={filter.demographic} setDemos={setNewDemographic} />
+        <Category cats={filter.category} setCats={setNewCategory} />
+        <Size size={filter.size} setSize={setNewSize} />
+        <Condition cond={filter.condition} setCond={setNewConditions} />
       </div>
     </div>
   );

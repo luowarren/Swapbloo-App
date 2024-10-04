@@ -2,7 +2,13 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { CategoryTable } from "./category-table";
 
-const Category = () => {
+const Category = ({
+  cats,
+  setCats,
+}: {
+  cats: string[];
+  setCats: (cats: string[]) => void;
+}) => {
   const [col, setCol] = useState(true);
 
   return (
@@ -20,7 +26,7 @@ const Category = () => {
           <ChevronRight className="h-5 w-4 stroke-[2.5px]" />
         )}
       </div>
-      {col && <CategoryTable />}
+      {col && <CategoryTable cats={cats} setCats={setCats} />}
     </div>
   );
 };
