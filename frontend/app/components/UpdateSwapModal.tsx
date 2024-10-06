@@ -112,22 +112,26 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
 
   if (!isVisible) return null;
 
-  return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+  return (<div
+    className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-100" // Full screen overlay, centered modal
+  >
+    <div
+      className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl h-auto overflow-y-auto" // Centered modal with max width and height
+      style={{ maxHeight: "90vh", marginTop: "20px", marginBottom: "20px" }} // Ensuring it doesn't go off-screen
+    >
       <form 
-        className="bg-white rounded-lg shadow-lg p-6 w-3/4" 
-        onSubmit={handleSubmit} // Added onSubmit to the form
+        className="w-full" 
+        onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold mb-4">Update Your Swap</h2>
-
+        <h2 className="text-2xl font-bold mb-6 text-center">Update Your Swap</h2>
+  
         {/* Their Items Section */}
-        <div className="mb-4">
-          <h3 className="font-bold">Their Items</h3>
-          <div className="flex flex-wrap space-x-4">
+        <div className="mb-6">
+          <h3 className="font-bold text-lg mb-2">Their Items</h3>
+          <div className="flex flex-wrap gap-4">
             {updatedMyItems && updatedMyItems.length > 0 ? (
               updatedMyItems.map((item, index) => (
                 <div key={index} className="relative w-32 h-40">
-                  {/* Show the item image in an overlay */}
                   <ItemImages itemId={item} className="w-full h-full" />
                 </div>
               ))
@@ -136,18 +140,15 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
             )}
           </div>
         </div>
-
+  
         {/* Your Items Section */}
-        <div className="mb-4">
-          <h3 className="font-bold">Your Items</h3>
-          <div className="flex flex-wrap space-x-4">
+        <div className="mb-6">
+          <h3 className="font-bold text-lg mb-2">Your Items</h3>
+          <div className="flex flex-wrap gap-4">
             {updatedRequestingItems && updatedRequestingItems.length > 0 ? (
               updatedRequestingItems.map((item, index) => (
                 <div key={index} className="relative w-32 h-40">
-                  {/* Show the item image in an overlay */}
                   <ItemImages itemId={item} className="w-full h-full" />
-
-                  {/* Remove item (x) button */}
                   <button
                     type="button"
                     onClick={() => handleRemoveMyItem(item)}
@@ -162,60 +163,63 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
             )}
           </div>
         </div>
-
-        {/* Add More of Your Items */}
-        <div className="mb-4">
-          <h3 className="font-bold">Add More of Your Items</h3>
-          <div className="flex flex-wrap space-x-4">
-          {userItems && userItems.length > 0 ? (
-            (() => {
-              const filteredItems = userItems.filter((item) => !updatedRequestingItems.includes(item.id));
-
-              return filteredItems.length > 0 ? (
-                filteredItems.map((item) => (
-                  <div key={item.id} className="relative w-32 h-40">
-                    <ItemImages itemId={item.id} className="w-full h-full" />
-                    <button
-                      type="button"
-                      onClick={() => handleAddMyItem(item.id)}
-                      className="absolute bottom-2 right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                    >
-                      +
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p>No items available to add.</p>
-              );
-            })()
-          ) : (
-            <p>No items available to add.</p>
-          )}
+  
+        {/* Add More of Your Items Section */}
+        <div className="mb-6">
+          <h3 className="font-bold text-lg mb-2">Add More of Your Items</h3>
+          <div className="flex flex-wrap gap-4">
+            {userItems && userItems.length > 0 ? (
+              (() => {
+                const filteredItems = userItems.filter(
+                  (item) => !updatedRequestingItems.includes(item.id)
+                );
+                return filteredItems.length > 0 ? (
+                  filteredItems.map((item) => (
+                    <div key={item.id} className="relative w-32 h-40">
+                      <ItemImages itemId={item.id} className="w-full h-full" />
+                      <button
+                        type="button"
+                        onClick={() => handleAddMyItem(item.id)}
+                        className="absolute bottom-2 right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      >
+                        +
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p>No items available to add.</p>
+                );
+              })()
+            ) : (
+              <p>No items available to add.</p>
+            )}
           </div>
         </div>
-
-        {/* Display an error message if no items */}
+  
+        {/* Error Message */}
         {errorMessage && (
-          <p className="text-red-500 mb-4">{errorMessage}</p>
+          <p className="text-red-500 mb-6 text-center">{errorMessage}</p>
         )}
-
-        {/* Buttons for saving or canceling */}
-        <div className="flex justify-between mt-4">
+  
+        {/* Buttons */}
+        <div className="flex justify-end space-x-4">
           <GenericButton text="Cancel" click={onClose} inverse={true} />
-          <button 
-            type="submit" 
-            className="bg-blue-500 text-white rounded-lg px-4 py-2"
-            disabled={updatedRequestingItems.length === 0} // Disable if no items in updatedRequestingItems
+          <button
+            type="submit"
+            className="bg-blue-500 text-white rounded-lg px-6 py-2"
+            disabled={updatedRequestingItems.length === 0}
           >
             Update Swap
           </button>
         </div>
       </form>
-
-       {/* Success Modal */}
-       {showSuccessModal && <SuccessModal onClose={handleCloseSuccessModal} />}
+  
+      {/* Success Modal */}
+      {showSuccessModal && <SuccessModal onClose={handleCloseSuccessModal} />}
     </div>
-  );
+  </div>
+  
+  )
 };
 
 export default UpdateSwapModal;

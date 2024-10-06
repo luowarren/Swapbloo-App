@@ -21,6 +21,7 @@ const NavBar: React.FC = () => {
             if (data) {
                 setUser(data.user);
             } else if (error) {
+                router.push('/')
                 console.error('Error fetching user:', error);
             }
         };

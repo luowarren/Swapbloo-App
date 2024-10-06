@@ -8,21 +8,22 @@ import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 import { getUserId } from "@/service/auth";
 
 interface SwapDetailsProps {
-  ownerId: string | null;
-  requesterId: string | null;
+    ownerId: string | null;
+    requesterId: string | null;
 }
+  
 
 const SwapDetails: React.FC<SwapDetailsProps> = ({
   ownerId,
   requesterId,
 }) => {
-  const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [myItems, setMyItems] = useState<string[]>([]); // Your items
   const [requestingItems, setRequestingItems] = useState<string[]>([]); // Other user's items
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [swapExists, setSwapExists] = useState<boolean>(true); // State to track if the swap exists
   const [swapId, setSwapId] = useState<string | null>(null);
+  const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] = useState(false); // Modal state here
 
   useEffect(() => {
     // Ensure that ownerId and requesterId are available before running this
@@ -67,6 +68,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
   }
 
   return (
+    
     <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 ">
       <div className="font-bold text-2xl mb-4">Swap Details</div>
       <div
@@ -139,8 +141,8 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
         {/* Update Swap Modal */}
         <UpdateSwapModal
-          isVisible={isUpdateSwapModalVisible}
-          onClose={() => setIsUpdateSwapModalVisible(false)}
+          isVisible={isUpdateSwapModalVisible} // Modal visibility from parent state
+          onClose={() => setIsUpdateSwapModalVisible(false)} // Close modal when done
           swapId={swapId}
           myItems={myItems} // Your items
           requestingItems={requestingItems} // Their items

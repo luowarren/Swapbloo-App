@@ -46,6 +46,7 @@ const ChatPage: React.FC = () => {
   const [accepterId, setAccepterId] = useState<string | null>(null);
   const [isSwapDetailsVisible, setIsSwapDetailsVisible] = useState(true); // Manage SwapDetails visibility
   const lastScrollTop = useRef(0); // Track the last scroll position
+  const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] = useState(false); // State to control modal visibility
 
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
@@ -323,7 +324,11 @@ const ChatPage: React.FC = () => {
   console.log(data[activeChat])
     
   return (
-    <div className="flex h-[85vh]">
+    <div className="relative"> {/* The relative container to position the grey overlay */}
+    {/* Grey overlay */}
+     
+
+    <div className="flex h-[85vh] z-100">
       {/* Sidebar for other chats */}
       <div className="flex flex-col w-1/4 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
         <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
@@ -349,7 +354,8 @@ const ChatPage: React.FC = () => {
 
       {/* Main chat area */}
       {activeChat !== null && (
-        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%] relative h-full">
+         
+        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%] relative h-full z-200">
           {/* SwapDetails */}
           <div className={`sticky top-0 z-10 bg-white border-b transition-transform duration-300 ${isSwapDetailsVisible ? 'translate-y-0' : '-translate-y-full'}`}>
             {activeChat != null && accepterId && requesterId && (
@@ -586,6 +592,7 @@ const ChatPage: React.FC = () => {
           />
         </div>
       )}
+    </div>
     </div>
   );
 };
