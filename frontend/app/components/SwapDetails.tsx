@@ -44,12 +44,12 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
             // Determine if the logged-in user is the requester or accepter
             if (userId === requesterId) {
               // If the logged-in user is the requester
-              setMyItems(user1Items || []); // Your items
-              setRequestingItems(user2Items || []); // The other user's items
-            } else if (userId === ownerId) {
-              // If the logged-in user is the owner/accepter
               setMyItems(user2Items || []); // Your items
               setRequestingItems(user1Items || []); // The other user's items
+            } else if (userId === ownerId) {
+              // If the logged-in user is the owner/accepter
+              setMyItems(user1Items || []); // Your items
+              setRequestingItems(user2Items || []); // The other user's items
             }
             console.log("7777", myItems)
           } else {
