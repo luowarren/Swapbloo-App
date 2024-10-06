@@ -38,3 +38,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ## Running Supabase
 To run the backend, you need a .env file in the root of your app directory.
 It should contain the supabase key and URL.
+
+## Public url stuff
+brew install --cask ngrok
+ngrok config add-authtoken 2n3EvXzko3SicNhgO1Ud9ydZ9YH_4q9gewq7njeWV8W7Sn3JR
+ngrok http http://localhost:3000

@@ -249,11 +249,13 @@ export async function listFilenamesFromBucket() {
  */
 export async function getImageFromId(imageId, bucket) {
   console.log("image id and bucket:", bucket, imageId);
-  const { data, error } = await supabase.storage.from(bucket).download(imageId);
-  console.log("getting data from buckets", data);
+  if (imageId != null) {
+    const { data, error } = await supabase.storage.from(bucket).download(imageId);
+    console.log("getting data from buckets", data);
 
-  if (error) {
-    return error;
+    if (error) {
+      return error;
+    }
   }
 
   return data;
