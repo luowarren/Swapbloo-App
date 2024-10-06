@@ -1,13 +1,20 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../../service/supabaseClient"; // Update the import path
 import ImageUpload from "../components/ImageUpload";
 import Category from "../listings/category";
 import Condition from "../listings/condition";
 import Size from "../listings/size";
 import Demographic from "../listings/demographic";
+import {
+  createItemListing,
+  createItemImage,
+  uploadImage,
+} from "@/service/items";
+import { getUserId } from "@/service/auth";
 
 const ListAnItemPage: React.FC = () => {
+  const [currUserId, setCurrUserId] = useState<string>("");
   const [demographic, setDemographic] = useState<string[]>([]);
   const [category, setCategory] = useState<string[]>([]);
   const [size, setSize] = useState<string[]>([]);
@@ -15,6 +22,33 @@ const ListAnItemPage: React.FC = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [title, setTitle] = useState(""); // State for title
   const [description, setDescription] = useState(""); // State for description
+  const [brand, setBrand] = useState(""); // State for description
+
+  const clearAllStates = () => {
+    setDemographic([]);
+    setCategory([]);
+    setSize([]);
+    setBrand("");
+    setTitle("");
+    setDescription("");
+    setUploadedImages([]);
+    setCondition([]);
+  };
+
+  const handleCurrentUser = async () => {
+    // get current user
+    const uid = await getUserId();
+    console.log("current user: ", uid);
+    if (uid != null) {
+      setCurrUserId(uid);
+    } else {
+      throw new Error();
+    }
+  };
+
+  useEffect(() => {
+    handleCurrentUser();
+  }, []);
 
   const handleDragStart =
     (index: number) => (event: React.DragEvent<HTMLDivElement>) => {
@@ -38,30 +72,47 @@ const ListAnItemPage: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    console.log(category, size, demographic, condition, title, description)
-    // try {
-    //   const uploadPromises = uploadedImages.map(async (image, index) => {
-    //     const response = await fetch(image);
-    //     const blob = await response.blob();
-    //     const fileName = `image_${Date.now()}_${index}.png`; // Create a unique file name
+    console.log(category, size, demographic, condition, title, description);
 
-    //     // Upload to Supabase
-    //     const { data, error } = await supabase.storage
-    //       .from("images")
-    //       .upload(fileName, blob, {
-    //         contentType: "image/png", // Adjust content type as needed
-    //       });
+    try {
+      let item = await createItemListing(
+        currUserId,
+        size[0],
+        condition[0],
+        category[0],
+        demographic[0],
+        title,
+        description,
+        brand
+      );
+      if (item.error) throw item.error;
+      const uploadPromises = uploadedImages.map(async (image, index) => {
+        console.log(image);
+        const fileName = `image_${Date.now()}_${index}.png`; // Create a unique file name
+        console.log(fileName);
 
-    //     if (error) throw error;
-    //     return data.Key; // or data.Path, depending on your needs
-    //   });
+        let uploadedImage = await uploadImage(image, fileName);
+        if (uploadedImage.error) throw uploadedImage.error;
+        if (item.data !== null) {
+          let itemImage = await createItemImage(
+            String(item.data[0].id),
+            fileName
+          );
+          if (itemImage.error) throw itemImage.error;
+        }
+      });
 
-    //   await Promise.all(uploadPromises);
-    //   alert("Photos uploaded successfully!"); // Mock success message
-    // } catch (error) {
-    //   console.error("Error uploading photos:", error);
-    //   alert("Failed to upload photos.");
-    // }
+      await Promise.all(uploadPromises);
+      alert("Listing uploaded successfully!"); // Mock success message
+      clearAllStates();
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth", // Optional: adds a smooth scrolling effect
+      });
+    } catch (error) {
+      console.error("Error uploading listing:", error);
+      alert("Failed to upload listing.");
+    }
   };
 
   return (
@@ -145,7 +196,7 @@ const ListAnItemPage: React.FC = () => {
 
           {/* Description Input */}
           <section className="mb-8 w-full">
-            <h2 className="text-xl font-bold mb-2">Description</h2>
+            <h2 className="text-xl font-bold mb-2">Description*</h2>
             <textarea
               placeholder="e.g. Stripey tee, only worn a few times."
               className="w-full border border-gray-300 rounded-lg p-2 h-72 text-gray-700"
@@ -157,18 +208,36 @@ const ListAnItemPage: React.FC = () => {
         {/* Info Section */}
         <div className="mb-9 w-[58%] flex flex-row justify-between">
           <Category cats={category} setCats={setCategory} />
-          <div className="w-[70%]" >
+          <div className="w-[70%]">
             <Demographic demos={demographic} setDemos={setDemographic} />
             <Size size={size} setSize={setSize} />
-            <div className="w-fit">
+            <div className="flex flex-row space justify-between">
               <Condition cond={condition} setCond={setCondition} />
+              {/* Brand Input */}
+              <section className="w-[60%] mt-4 mb-10">
+                <h2 className="text-sm font-bold mb-2 text-slate-600">
+                  Brand*
+                </h2>
+                <input
+                  type="text"
+                  placeholder="e.g. Gucci"
+                  className=" mt-2 w-full border border-slate-200 rounded-lg p-2 text-gray-700"
+                  value={brand} // Bind state to input
+                  onChange={(e) => setBrand(e.target.value)} // Update state on change
+                />
+              </section>
             </div>
           </div>
         </div>
       </div>
 
       {/* Upload button */}
-      {(uploadedImages.length && title.length && description.length && category.length && size.length && demographic.length && condition.length) ? (
+      {uploadedImages.length &&
+      title.length &&
+      category.length &&
+      size.length &&
+      demographic.length &&
+      condition.length ? (
         <button
           onClick={handleUpload}
           style={{
@@ -183,6 +252,9 @@ const ListAnItemPage: React.FC = () => {
         </button>
       ) : (
         <button
+          onClick={() => {
+            alert("Something is missing...");
+          }}
           style={{
             display: "inline-block",
             padding: "10px 20px",
