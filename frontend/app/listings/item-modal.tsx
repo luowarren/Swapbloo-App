@@ -1,11 +1,23 @@
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import ItemImages from "../components/ItemImages";
 import UserRating from "../components/UserRating";
+import { Heart, MoreHorizontal, Share } from "lucide-react";
+import { getUser } from "@/service/users";
+import ProfileImage from "../components/ProfileImage";
 
 const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const handleMakeOffer = () => {};
-  const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
+  const [userLoading, setUserLoading] = useState(true);
+  const [user, setUser] = useState<any>(undefined);
+
+  useEffect(() => {
+    getUser(item.owner_id).then((user) => {
+      console.log(user);
+      setUserLoading(false);
+      setUser(user.Users?.[0]);
+    });
+  }, []);
 
   return (
     <Dialog>
@@ -24,26 +36,26 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
             <div className="flex space-x-2">
               <button
                 onClick={handleMakeOffer}
-                className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full"
+                className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
               >
                 Make Offer
               </button>
 
-              <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-full">
-                <img src="flower.png" className="w-6 h-6" alt="flower icon" />
+              <button className="text-indigo-800 bg-gray-100 p-2 rounded-sm">
+                <Heart />
               </button>
 
-              <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
-                <img src="flower.png" className="w-6 h-6"></img>
+              <button className="text-indigo-800 bg-gray-100 p-2 rounded-sm">
+                <Share />
               </button>
 
-              <button className="bg-indigo-700 hover:bg-indigo-800 text-white p-2 rounded-lg">
-                <img src="flower.png" className="w-6 h-6"></img>
+              <button className="text-indigo-800 bg-gray-100 p-2 rounded-sm">
+                <MoreHorizontal />
               </button>
             </div>
 
-            <hr className="border-gray-600 w-3/4 mt-2"></hr>
-            <p className="text-gray-800 mt-4">{item.description}</p>
+            <hr className="border-gray-300 mt-2"></hr>
+            <p className="text-gray-700 mt-2">{item.caption}</p>
 
             {item.damage && (
               <div className="flex items-center text-sm text-gray-800 mt-2">
@@ -56,37 +68,50 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
             </p>
 
             <div className="mt-4">
-              <div className="bg-green-300 rounded-lg w-3/4 h-24 flex items-center justify-center text-center mb-2">
-                <span className="text-black font-bold">Map</span>
+              <div
+                style={{
+                  width: "100%",
+                  height: "200px",
+                  borderRadius: "100px",
+                }}
+              >
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3539.0870022630133!2d153.01028581134258!3d-27.4976695762045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b91508241eb7c49%3A0x9ae9946d3710eee9!2sThe%20University%20of%20Queensland!5e0!3m2!1sen!2sau!4v1728004940952!5m2!1sen!2sau"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
               <p className="text-sm text-gray-700 mb-2">{item.location}</p>
-              <hr className="border-gray-600 w-3/4"></hr>
 
-              <div className="flex items-center my-4">
-                {profilePic && (
-                  <img
-                    src={profilePic}
-                    alt="Owner Avatar"
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
-                )}
-                <div>
-                  <p className="text-black font-semibold">{item.ownerName}</p>
-                  <div className="flex items-center text-sm text-gray-700">
-                    <UserRating rating={item.ownerRating} />
-                    <span className="ml-1">(8)</span>
+              {!userLoading && (
+                <div className="mt-8">
+                  <div className="text-gray-500 font-medium">
+                    Seller information
+                  </div>
+                  <div className="flex gap-2 items-center ">
+                    <ProfileImage userId={item.owner_id} />
+                    <div className="flex flex-col pt-4">
+                      <p className="text-gray-700 font-semibold">{user.name}</p>
+                      <div className="flex items-center text-sm text-gray-700">
+                        <UserRating rating={item.rating} reviewButton={false} />
+                        {/* <span className="ml-1">(8)</span> */}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2 text-sm">
+                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
+                      Visit Shop
+                    </button>
+                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm hover:bg-indigo-50">
+                      Ask a question
+                    </button>
                   </div>
                 </div>
-              </div>
-
-              <div className="flex space-x-2">
-                <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg mr-2 hover:bg-indigo-50">
-                  Visit Shop
-                </button>
-                <button className="border border-indigo-800 text-indigo-800 font-semibold px-10 py-2 rounded-lg hover:bg-indigo-50">
-                  Ask a question
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
