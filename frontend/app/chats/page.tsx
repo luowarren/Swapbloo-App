@@ -44,6 +44,8 @@ const ChatPage: React.FC = () => {
   const otherUserDataRef = useRef(otherUserData);
   const [requesterId, setRequesterId] = useState<string | null>(null);
   const [accepterId, setAccepterId] = useState<string | null>(null);
+  const [isSwapDetailsVisible, setIsSwapDetailsVisible] = useState(true); // Manage SwapDetails visibility
+  const lastScrollTop = useRef(0); // Track the last scroll position
 
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
@@ -319,7 +321,7 @@ const ChatPage: React.FC = () => {
 
   console.log('hello sigma')
   console.log(data[activeChat])
-
+    
   return (
     <div className="flex h-[85vh]">
       {/* Sidebar for other chats */}
@@ -347,8 +349,16 @@ const ChatPage: React.FC = () => {
 
       {/* Main chat area */}
       {activeChat !== null && (
-        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%]">
-          {/* Banner for active chat */}
+        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%] relative h-full">
+          {/* SwapDetails */}
+          <div className={`sticky top-0 z-10 bg-white border-b transition-transform duration-300 ${isSwapDetailsVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+            {activeChat != null && accepterId && requesterId && (
+              <SwapDetails
+                ownerId={accepterId}
+                requesterId={requesterId}
+              />
+            )}
+          </div>
 
           <div
             ref={messageBoxRef} // Attach the ref here
@@ -356,12 +366,7 @@ const ChatPage: React.FC = () => {
             className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative border"
           >
             
-            {activeChat !=null && accepterId && requesterId && (
-              <SwapDetails
-                ownerId={accepterId} // Your logic for ownerId
-                requesterId={requesterId} // Your logic for requesterId
-              />
-            )}
+            
 
             {otherUserData != null &&(<div
               style={{
@@ -544,6 +549,7 @@ const ChatPage: React.FC = () => {
             </button>
           </form> */}
         </div>
+      
       )}
       {/* Other users info and meetup info */}
       {activeChat !== null && (

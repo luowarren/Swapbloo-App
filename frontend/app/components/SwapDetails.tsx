@@ -67,7 +67,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
   }
 
   return (
-    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4">
+    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 ">
       <div className="font-bold text-2xl mb-4">Swap Details</div>
       <div
         style={{
