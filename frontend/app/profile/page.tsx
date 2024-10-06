@@ -1,14 +1,19 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { fetchUserData, fetchUserItems } from '../../service/users';
-import { getUserId } from '@/service/auth';
-import { getUser } from '../../service/users';
-import { getListingsByUsers } from '@/service/items';
-import { getRequestedItems, getReceivedRequests, getRequestedSwaps, getReceivedSwaps } from '@/service/swaps'; // Import swap functions
-import ProfileImage from '../components/ProfileImage';
-import ItemImages from '../components/ItemImages';
-import { useRouter } from 'next/navigation';
-import UserRating from '../components/UserRating';
+import React, { useEffect, useState } from "react";
+import { fetchUserData, fetchUserItems } from "../../service/users";
+import { getUserId } from "@/service/auth";
+import { getUser } from "../../service/users";
+import { getListingsByUsers } from "@/service/items";
+import {
+  getRequestedItems,
+  getReceivedRequests,
+  getRequestedSwaps,
+  getReceivedSwaps,
+} from "@/service/swaps"; // Import swap functions
+import ProfileImage from "../components/ProfileImage";
+import ItemImages from "../components/ItemImages";
+import { useRouter } from "next/navigation";
+import UserRating from "../components/UserRating";
 
 // Define types for UserData and ItemData
 interface UserData {
@@ -35,7 +40,9 @@ const Login: React.FC = () => {
   const [outgoingSwaps, setOutgoingSwaps] = useState<ItemData[]>([]); // State to store requested swaps
   const [incomingSwaps, setIncomingSwaps] = useState<ItemData[]>([]); // State to store incoming swap requests
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'listings' | 'requested' | 'incoming'>('listings'); // State to manage active tab
+  const [activeTab, setActiveTab] = useState<
+    "listings" | "requested" | "incoming"
+  >("listings"); // State to manage active tab
   const router = useRouter(); // Move useRouter outside useEffect
   const [uid, setUserId] = useState<UserData | null>(null);
   useEffect(() => {
@@ -92,7 +99,7 @@ const Login: React.FC = () => {
   }
 
   // Function to switch tabs
-  const handleTabSwitch = (tab: 'listings' | 'requested' | 'incoming') => {
+  const handleTabSwitch = (tab: "listings" | "requested" | "incoming") => {
     setActiveTab(tab);
   };
 
@@ -103,7 +110,7 @@ const Login: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold">{user.username}</h2>
           <div className="flex items-center">
-          <UserRating rating={user.rating} num={8} />
+            <UserRating rating={user.rating} num={8} />
           </div>
           <p className="text-sm text-gray-500">{user.location}</p>
         </div>
@@ -113,20 +120,26 @@ const Login: React.FC = () => {
       {/* Tab Buttons */}
       <div className="flex space-x-8 mt-5 mx-4">
         <button
-          className={`font-semibold pb-2 ${activeTab === 'listings' ? 'underline' : ''}`}
-          onClick={() => handleTabSwitch('listings')}
+          className={`font-semibold pb-2 ${
+            activeTab === "listings" ? "underline" : ""
+          }`}
+          onClick={() => handleTabSwitch("listings")}
         >
           Listings
         </button>
         <button
-          className={`font-semibold pb-2 ${activeTab === 'requested' ? 'underline' : ''}`}
-          onClick={() => handleTabSwitch('requested')}
+          className={`font-semibold pb-2 ${
+            activeTab === "requested" ? "underline" : ""
+          }`}
+          onClick={() => handleTabSwitch("requested")}
         >
           Requested Swaps
         </button>
         <button
-          className={`font-semibold pb-2 ${activeTab === 'incoming' ? 'underline' : ''}`}
-          onClick={() => handleTabSwitch('incoming')}
+          className={`font-semibold pb-2 ${
+            activeTab === "incoming" ? "underline" : ""
+          }`}
+          onClick={() => handleTabSwitch("incoming")}
         >
           Incoming Swap Requests
         </button>
@@ -134,15 +147,15 @@ const Login: React.FC = () => {
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
-        {activeTab === 'listings' && (
-          <div>
+        {activeTab === "listings" && (
+          <div className="flex flex-row">
             {items.length > 0 ? (
               items.map((item) => (
                 <ListingCard
                   key={item.id}
                   name={item.title}
                   size={item.size}
-                  brand={item.brand || 'Unknown'}
+                  brand={item.brand || "Unknown"}
                   id={item.id}
                 />
               ))
@@ -152,7 +165,7 @@ const Login: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'requested' && (
+        {activeTab === "requested" && (
           <div>
             {outgoingSwaps.length > 0 ? (
               outgoingSwaps.map((swapItem) => (
@@ -166,7 +179,7 @@ const Login: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'incoming' && (
+        {activeTab === "incoming" && (
           <div>
             {incomingSwaps.length > 0 ? (
               incomingSwaps.map((swapItem) => (
@@ -197,6 +210,10 @@ const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
   const handleCardClick = (id: number) => {
     router.push(`/item?itemId=${id}`); // Use router here
   };
+
+  const truncateMessage = (msg: string, maxLength: number) => {
+    return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
+  };
   return (
     <div>
       <div
@@ -205,18 +222,22 @@ const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
         style={{ cursor: "pointer" }}
       >
         {/* Main image area */}
-        <div className="relative w-full h-3/4"> {/* Set height to 75% of the card */}
+        <div className="relative w-full h-3/4">
+          {" "}
+          {/* Set height to 75% of the card */}
           {/* Item image */}
-          <ItemImages
-            itemId={id}
-            className="w-full h-full object-cover"
-          />
+          <ItemImages itemId={id} className="w-full h-full object-cover" />
         </div>
       </div>
       {/* Text below the image */}
       <div className="mt-2 text-center">
-        <p className="text-sm font-semibold text-indigo-900">{brand}</p>
-        <p className="text-xs text-gray-600">{size}</p>
+        <div className="text-sm font-semibold text-indigo-900">
+          {truncateMessage(name, 15)}
+        </div>
+        <p className="text-xs text-gray-600">
+        {truncateMessage(`${size} • ${brand}`, 15)}
+          
+        </p>
       </div>
     </div>
   );
