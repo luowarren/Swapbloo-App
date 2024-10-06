@@ -140,9 +140,9 @@ const NavBar: React.FC = () => {
             {/* Bottom navigation bar */}
             <div className="bg-white border-t">
                 <div className="container mx-auto py-2 px-6 flex justify-center space-x-8">
-                    <Link href="/marketplace">
+                    <Link href="/listings/">
                     <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
-                            Womanswear
+                            Items
                         </p>
                     </Link>
                     <Link href="/marketplace">
@@ -155,9 +155,9 @@ const NavBar: React.FC = () => {
                             Sigmawear
                         </p>
                     </Link>
-                    <Link href="/marketplace">
+                    <Link href="/chats">
                         <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
-                            Explore
+                            Chat
                         </p>
                     </Link>
                 </div>

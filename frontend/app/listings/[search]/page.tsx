@@ -22,8 +22,6 @@ const ListingsPage = () => {
   const search = useParams().search.toString();
   const decodedSearch = decodeURIComponent(search); // Decode the search term
 
-  console.log(decodedSearch); // See the decoded search term
-
   return (
     <div className="flex flex-row">
       <Sidebar filter={filter} setFilter={setFilter} search={decodedSearch} />
