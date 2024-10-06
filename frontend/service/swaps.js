@@ -185,6 +185,7 @@ export async function modifySwapRequest(
  * @returns {Promise<{swapExists: boolean, user1Items: string[], user2Items: string[]}>}
  */
 export async function getSwapDetailsBetweenUsers(userId1, userId2) {
+  console.log("sigmas are swapping", userId1, userId2)
   // Step 1: Check if there's a swap between these two users
   const { data: swap, error } = await supabase
     .from("Swaps")

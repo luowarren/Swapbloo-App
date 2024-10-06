@@ -13,9 +13,10 @@ import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
 import { getUserIdByUsername, getSwapDetailsBetweenUsers } from "../../service/swaps"
+import SwapDetails from "../components/SwapDetails";
 // import { supabase } from "@/service/supabaseClient";
 
-import { ArrowRightLeft } from "lucide-react";
+
 import { getUserId } from "../../service/users";
 import { supabase, getChats, getChat, sendMessage, getUserIdsFromChat } from "../../service/chat"
 sortData(data);
@@ -41,53 +42,28 @@ const ChatPage: React.FC = () => {
   const [accepted, setAccepted] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
   const otherUserDataRef = useRef(otherUserData);
-  const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] = useState(false);
-  const [myItems, setMyItems] = useState<string[]>([]);
-  const [requestingItems, setRequestingItems] = useState<string[]>([]);
   const [requesterId, setRequesterId] = useState<string | null>(null);
   const [accepterId, setAccepterId] = useState<string | null>(null);
-  const [swapId, setswapId] = useState<number | null>(null);
 
-  // Function to retrieve the swap details for the active chat
-  const handleOpenUpdateSwapModal = async () => {
-    if (activeChat !== null) {
-      const chatId = chats[activeChat].id; // Assuming chat ID is available here
-
-      // Fetch user IDs from the 'Chats' table using chat_id
-      const userIds = await getUserIdsFromChat(chatId);
-      const userId = await getUserId(); // Fetch the logged-in user's ID
-
-      if (userIds) {
-        const { requesterId, accepterId } = userIds;
-        setRequesterId(requesterId);
-        setAccepterId(accepterId);
-    
-        // Fetch the swap details between the two users
-        const { swapExists, user1Items, user2Items, swapId } = await getSwapDetailsBetweenUsers(requesterId, accepterId);
-    
-        if (swapExists) {
-          setswapId(swapId);
-          // Determine if the logged-in user is the requester or accepter
-          if (userId === requesterId) {
-            // If the logged-in user is the requester
-            setMyItems(user2Items); // Assign user1Items as your items
-            setRequestingItems(user1Items); // Assign user2Items as the other user's items
-          } else if (userId === accepterId) {
-            // If the logged-in user is the accepter
-            setMyItems(user1Items); // Assign user2Items as your items
-            setRequestingItems(user2Items); // Assign user1Items as the other user's items
-          }
-    
-          // Show the Update Swap Modal
-          setIsUpdateSwapModalVisible(true);
-        } else {
-          console.error("No swap exists between these users.");
-        }
+  const fetchChatUsers = async (chatId: string) => {
+    const users = await getUserIdsFromChat(chatId);
+  
+    if (users) {
+      if (currUserId === users.requesterId) {
+        setRequesterId(users.accepterId); // Other user's ID
+        setAccepterId(users.requesterId); // Your ID
+      } else {
+        setRequesterId(users.requesterId); // Other user's ID
+        setAccepterId(users.accepterId); // Your ID
       }
+  
+      console.log('User 1 ID:', users.requesterId);
+      console.log('User 2 ID:', users.accepterId);
+    } else {
+      console.log('No users found for the given chat ID');
     }
   };
-
-
+  
   
   useEffect(() => {
     otherUserDataRef.current = otherUserData;
@@ -158,7 +134,9 @@ const ChatPage: React.FC = () => {
       // update list of messages
       const chat_id = chats[activeChat].id
       getAllMessages(chat_id);
-
+      console.log("what the fuck", data[activeChat])
+      // Fetch and set the UUID (requesterId) for the other user by their username
+      fetchChatUsers(chat_id);
       // update otherUserData
       setOtherUserData((prevObj) => ({
         // ...prevObj,
@@ -167,6 +145,25 @@ const ChatPage: React.FC = () => {
       }))
     } 
   }, [activeChat])
+
+  useEffect(() => {
+    if (chats != null && activeChat != null) {
+      const chat_id = chats[activeChat].id;
+  
+      // Fetch messages for the current chat
+      getAllMessages(chat_id);
+  
+      // Fetch and set the UUID (requesterId) for the other user
+      fetchChatUsers(chat_id);
+  
+      // Update otherUserData
+      setOtherUserData({
+        name: chats[activeChat].username,
+        chat_id: chats[activeChat].id,
+      });
+    }
+  }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
+  
   
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
@@ -191,13 +188,14 @@ const ChatPage: React.FC = () => {
 //     checkUser();
 //   }, [router]);
 
-
+  
     if (activeChat != null) {
       data[activeChat]["lastMessage"] = notif;
       data[activeChat]["date"] = new Date().toISOString();
 
       sortData(data);
       setActiveChat(0);
+      
 
       if (otherUserData != null) {
         setMessages((prevMessages) => [
@@ -295,9 +293,17 @@ const ChatPage: React.FC = () => {
   // Switch active chat
   const switchChat = (chat: number) => {
     setActiveChat(chat);
-    // setMessages(data[chat]["messages"]); // Clear messages when switching chats
+    
+    // Clear out the requesterId and accepterId before fetching new ones
+    setRequesterId(null);
+    setAccepterId(null);
+    
+    // Fetch new data for the selected chat
+    fetchChatUsers(chats[chat].id);
+
     setAccepted(false);
   };
+
 
   // Toggle selection of a lastMessage preview
   const toggleMessageSelection = (index: number) => {
@@ -349,103 +355,14 @@ const ChatPage: React.FC = () => {
             id="messageBox"
             className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative border"
           >
-            <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl text-bold flex flex-col items-center border mb-4">
-              <div className="font-bold text-2xl mb-4">Swap Details</div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginBottom: "1em",
-                  width: "100%",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                    maxWidth: "80%",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <ItemPreview text="dress xs" />
-                  <ItemPreview />
-                  <ArrowRightLeft />
-                </div>
+            
+            {activeChat !=null && accepterId && requesterId && (
+              <SwapDetails
+                ownerId={accepterId} // Your logic for ownerId
+                requesterId={requesterId} // Your logic for requesterId
+              />
+            )}
 
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                    maxWidth: "80%",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <ItemPreview text="bucket hat" />
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  width: "50%",
-                }}
-              >
-                {" "}
-                {accepted ? (
-                  <GenericButton
-                    text="Update Offer"
-                    // inverse={true}
-                    noClick={true}
-                  />
-                ) : (
-                  <GenericButton
-                    text="Update Offer"
-                    click={handleOpenUpdateSwapModal}
-                  />
-                )}
-                 {/* Update Swap Modal */}
-               
-                  {activeChat !== null && (
-                  <UpdateSwapModal
-                  isVisible={isUpdateSwapModalVisible}
-                  onClose={() => setIsUpdateSwapModalVisible(false)}
-                  swapId={swapId} // Adjust as needed
-                  myItems={myItems}
-                  requestingItems={requestingItems}
-                  ownerId={requesterId}
-                  requesterId={accepterId}
-                  onUpdate={() => console.log("Swap updated!")} // Handle post-update logic here
-                />
-                )}
-                
-                {accepted ? (
-                  <GenericButton
-                    text="Accept Offer"
-                    // inverse={true}
-                    noClick={true}
-                  />
-                ) : (
-                  <GenericButton
-                    text="Accept Offer"
-                    click={() => {
-                      setAccepted(true);
-                      setNotification(
-                        `You accepted the offer with ${data[activeChat].name}!`,
-                        "accept"
-                      );
-                    }}
-                  />
-                )}
-              </div>
-            </div>
             {otherUserData != null &&(<div
               style={{
                 display: "flex",
