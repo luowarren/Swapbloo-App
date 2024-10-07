@@ -159,6 +159,7 @@ const ChatPage: React.FC = () => {
       getMeetUpData(swapId);
     } else {
       console.log("couldnt get swap data! cnt")
+      setMeetUpInfo(null)
     }
   }, [swapId])
 
@@ -170,6 +171,8 @@ const ChatPage: React.FC = () => {
       setSwapId(curr_swap_id[0].id);
     } else {
       console.log("epic fail, couldn't find swap id")
+      setSwapId(null);
+      setMeetUpInfo(null);
     }
   }
 
@@ -608,7 +611,7 @@ const ChatPage: React.FC = () => {
               }}
               meetUpInfo={meetUpInfo}
             />) : (
-              <div>Loading...</div>
+              <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
             )}
           </div>
         </div>
