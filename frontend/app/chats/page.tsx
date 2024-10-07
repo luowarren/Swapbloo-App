@@ -349,9 +349,9 @@ const ChatPage: React.FC = () => {
       {" "}
       {/* The relative container to position the grey overlay */}
       {/* Grey overlay */}
-      <div className="flex h-[85vh] z-100">
+      <div className="flex h-[85vh] z-100 bg-gray-100">
         {/* Sidebar for other chats */}
-        <div className="flex flex-col w-1/4 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
+        <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
           <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
             <h2>Chats</h2>
           </div>
@@ -373,7 +373,18 @@ const ChatPage: React.FC = () => {
 
         {/* Main chat area */}
         {activeChat !== null && (
-          <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%] relative h-full z-200">
+          <div
+            style={{
+              width: "55%",
+              // flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
+              height: "100%", // 'h-full'
+              padding: "1rem", // 'p-4' (4 units in Tailwind is usually 1rem)
+              position: "relative",
+              zIndex: 200, // 'z-200'
+            }}
+          >
             {/* SwapDetails */}
             <div
               className={`sticky top-0 z-10 bg-white border-b transition-transform duration-300 ${
@@ -576,27 +587,35 @@ const ChatPage: React.FC = () => {
         )}
         {/* Other users info and meetup info */}
         {activeChat !== null && (
-          <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-gray-100 pr-3">
-            <div className="w-full bg-white text-black p-4 rounded-lg text-2xl flex flex-col items-center mt-4 border">
-              <div className="w-16 h-16 bg-yellow-500 rounded-full mb-3"></div>
-              <div className="font-bold overflow-auto text-center">
-                {data[activeChat].name}'s Swap Shop
+          <div className="flex flex-col flex-grow py-4 pt-0 border-r overflow-y-auto h-full pr-3">
+            <div className="w-full bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 border">
+              <div className="flex flex-row items-center justify-evenly w-full mb-4">
+                <div className="w-16 h-16 bg-yellow-500 rounded-full"></div>
+                <div className="flex flex-col items-start align-middle">
+                  <div className="font-bold overflow-auto text-center">
+                    {data[activeChat].name}'s Swap Shop
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {data[activeChat].username}
+                  </div>
+                  <UserRating
+                    rating={Number(data[activeChat].rating)}
+                    num={8}
+                  />
+                </div>
               </div>
-              <div className="text-sm text-gray-500">
-                {data[activeChat].username}
-              </div>
-              <UserRating rating={Number(data[activeChat].rating)} num={8} />
-              <GenericButton text="Visit Shop" inverse={true} />
+                <GenericButton text="Visit Shop" inverse={true} width="90%"/>
             </div>
+
             <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
-              <div className="font-bold text-2xl">Meetup Info</div>
+              <div className="font-bold text-xl pb-2">Meetup Info</div>
               <LocationSelector
-              click={() => {
-                setNotification(
-                  `You updated the meetup details with ${data[activeChat].name}`
-                );
-              }}
-            />
+                click={() => {
+                  setNotification(
+                    `You updated the meetup details with ${data[activeChat].name}`
+                  );
+                }}
+              />
             </div>
           </div>
         )}

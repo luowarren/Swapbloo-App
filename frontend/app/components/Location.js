@@ -26,51 +26,53 @@ const LocationSelector = ({ click }) => {
     if ((selectedLocation && selectedDate && selectedTime) == "") {
       alert("Something is empty...");
     } else {
+      alert(`Location: ${selectedLocation} Date: ${selectedDate} Time: ${selectedTime}`)
       click();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div style={{ margin: "0.5em", marginTop: "1em" }}>
-        <ShowMap locations={locations} width="15rem" height="10rem"></ShowMap>
+    <div>
+      <ShowMap locations={locations} setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
+      <form onSubmit={handleSubmit}>
+        <div style={{ margin: "0.5em", marginTop: "1em" }}>
+          <div>
+            <label htmlFor="date">Date: </label>
+            <input
+              type="date"
+              id="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+            />
+          </div>
 
-        <div>
-          <label htmlFor="date">Date: </label>
-          <input
-            type="date"
-            id="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
+          <div>
+            <label htmlFor="time">Time: </label>
+            <input
+              type="time"
+              id="time"
+              value={selectedTime}
+              onChange={handleTimeChange}
+            />
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="time">Time: </label>
-          <input
-            type="time"
-            id="time"
-            value={selectedTime}
-            onChange={handleTimeChange}
-          />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center" /* Centers horizontally */,
+            alignItems: "center" /* Centers vertically */,
+            width: "100%" /* Takes full width of the parent */,
+            boxSizing:
+              "border-box" /* Ensures padding and border are included in total width/height */,
+            padding: "0.5em",
+            height: "auto",
+          }}
+        >
+          <GenericButton type="submit" text="Update Meetup" inverse={true} width="100%"/>
         </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center" /* Centers horizontally */,
-          alignItems: "center" /* Centers vertically */,
-          width: "100%" /* Takes full width of the parent */,
-          boxSizing:
-            "border-box" /* Ensures padding and border are included in total width/height */,
-          padding: "0.5em",
-          height: "auto",
-        }}
-      >
-        <GenericButton type="submit" text="Update Meetup" inverse={true} />
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

@@ -22,6 +22,7 @@ function CenterMap({ selected, zoom }) {
 // Main component
 export default function ShowMap({
   locations,
+  setter= () => {},
   width = "25rem",
   height = "15rem",
   zoom = 11,
@@ -113,7 +114,7 @@ export default function ShowMap({
               <div className="flex flex-col justify-center items-center h-full">
                 {" "}
                 {/* Ensure h-full or a specific height */}
-                <span>{location.name}</span>
+                <span className="mb-2">{location.name}</span>
                 <GenericButton
                   text={location === selected ? "Selected" : "Select"}
                   noClick={location === selected}
@@ -121,6 +122,7 @@ export default function ShowMap({
                     locations.forEach((l) => (l.pinned = false));
                     location.pinned = true;
                     setSelected(location);
+                    setter(location.name);
                   }}
                 />
               </div>
@@ -182,9 +184,7 @@ export default function ShowMap({
               style={{
                 bottom: "10px",
                 left: "10px",
-                padding: "0.5rem",
-                borderRadius: "8px",
-                zIndex: 1000, // Ensure it appears above the map
+                paddingRight: "0.5rem",
               }}
               onClick={() => setIsSearchVisible(!isSearchVisible)}
             >
@@ -195,17 +195,18 @@ export default function ShowMap({
               placeholder="Search by location"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: "200px", padding: "8px" }}
+              style={{ width: "200px", padding: "8px", borderWidth: "1px", borderRadius: "8px" }}
             />
           </div>
           {/* Search results */}
           {searchTerm && (
-            <ul style={{ listStyleType: "none", paddingBottom: "8px", overflow: "scroll" }}>
+            <ul style={{ listStyleType: "none", paddingBottom: "8px", overflow: "scroll"}}>
               {filteredLocations.map((location) => (
                 <li
                   key={location.id}
                   onClick={() => {
                     setSelected(location);
+                    setter(location.name)
                     setSearchTerm(""); // Clear search when selecting a location
                     setIsSearchVisible(false); // Hide search bar on selection
                   }}
