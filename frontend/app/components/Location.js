@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import locations from "../chats/locations";
 import GenericButton from "./GenericButton";
+import ShowMap from "./Map";
 
 const LocationSelector = ({ click }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -32,23 +33,7 @@ const LocationSelector = ({ click }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ margin: "0.5em", marginTop: "1em" }}>
-        <div>
-          <label htmlFor="date">Location: </label>
-          <select
-            id="location"
-            value={selectedLocation}
-            onChange={handleLocationChange}
-          >
-            <option value="" style={{}}>
-              None
-            </option>
-            {locations.map((location) => (
-              <option key={location.id} value={location.name}>
-                {location.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <ShowMap locations={locations} width="15rem" height="10rem"></ShowMap>
 
         <div>
           <label htmlFor="date">Date: </label>
@@ -83,7 +68,7 @@ const LocationSelector = ({ click }) => {
           height: "auto",
         }}
       >
-        <GenericButton text="Update Meetup" inverse={true} />
+        <GenericButton type="submit" text="Update Meetup" inverse={true} />
       </div>
     </form>
   );

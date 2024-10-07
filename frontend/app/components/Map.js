@@ -1,30 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMap, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { getDistance } from "geolib";
 import L from "leaflet";
 import GenericButton from "./GenericButton";
+import { Minus, Search } from "lucide-react";
+
+// Custom hook to center the map
+function CenterMap({ selected, zoom }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (selected) {
+      map.closePopup();
+      map.setView([selected.latitude, selected.longitude], zoom);
+    }
+  }, [selected, map, zoom]);
+
+  return null; // This component does not render anything
+}
 
 // Main component
 export default function ShowMap({
   locations,
-  width = "35rem",
-  height = "25rem",
+  width = "25rem",
+  height = "15rem",
   zoom = 11,
   iconSize = 35,
 }) {
   const [userLocation, setUserLocation] = useState(null);
-  const [nearbyLocation, setNearbyLocation] = useState({});
-
-  locations = locations.sort((a, b) => {
-    if (a.pinned === b.pinned) {
-      return 0; // If both are pinned or both are not pinned, maintain their order
-    }
-    return a.pinned ? -1 : 1;
-  }); // Move pinned locations to the front
-  var initialCenter = [locations[0].latitude, locations[0].longitude];
-
   const [selected, setSelected] = useState(locations[0]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredLocations, setFilteredLocations] = useState(locations);
+  const [isSearchVisible, setIsSearchVisible] = useState(false); // State for search bar visibility
+  const mapRef = useRef(); // Ref to store map instance
+
+  // Sort locations and initialize
+  locations = locations.sort((a, b) =>
+    a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
+  );
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -36,25 +50,18 @@ export default function ShowMap({
     );
   }, []);
 
+  // Search functionality
   useEffect(() => {
-    if (userLocation) {
-      const nearestLocation = locations
-        .map((location) => {
-          const metres = getDistance(userLocation, {
-            latitude: location.latitude,
-            longitude: location.longitude,
-          });
-          return {
-            ...location,
-            distance: metres,
-            nearby: metres <= 100,
-          };
-        })
-        .sort((a, b) => a.distance - b.distance)[0];
-
-      setNearbyLocation(nearestLocation);
+    if (searchTerm) {
+      const lowercasedTerm = searchTerm.toLowerCase();
+      const results = locations.filter((location) =>
+        location.name.toLowerCase().includes(lowercasedTerm)
+      );
+      setFilteredLocations(results);
+    } else {
+      setFilteredLocations([]);
     }
-  }, [userLocation, locations]);
+  }, [searchTerm, locations]);
 
   // Create a location icon
   const locationIcon = new L.Icon({
@@ -79,69 +86,144 @@ export default function ShowMap({
   });
 
   return (
-    <MapContainer
-      center={userLocation || initialCenter}
-      zoom={zoom}
-      style={{
-        backgroundColor: "#68D391", // bg-green-400
-        borderRadius: "0.5rem", // rounded-lg
-        width: width, // w-[50%]
-        height: height, // h-24 (24 * 0.25rem = 6rem)
-        fontSize: "0.75rem", // text-xs
-        display: "flex", // flex
-        alignItems: "center", // items-center
-        justifyContent: "center", // justify-center
-        marginRight: "1rem", // mr-4 (4 * 0.25rem = 1rem)
-      }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      />
-      {userLocation && (
-        <Marker position={userLocation} icon={personIcon}>
-          <Popup>You are here!</Popup>
-        </Marker>
-      )}
-      {locations.map((location) => (
-        <Marker
-          key={location.id}
-          position={[location.latitude, location.longitude]}
-          icon={location == selected ? selectedIcon : locationIcon}
+    <div style={{ position: "relative", width, height, }}>
+      {/* Map */}
+      <MapContainer
+        center={userLocation || [selected.latitude, selected.longitude]}
+        zoom={zoom}
+        style={{ width: "100%", height: "100%", borderRadius: "8px" }}
+        whenCreated={(mapInstance) => (mapRef.current = mapInstance)} // Store the map instance
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {userLocation && (
+          <Marker position={userLocation} icon={personIcon}>
+            <GenericButton>You are here!</GenericButton>
+          </Marker>
+        )}
+        {locations.map((location) => (
+          <Marker
+            key={location.id}
+            position={[location.latitude, location.longitude]}
+            icon={location == selected ? selectedIcon : locationIcon}
+          >
+            <Popup>
+              <div className="flex flex-col justify-center items-center h-full">
+                {" "}
+                {/* Ensure h-full or a specific height */}
+                <span>{location.name}</span>
+                <GenericButton
+                  text={location === selected ? "Selected" : "Select"}
+                  noClick={location === selected}
+                  click={() => {
+                    locations.forEach((l) => (l.pinned = false));
+                    location.pinned = true;
+                    setSelected(location);
+                  }}
+                />
+              </div>
+            </Popup>
+            {/* <Circle center={[location.latitude, location.longitude]} radius={100} color="purple" fillColor="purple" fillOpacity={0.5} /> */}
+          </Marker>
+        ))}
+        <CenterMap selected={selected} zoom={zoom} />
+      </MapContainer>
+
+      {/* Search Bar Toggle Button */}
+      {!isSearchVisible && (
+        <button
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            backgroundColor: "white",
+            padding: "1rem",
+            borderRadius: "8px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            zIndex: 1000, // Ensure it appears above the map
+          }}
+          onClick={() => setIsSearchVisible(!isSearchVisible)}
         >
-          <Popup>
-            <div className="flex flex-col justify-center items-center h-full">
-              {" "}
-              {/* Ensure h-full or a specific height */}
-              <span>{location.name}</span>
-              <GenericButton
-                text={location === selected ? "Selected" : "Select"}
-                noClick={location === selected}
-                click={() => {
-                  locations.forEach((l) => (l.pinned = false));
-                  location.pinned = true;
-                  setSelected(location);
-                }}
-              />
-            </div>
-          </Popup>
-          {/* <Circle center={[location.latitude, location.longitude]} radius={100} color="purple" fillColor="purple" fillOpacity={0.5} /> */}
-        </Marker>
-      ))}
-      {nearbyLocation && nearbyLocation.nearby && (
+          <Search />
+        </button>
+      )}
+      {/* Custom Search Bar Overlay */}
+      {isSearchVisible && (
         <div
           style={{
             position: "absolute",
-            bottom: 20,
-            left: 20,
-            background: "white",
-            padding: "10px",
+            display: "flex",
+            flexDirection: "column",
+            alignContent: "center",
+            top: "10px",
+            right: "10px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            zIndex: 1000, // Ensure it appears above the map
+            maxHeight: "90%",
           }}
         >
-          <h3>{nearbyLocation.name}</h3>
-          <p>Within 100 Metres!</p>
+          <div
+            style={{
+              display: "flex",
+              alignContent: "center",
+              top: "10px",
+              right: "10px",
+              backgroundColor: "white",
+              padding: "0.5rem",
+              borderRadius: "8px",
+              zIndex: 1000, // Ensure it appears above the map
+            }}
+          >
+            <button
+              style={{
+                bottom: "10px",
+                left: "10px",
+                padding: "0.5rem",
+                borderRadius: "8px",
+                zIndex: 1000, // Ensure it appears above the map
+              }}
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+            >
+              <Minus />
+            </button>
+            <input
+              type="text"
+              placeholder="Search by location"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: "200px", padding: "8px" }}
+            />
+          </div>
+          {/* Search results */}
+          {searchTerm && (
+            <ul style={{ listStyleType: "none", paddingBottom: "8px", overflow: "scroll" }}>
+              {filteredLocations.map((location) => (
+                <li
+                  key={location.id}
+                  onClick={() => {
+                    setSelected(location);
+                    setSearchTerm(""); // Clear search when selecting a location
+                    setIsSearchVisible(false); // Hide search bar on selection
+                  }}
+                  style={{ cursor: "pointer", padding: "8px" }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "lightgrey")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "white")
+                  }
+                >
+                  {location.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
-    </MapContainer>
+    </div>
   );
 }

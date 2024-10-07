@@ -147,7 +147,7 @@ const Login: React.FC = () => {
         </button>
       </div>
 
-      <ShowMap locations={locations}></ShowMap>
+      <ShowMap locations={locations} ></ShowMap>
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
