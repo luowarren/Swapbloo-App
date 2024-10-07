@@ -4,10 +4,13 @@ import { UserRound } from "lucide-react";
 
 interface ProfileImageProps {
   userId: string;
-  className?: string | null;  // Allow string or null
+  className?: string | null; // Allow string or null
 }
 
-const ProfileImage: React.FC<ProfileImageProps> = ({ userId, className = '' }) => {
+const ProfileImage: React.FC<ProfileImageProps> = ({
+  userId,
+  className = "",
+}) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -38,7 +41,11 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ userId, className = '' }) =
   }, [userId]);
 
   if (loading) {
-    return <p>Loading profile picture...</p>;
+    return (
+      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+        <UserRound />
+      </div>
+    );
   }
 
   return (
@@ -51,7 +58,7 @@ const ProfileImage: React.FC<ProfileImageProps> = ({ userId, className = '' }) =
         />
       ) : (
         <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 ">
-          <UserRound/>
+          <UserRound />
         </div>
       )}
     </div>

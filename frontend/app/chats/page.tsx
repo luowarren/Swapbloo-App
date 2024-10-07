@@ -4,7 +4,7 @@ import React, { useState, FormEvent, useRef, useEffect } from "react";
 import MessagePreview from "../components/MessagePreview";
 import MessageBubble from "../components/MessageBubble";
 import UserRating from "../components/UserRating";
-
+import UpdateSwapModal from "../components/UpdateSwapModal"
 import { useRouter } from 'next/navigation'; // Next.js router for redirection
 import Map from "../components/Map";
 import ItemPreview from "../components/ItemPreview";
@@ -12,11 +12,13 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
+import { getUserIdByUsername, getSwapDetailsBetweenUsers } from "../../service/swaps"
+import SwapDetails from "../components/SwapDetails";
 // import { supabase } from "@/service/supabaseClient";
 
-import { ArrowRightLeft } from "lucide-react";
+
 import { getUserId } from "../../service/users";
-import { supabase, getChats, getChat, sendMessage } from "../../service/chat"
+import { supabase, getChats, getChat, sendMessage, getUserIdsFromChat } from "../../service/chat"
 sortData(data);
 
 const ChatPage: React.FC = () => {
@@ -40,6 +42,31 @@ const ChatPage: React.FC = () => {
   const [accepted, setAccepted] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
   const otherUserDataRef = useRef(otherUserData);
+  const [requesterId, setRequesterId] = useState<string | null>(null);
+  const [accepterId, setAccepterId] = useState<string | null>(null);
+  const [isSwapDetailsVisible, setIsSwapDetailsVisible] = useState(true); // Manage SwapDetails visibility
+  const lastScrollTop = useRef(0); // Track the last scroll position
+  const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] = useState(false); // State to control modal visibility
+
+  const fetchChatUsers = async (chatId: string) => {
+    const users = await getUserIdsFromChat(chatId);
+  
+    if (users) {
+      if (currUserId === users.requesterId) {
+        setRequesterId(users.accepterId); // Other user's ID
+        setAccepterId(users.requesterId); // Your ID
+      } else {
+        setRequesterId(users.requesterId); // Other user's ID
+        setAccepterId(users.accepterId); // Your ID
+      }
+  
+      console.log('User 1 ID:', users.requesterId);
+      console.log('User 2 ID:', users.accepterId);
+    } else {
+      console.log('No users found for the given chat ID');
+    }
+  };
+  
   
   useEffect(() => {
     otherUserDataRef.current = otherUserData;
@@ -110,7 +137,9 @@ const ChatPage: React.FC = () => {
       // update list of messages
       const chat_id = chats[activeChat].id
       getAllMessages(chat_id);
-
+      console.log("what the fuck", data[activeChat])
+      // Fetch and set the UUID (requesterId) for the other user by their username
+      fetchChatUsers(chat_id);
       // update otherUserData
       setOtherUserData((prevObj) => ({
         // ...prevObj,
@@ -119,6 +148,25 @@ const ChatPage: React.FC = () => {
       }))
     } 
   }, [activeChat])
+
+  useEffect(() => {
+    if (chats != null && activeChat != null) {
+      const chat_id = chats[activeChat].id;
+  
+      // Fetch messages for the current chat
+      getAllMessages(chat_id);
+  
+      // Fetch and set the UUID (requesterId) for the other user
+      fetchChatUsers(chat_id);
+  
+      // Update otherUserData
+      setOtherUserData({
+        name: chats[activeChat].username,
+        chat_id: chats[activeChat].id,
+      });
+    }
+  }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
+  
   
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
@@ -143,13 +191,14 @@ const ChatPage: React.FC = () => {
 //     checkUser();
 //   }, [router]);
 
-
+  
     if (activeChat != null) {
       data[activeChat]["lastMessage"] = notif;
       data[activeChat]["date"] = new Date().toISOString();
 
       sortData(data);
       setActiveChat(0);
+      
 
       if (otherUserData != null) {
         setMessages((prevMessages) => [
@@ -247,9 +296,17 @@ const ChatPage: React.FC = () => {
   // Switch active chat
   const switchChat = (chat: number) => {
     setActiveChat(chat);
-    // setMessages(data[chat]["messages"]); // Clear messages when switching chats
+    
+    // Clear out the requesterId and accepterId before fetching new ones
+    setRequesterId(null);
+    setAccepterId(null);
+    
+    // Fetch new data for the selected chat
+    fetchChatUsers(chats[chat].id);
+
     setAccepted(false);
   };
+
 
   // Toggle selection of a lastMessage preview
   const toggleMessageSelection = (index: number) => {
@@ -263,8 +320,15 @@ const ChatPage: React.FC = () => {
     data[index]["viewed"] = true;
   };
 
+  console.log('hello sigma')
+  console.log(data[activeChat])
+    
   return (
-    <div className="flex h-[85vh]">
+    <div className="relative"> {/* The relative container to position the grey overlay */}
+    {/* Grey overlay */}
+     
+
+    <div className="flex h-[85vh] z-100">
       {/* Sidebar for other chats */}
       <div className="flex flex-col w-1/4 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
         <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
@@ -290,100 +354,26 @@ const ChatPage: React.FC = () => {
 
       {/* Main chat area */}
       {activeChat !== null && (
-        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%]">
-          {/* Banner for active chat */}
+         
+        <div className="flex-grow flex flex-col h-full p-4 bg-gray-100 w-[55%] relative h-full z-200">
+          {/* SwapDetails */}
+          <div className={`sticky top-0 z-10 bg-white border-b transition-transform duration-300 ${isSwapDetailsVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+            {activeChat != null && accepterId && requesterId && (
+              <SwapDetails
+                ownerId={accepterId}
+                requesterId={requesterId}
+              />
+            )}
+          </div>
 
           <div
             ref={messageBoxRef} // Attach the ref here
             id="messageBox"
             className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative border"
           >
-            <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl text-bold flex flex-col items-center border mb-4">
-              <div className="font-bold text-2xl mb-4">Swap Details</div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginBottom: "1em",
-                  width: "100%",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                    maxWidth: "80%",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <ItemPreview text="dress xs" />
-                  <ItemPreview />
-                  <ArrowRightLeft />
-                </div>
+            
+            
 
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-evenly",
-                    alignItems: "center",
-                    maxWidth: "80%",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <ItemPreview text="bucket hat" />
-                </div>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-around",
-                  width: "50%",
-                }}
-              >
-                {" "}
-                {accepted ? (
-                  <GenericButton
-                    text="Update Offer"
-                    // inverse={true}
-                    noClick={true}
-                  />
-                ) : (
-                  <GenericButton
-                    text="Update Offer"
-                    click={() => {
-                      setNotification(
-                        `You updated the offer with ${data[activeChat].name}`
-                      );
-                    }}
-                  />
-                )}
-                {accepted ? (
-                  <GenericButton
-                    text="Accept Offer"
-                    // inverse={true}
-                    noClick={true}
-                  />
-                ) : (
-                  <GenericButton
-                    text="Accept Offer"
-                    click={() => {
-                      setAccepted(true);
-                      setNotification(
-                        `You accepted the offer with ${data[activeChat].name}!`,
-                        "accept"
-                      );
-                    }}
-                  />
-                )}
-              </div>
-            </div>
             {otherUserData != null &&(<div
               style={{
                 display: "flex",
@@ -565,6 +555,7 @@ const ChatPage: React.FC = () => {
             </button>
           </form> */}
         </div>
+      
       )}
       {/* Other users info and meetup info */}
       {activeChat !== null && (
@@ -601,6 +592,7 @@ const ChatPage: React.FC = () => {
           />
         </div>
       )}
+    </div>
     </div>
   );
 };

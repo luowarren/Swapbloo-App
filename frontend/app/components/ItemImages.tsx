@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { getImages } from "../../service/items"; // Import the getImages function
 import ImageDisplay from "./ImageDisplay"; // Import the ImageDisplay component
@@ -12,6 +10,8 @@ const ItemImages = ({
   className?: string;
 }) => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -47,14 +47,48 @@ const ItemImages = ({
     };
   }, [itemId]); // Only depend on itemId
 
+  const handlePrevImage = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
   return (
-    <div className="">
+    <div className={`relative ${className}`}>
       {imageUrls.length > 0 ? (
-        imageUrls.map((url, index) => (
-          <div key={index}>
-            <ImageDisplay imageUrl={url} className={className} />
-          </div>
-        ))
+        <>
+          {/* Display the current image with max width of 90% and max height of 600px */}
+          <ImageDisplay
+            imageUrl={imageUrls[currentIndex]}
+            className="w-full max-w-[90%] max-h-[600px] h-auto mx-auto object-contain"
+          />
+
+          {/* Left Arrow (only show if not on the first image) */}
+          {currentIndex > 0 && (
+            <button
+              className="absolute left-2 top-1/2 transform -translate-y-1/2 text-blue-500 text-2xl font-bold"
+              onClick={handlePrevImage}
+            >
+              &lt;
+            </button>
+          )}
+
+          {/* Right Arrow (only show if not on the last image) */}
+          {currentIndex < imageUrls.length - 1 && (
+            <button
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-blue-500 text-2xl font-bold"
+              onClick={handleNextImage}
+            >
+              &gt;
+            </button>
+          )}
+        </>
       ) : (
         <p>Loading images...</p>
       )}

@@ -122,8 +122,8 @@ export async function createSwapRequest(
  * User tries to modify their swap request with another user.
  *
  * @param {number} swapId - id of the swap
- * @param {Array<string>} myItems - array of item ids
- * @param {Array<string>} requestingItems - array of item ids
+ * @param {Array<number>} myItems - array of item ids
+ * @param {Array<number>} requestingItems - array of item ids
  * @param {number} ownerId - id of the owner
  * @param {number} requesterId - id of the requester
  */
@@ -175,6 +175,90 @@ export async function modifySwapRequest(
   }
 
   return { data, error };
+}
+
+/**
+ * Finds the swap between two users if it exists, and returns the items involved for each user.
+ *
+ * @param {string} userId1 - The ID of the first user.
+ * @param {string} userId2 - The ID of the second user.
+ * @returns {Promise<{swapExists: boolean, user1Items: string[], user2Items: string[]}>}
+ */
+export async function getSwapDetailsBetweenUsers(userId1, userId2) {
+  console.log("sigmas are swapping", userId1, userId2)
+  // Step 1: Check if there's a swap between these two users
+  const { data: swap, error } = await supabase
+    .from("Swaps")
+    .select("*")
+    .or(`requester_id.eq.${userId1},accepter_id.eq.${userId1}`)
+    .or(`requester_id.eq.${userId2},accepter_id.eq.${userId2}`)
+    .single(); // Ensures there's only one swap
+
+  if (error || !swap) {
+    // No swap found between the users
+    return {
+      swapExists: false,
+      user1Items: [],
+      user2Items: [],
+      swapId: null,
+    };
+  }
+
+  // Swap found
+  const swapId = swap.id;
+
+  // Step 2: Get items associated with this swap for both users
+  const { data: swapItems, error: itemsError } = await supabase
+    .from("SwapItems")
+    .select("*")
+    .eq("swap_id", swapId);
+
+  if (itemsError || !swapItems) {
+    return {
+      swapExists: true,
+      user1Items: [],
+      user2Items: [],
+      swapId: swapId,
+    };
+  }
+
+  // Step 3: Separate the items for each user
+  const user1Items = swapItems
+    .filter(item => item.owner_id === userId1)
+    .map(item => item.item_id);
+
+  const user2Items = swapItems
+    .filter(item => item.owner_id === userId2)
+    .map(item => item.item_id);
+
+  // Return the swap details
+  return {
+    swapExists: true,
+    user1Items,
+    user2Items,
+    swapId,
+  };
+}
+
+/**
+ * Retrieves the user ID based on the username.
+ *
+ * @param {string} username - The username of the user.
+ * @returns {Promise<string | null>} - The user ID if found, or null if not.
+ */
+export async function getUserIdByUsername(username) {
+  const { data: user, error } = await supabase
+    .from("Users")
+    .select("id")
+    .eq("username", username)
+    .single(); // Expecting one user
+
+  if (error || !user) {
+    console.error("Error retrieving user ID:", error?.message || "User not found");
+    return null;
+  }
+
+  return user.id;
 }
 
 /**

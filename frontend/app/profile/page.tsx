@@ -152,7 +152,7 @@ const Login: React.FC = () => {
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
-          <div>
+          <div className="flex flex-row">
             {items.length > 0 ? (
               items.map((item) => (
                 <ListingCard
@@ -214,6 +214,10 @@ const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
   const handleCardClick = (id: number) => {
     router.push(`/item?itemId=${id}`); // Use router here
   };
+
+  const truncateMessage = (msg: string, maxLength: number) => {
+    return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
+  };
   return (
     <div>
       <div
@@ -231,8 +235,13 @@ const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
       </div>
       {/* Text below the image */}
       <div className="mt-2 text-center">
-        <p className="text-sm font-semibold text-indigo-900">{brand}</p>
-        <p className="text-xs text-gray-600">{size}</p>
+        <div className="text-sm font-semibold text-indigo-900">
+          {truncateMessage(name, 15)}
+        </div>
+        <p className="text-xs text-gray-600">
+        {truncateMessage(`${size} • ${brand}`, 15)}
+          
+        </p>
       </div>
     </div>
   );
