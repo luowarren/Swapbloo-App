@@ -1,22 +1,24 @@
 // LocationSelector.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import locations from "../chats/locations";
 import GenericButton from "./GenericButton";
 
-const LocationSelector = ({ click }) => {
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
+const LocationSelector = ({ click, meetUpInfo }) => {
+  const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
+  const [selectedDate, setSelectedDate] = useState(meetUpInfo.date);
+  const [selectedTime, setSelectedTime] = useState(meetUpInfo.time);
 
   const handleLocationChange = (event) => {
     setSelectedLocation(event.target.value);
   };
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+    // console.log("new date" + event.target.value)
+    setSelectedDate(event.target.value);//new Date(event.target.value).toISOString());
   };
 
   const handleTimeChange = (event) => {
+    // console.log("new time" + event.target.value)
     setSelectedTime(event.target.value);
   };
 
@@ -25,7 +27,7 @@ const LocationSelector = ({ click }) => {
     if ((selectedLocation && selectedDate && selectedTime) == "") {
       alert("Something is empty...");
     } else {
-      click();
+      click(selectedLocation, selectedDate, selectedTime);
     }
   };
 

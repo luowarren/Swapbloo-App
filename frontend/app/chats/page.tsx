@@ -12,11 +12,9 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import { getUserIdByUsername, getSwapDetailsBetweenUsers } from "../../service/swaps"
+import { getUserIdByUsername, getSwapDetailsBetweenUsers, getSwapId } from "../../service/swaps"
+import { updateMeetUp, getMeetUp } from "../../service/meetups"
 import SwapDetails from "../components/SwapDetails";
-// import { supabase } from "@/service/supabaseClient";
-
-
 import { getUserId } from "../../service/users";
 import { supabase, getChats, getChat, sendMessage, getUserIdsFromChat } from "../../service/chat"
 sortData(data);
@@ -25,7 +23,7 @@ const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
     id: string, created_at: string, user1_id: string, user2_id: string, status: string, viewed: boolean, profilePic: string,
-    username: string, latestMessage: {created_at: string, chat_id: string, sender_id: string, content: string}
+    username: string, latestMessage: {created_at: string, chat_id: string, sender_id: string, content: string }
   }> | null>(null);
   const [messages, setMessages] = useState<Array<{
     type: string, chat_id: string, content: string, created_at: string, sender_id: string
@@ -33,6 +31,10 @@ const ChatPage: React.FC = () => {
   const [otherUserData, setOtherUserData] = useState<{
     name: string, chat_id: string
   } | null> (null);
+  const [swapId, setSwapId] = useState<string | null>(null);
+  const [meetUpInfo, setMeetUpInfo] = useState<{
+    location: string, date: string, time: string
+  } | null>(null);
   const [user, setUser] = useState<any>(null); // State for user
   const [loading, setLoading] = useState(true); // For handling the loading state
   const router = useRouter();
@@ -108,7 +110,11 @@ const ChatPage: React.FC = () => {
     return () => {
       channel.unsubscribe();
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    console.log("Available chats:", chats);
+  }, [chats])
 
   const handleInitialDataFetches = async () => {
     // get all chats
@@ -118,7 +124,6 @@ const ChatPage: React.FC = () => {
     if (uid != null) {
       const c = await getChats(uid);
       setChats(c);
-      console.log("Available chats:", chats);
     }
   }
 
@@ -132,14 +137,54 @@ const ChatPage: React.FC = () => {
     setMessages(c);
   }
 
+  async function getMeetUpData(swap_id: string) {
+    const meetUpData = await getMeetUp(swap_id);
+    if (meetUpData) {
+      const new_meet_up_data = {
+        location: meetUpData[0].location,
+        date: meetUpData[0].date,
+        time: meetUpData[0].time
+      };
+      console.log(new_meet_up_data);
+      setMeetUpInfo(new_meet_up_data);
+    } else {
+      console.log("failed to update meet up data poop")
+    }
+  }
+
+  useEffect(() => {
+    console.log("Current swap id " + swapId);
+    // update meet up data
+    if (swapId !== null) {
+      getMeetUpData(swapId);
+    } else {
+      console.log("couldnt get swap data! cnt")
+    }
+  }, [swapId])
+
+  async function updateSwapId(chat_id: string) {
+    const curr_swap_id = await getSwapId(chat_id);
+    if (curr_swap_id !== null && curr_swap_id.length > 0) {
+      // console.log("Got swap id:")
+      // console.log(curr_swap_id)
+      setSwapId(curr_swap_id[0].id);
+    } else {
+      console.log("epic fail, couldn't find swap id")
+    }
+  }
+
   useEffect(() => {
     if (chats != null && activeChat != null) {
       // update list of messages
       const chat_id = chats[activeChat].id
       getAllMessages(chat_id);
-      console.log("what the fuck", data[activeChat])
+
       // Fetch and set the UUID (requesterId) for the other user by their username
       fetchChatUsers(chat_id);
+
+      // update current swap id
+      updateSwapId(chat_id);
+
       // update otherUserData
       setOtherUserData((prevObj) => ({
         // ...prevObj,
@@ -162,7 +207,7 @@ const ChatPage: React.FC = () => {
       // Update otherUserData
       setOtherUserData({
         name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
+        chat_id: chats[activeChat].id
       });
     }
   }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
@@ -176,53 +221,30 @@ const ChatPage: React.FC = () => {
   }, [messages]);
 
 
-  const setNotification = (notif: string, type: string = "notification") => {
-
-//   useEffect(() => {
-//     const checkUser = async () => {
-//       const { data, error } = await supabase.auth.getUser();
-//       if (data?.user) {
-//         setUser(data.user);
-//       } else {
-//         router.push('/login'); // Redirect to /login if no user is found
-//       }
-//       setLoading(false);
-//     };
-//     checkUser();
-//   }, [router]);
-
-  
+  const setNotification = (notif: string, location: string, date: string, time: string) => {
+    const type = "notification";
+    updateMeetUp(swapId, location, date, time);
     if (activeChat != null) {
-      data[activeChat]["lastMessage"] = notif;
-      data[activeChat]["date"] = new Date().toISOString();
+      // data[activeChat]["lastMessage"] = notif;
+      // data[activeChat]["date"] = new Date().toISOString();
 
-      sortData(data);
-      setActiveChat(0);
+      // sortData(data);
+      // setActiveChat(0);
       
 
-      if (otherUserData != null) {
-        setMessages((prevMessages) => [
-          // ...prevMessages,
-          {
-            type: "notification",
-            chat_id: otherUserData.chat_id,
-            content: notif,
-            sender_id: "me",
-            created_at: new Date().toISOString(),
-          },
-        ]);
-        console.log(messages);
-      }
-      // setMessages((prevMessages) => [
-      //   // ...prevMessages,
-      //   {
-      //     type: type,
-      //     text: notif,
-      //     sender: "me",
-      //     date: new Date().toISOString(),
-      //   },
-      // ]);
-      // //   console.log(messages);
+      // if (otherUserData != null) {
+      //   setMessages((prevMessages) => [
+      //     prevMessages,
+      //     {
+      //       type: "notification",
+      //       chat_id: otherUserData.chat_id,
+      //       content: notif,
+      //       sender_id: "me",
+      //       created_at: new Date().toISOString(),
+      //     },
+      //   ]);
+      //   console.log(messages);
+      // }
     }
   };
 
@@ -302,7 +324,9 @@ const ChatPage: React.FC = () => {
     setAccepterId(null);
     
     // Fetch new data for the selected chat
-    fetchChatUsers(chats[chat].id);
+    if (chats != null) {
+      fetchChatUsers(chats[chat].id);
+    }
 
     setAccepted(false);
   };
@@ -320,8 +344,10 @@ const ChatPage: React.FC = () => {
     data[index]["viewed"] = true;
   };
 
-  console.log('hello sigma')
-  console.log(data[activeChat])
+  console.log('hello sigma WOW PILOT GRAAAAAAAAAPE')
+  if (activeChat != null) {
+    console.log(data[activeChat])
+  }
     
   return (
     <div className="relative"> {/* The relative container to position the grey overlay */}
@@ -573,13 +599,17 @@ const ChatPage: React.FC = () => {
           </div>
           <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
             <div className="font-bold text-2xl">Meetup Info</div>
-            <LocationSelector
-              click={() => {
+            {meetUpInfo!== null ? (<LocationSelector
+              click={(location: string, date: string, time: string) => {
                 setNotification(
-                  `You updated the meetup details with ${data[activeChat].name}`
+                  `You updated the meetup details with ${data[activeChat].name}`,
+                  location, date, time
                 );
               }}
-            />
+              meetUpInfo={meetUpInfo}
+            />) : (
+              <div>Loading...</div>
+            )}
           </div>
         </div>
       )}

@@ -494,6 +494,14 @@ export async function getReceivedSwaps(uid) {
   return { data: Swaps, swapError };
 }
 
+export async function getSwapId(chat_id) {
+  const {data: swap_id, swapidError} = await supabase
+    .from("Swaps")
+    .select("id")
+    .eq("chat_id",chat_id);
+  return swap_id
+}
+
 // what about when a user wants to edit which items are apart of the swap????
 async function runTest() {
   (async () => {
