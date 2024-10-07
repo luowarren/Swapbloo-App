@@ -1,4 +1,4 @@
-const locations = [
+export const locations = [
   {
     id: "1",
     latitude: -27.49620324556435,
@@ -63,13 +63,3 @@ const locations = [
     pinned: false,
   },
 ];
-// locations.js
-// const locations = [
-//   { id: 1, name: "New York" },
-//   { id: 2, name: "Los Angeles" },
-//   { id: 3, name: "Chicago" },
-//   { id: 4, name: "Houston" },
-//   { id: 5, name: "Miami" },
-// ];
-
-export default locations;

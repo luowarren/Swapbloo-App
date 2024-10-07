@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { supabase } from "../../service/supabaseClient"; // Update the import path
+import React, { useEffect, useState, useRef } from "react";
 import ImageUpload from "../components/ImageUpload";
 import Category from "../listings/category";
 import Condition from "../listings/condition";
@@ -12,6 +11,7 @@ import {
   uploadImage,
 } from "@/service/items";
 import { getUserId } from "@/service/auth";
+import QRCode from "qrcode";
 
 const ListAnItemPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string>("");
@@ -20,9 +20,11 @@ const ListAnItemPage: React.FC = () => {
   const [size, setSize] = useState<string[]>([]);
   const [condition, setCondition] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [title, setTitle] = useState(""); // State for title
-  const [description, setDescription] = useState(""); // State for description
-  const [brand, setBrand] = useState(""); // State for description
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [brand, setBrand] = useState("");
+  const canvasRef = useRef<HTMLCanvasElement>(null); // Reference for canvas
+  const [listingId, setListingId] = useState<string>(""); // State for listing ID
 
   const clearAllStates = () => {
     setDemographic([]);
@@ -36,9 +38,7 @@ const ListAnItemPage: React.FC = () => {
   };
 
   const handleCurrentUser = async () => {
-    // get current user
     const uid = await getUserId();
-    console.log("current user: ", uid);
     if (uid != null) {
       setCurrUserId(uid);
     } else {
@@ -49,6 +49,16 @@ const ListAnItemPage: React.FC = () => {
   useEffect(() => {
     handleCurrentUser();
   }, []);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const uploadUrl = `https://93c9-61-68-215-159.ngrok-free.app/login`; // Generate unique upload URL
+      QRCode.toCanvas(canvasRef.current, uploadUrl, function (error) {
+        if (error) console.error(error);
+        console.log("QR Code generated!");
+      });
+    }
+  }, [uploadedImages, listingId]); // Regenerate QR code when images are uploaded or listingId changes
 
   const handleDragStart =
     (index: number) => (event: React.DragEvent<HTMLDivElement>) => {
@@ -68,7 +78,7 @@ const ListAnItemPage: React.FC = () => {
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault(); // Allow the drop
+    event.preventDefault();
   };
 
   const handleUpload = async () => {
@@ -86,11 +96,11 @@ const ListAnItemPage: React.FC = () => {
         brand
       );
       if (item.error) throw item.error;
-      const uploadPromises = uploadedImages.map(async (image, index) => {
-        console.log(image);
-        const fileName = `image_${Date.now()}_${index}.png`; // Create a unique file name
-        console.log(fileName);
 
+      // Set the listing ID for QR code
+      if (item.data !== null) setListingId(item.data[0].id);
+      const uploadPromises = uploadedImages.map(async (image, index) => {
+        const fileName = `image_${Date.now()}_${index}.png`;
         let uploadedImage = await uploadImage(image, fileName);
         if (uploadedImage.error) throw uploadedImage.error;
         if (item.data !== null) {
@@ -103,11 +113,11 @@ const ListAnItemPage: React.FC = () => {
       });
 
       await Promise.all(uploadPromises);
-      alert("Listing uploaded successfully!"); // Mock success message
+      alert("Listing uploaded successfully!");
       clearAllStates();
       window.scrollTo({
         top: 0,
-        behavior: "smooth", // Optional: adds a smooth scrolling effect
+        behavior: "smooth",
       });
     } catch (error) {
       console.error("Error uploading listing:", error);
@@ -119,7 +129,6 @@ const ListAnItemPage: React.FC = () => {
     <div className="min-h-screen bg-white px-24 py-12">
       <h1 className="text-3xl font-bold mb-6">List an Item</h1>
 
-      {/* Photos Section */}
       <section className="mb-8">
         <h2 className="text-xl font-bold mb-2">Photos</h2>
         <p className="text-gray-600 mb-4">
@@ -127,7 +136,6 @@ const ListAnItemPage: React.FC = () => {
           clear, with any flaws clearly presented.
         </p>
 
-        {/* Photo Upload Grid */}
         <div className="grid grid-cols-4 gap-4 mb-4">
           {[...Array(4)].map((_, index) => {
             const imageSrc = uploadedImages[index];
@@ -135,7 +143,7 @@ const ListAnItemPage: React.FC = () => {
               <div
                 key={index}
                 className="border-dotted border-2 border-gray-300 rounded-lg h-60 flex items-center justify-center text-center"
-                draggable={!!imageSrc} // Allow dragging only if there's an image
+                draggable={!!imageSrc}
                 onDragStart={handleDragStart(index)}
                 onDrop={(event) => handleDrop(index, event)}
                 onDragOver={handleDragOver}
@@ -156,17 +164,18 @@ const ListAnItemPage: React.FC = () => {
           })}
         </div>
 
-        {/* Add photos component */}
         <ImageUpload
           setImages={setUploadedImages}
           currentImages={uploadedImages}
         />
 
-        {/* QR code section */}
         <div className="border border-gray-300 p-4 flex items-center justify-between rounded-lg mt-4">
-          <div className="w-24 h-24 bg-gray-200 flex items-center justify-center">
-            <img src="qr_code_placeholder.png" alt="QR Code" />
-          </div>
+          <canvas
+            ref={canvasRef}
+            width={128}
+            height={128}
+            className="bg-gray-200"
+          />
           <div className="ml-4">
             <p className="font-bold">Scan the QR code on the left</p>
             <p>
@@ -180,32 +189,31 @@ const ListAnItemPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Title and Description Input */}
       <div className="flex flex-row w-full justify-between">
         <div className="w-[40%]">
-          {/* Title Input */}
           <section className="w-full mt-4 mb-10">
             <h2 className="text-xl font-bold mb-2">Title</h2>
             <input
               type="text"
               placeholder="e.g. Women's Long Sleeve Tee"
               className="w-full border border-gray-300 rounded-lg p-2 text-gray-700"
-              value={title} // Bind state to input
-              onChange={(e) => setTitle(e.target.value)} // Update state on change
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </section>
 
-          {/* Description Input */}
           <section className="mb-8 w-full">
             <h2 className="text-xl font-bold mb-2">Description*</h2>
             <textarea
               placeholder="e.g. Stripey tee, only worn a few times."
               className="w-full border border-gray-300 rounded-lg p-2 h-72 text-gray-700"
-              value={description} // Bind state to textarea
-              onChange={(e) => setDescription(e.target.value)} // Update state on change
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </section>
         </div>
-        {/* Info Section */}
+
         <div className="mb-9 w-[58%] flex flex-row justify-between">
           <Category cats={category} setCats={setCategory} />
           <div className="w-[70%]">
@@ -213,7 +221,6 @@ const ListAnItemPage: React.FC = () => {
             <Size size={size} setSize={setSize} />
             <div className="flex flex-row space justify-between">
               <Condition cond={condition} setCond={setCondition} />
-              {/* Brand Input */}
               <section className="w-[60%] mt-4 mb-10">
                 <h2 className="text-sm font-bold mb-2 text-slate-600">
                   Brand*
@@ -221,9 +228,9 @@ const ListAnItemPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="e.g. Gucci"
-                  className=" mt-2 w-full border border-slate-200 rounded-lg p-2 text-gray-700"
-                  value={brand} // Bind state to input
-                  onChange={(e) => setBrand(e.target.value)} // Update state on change
+                  className="mt-2 w-full border border-slate-200 rounded-lg p-2 text-gray-700"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
                 />
               </section>
             </div>
@@ -231,7 +238,6 @@ const ListAnItemPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Upload button */}
       {uploadedImages.length &&
       title.length &&
       category.length &&

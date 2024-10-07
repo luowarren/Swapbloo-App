@@ -12,8 +12,10 @@ import {
 } from "@/service/swaps"; // Import swap functions
 import ProfileImage from "../components/ProfileImage";
 import ItemImages from "../components/ItemImages";
+import ShowMap from "../components/Map";
 import { useRouter } from "next/navigation";
 import UserRating from "../components/UserRating";
+import { locations } from "./locations";
 
 // Define types for UserData and ItemData
 interface UserData {
@@ -144,6 +146,8 @@ const Login: React.FC = () => {
           Incoming Swap Requests
         </button>
       </div>
+
+      <ShowMap locations={locations} ></ShowMap>
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
