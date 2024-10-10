@@ -58,7 +58,6 @@ const Login: React.FC = () => {
 
         // Fetch user details using the userId
         const userBlob = await getUser(userId);
-        console.log("userrrr", userBlob.Users);
 
         // Safely check if userBlob.Users exists and has items
         if (userBlob?.Users && userBlob.Users.length > 0) {
@@ -67,7 +66,6 @@ const Login: React.FC = () => {
 
           // Fetch user's items
           const userItemsBlob = await getListingsByUsers([user.id]);
-          console.log("iteming", userItemsBlob);
           const userItems = userItemsBlob?.data ?? [];
           setItems(userItems);
 
@@ -147,7 +145,7 @@ const Login: React.FC = () => {
         </button>
       </div>
 
-      <ShowMap locations={locations} ></ShowMap>
+      <ShowMap ></ShowMap>
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">

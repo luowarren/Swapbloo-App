@@ -38,7 +38,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
         if (userId) {
           // Fetch the swap details between the two users
           const { swapExists, user1Items, user2Items, swapId } = await getSwapDetailsBetweenUsers(requesterId, ownerId);
-          console.log("yes we exist 333", swapExists)
           if (swapExists) {
             setSwapId(swapId);
             // Determine if the logged-in user is the requester or accepter
@@ -51,7 +50,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
               setMyItems(user1Items || []); // Your items
               setRequestingItems(user2Items || []); // The other user's items
             }
-            console.log("7777", myItems)
           } else {
             setSwapExists(false); // Set swapExists to false if no swap exists
           }

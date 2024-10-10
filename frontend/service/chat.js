@@ -185,9 +185,6 @@ export async function getUserIdsFromChat(chatId) {
       const uid = "797fbccf-0b76-4a60-8406-a3ecd0408e69"
       const chat_id = "16";
       // const chats = await getChats(uid);
-      // console.log("gaga")
-      // console.log(chats);
-      // console.log("gaga")
       // const messsages = await getChat(uid, chat_id);
       // console.log(messages);
       // const s = await sendMessage(uid, chat_id, "test fuck");
