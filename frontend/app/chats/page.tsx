@@ -349,7 +349,7 @@ const ChatPage: React.FC = () => {
       {" "}
       {/* The relative container to position the grey overlay */}
       {/* Grey overlay */}
-      <div className="flex h-[85vh] z-100 bg-gray-100">
+      <div className="flex h-[85vh] bg-gray-100">
         {/* Sidebar for other chats */}
         <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
           <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
@@ -382,12 +382,11 @@ const ChatPage: React.FC = () => {
               height: "100%", // 'h-full'
               padding: "1rem", // 'p-4' (4 units in Tailwind is usually 1rem)
               position: "relative",
-              zIndex: 200, // 'z-200'
             }}
           >
             {/* SwapDetails */}
             <div
-              className={`sticky top-0 z-10 bg-white border-b transition-transform duration-300 ${
+              className={`sticky top-0 bg-white border-b transition-transform duration-300 ${
                 isSwapDetailsVisible ? "translate-y-0" : "-translate-y-full"
               }`}
             >
@@ -607,7 +606,7 @@ const ChatPage: React.FC = () => {
                 <GenericButton text="Visit Shop" inverse={true} width="90%"/>
             </div>
 
-            <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+            <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border z-10">
               <div className="font-bold text-xl pb-2">Meetup Info</div>
               <LocationSelector
                 click={() => {

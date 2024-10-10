@@ -33,7 +33,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Store the current user's ID
   const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal visibility state
-
+  console.log("I am sigmarig")
   // Fetch the current user's ID and fetch their listings
   useEffect(() => {
     const fetchUserItems = async () => {
@@ -112,13 +112,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
 
   if (!isVisible) return null;
 
-  return (<div
-    className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-100" // Full screen overlay, centered modal
-  >
-    <div
-      className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3xl h-auto overflow-y-auto" // Centered modal with max width and height
-      style={{ maxHeight: "90vh", marginTop: "20px", marginBottom: "20px" }} // Ensuring it doesn't go off-screen
-    >
+  return (
+    
       <form 
         className="w-full" 
         onSubmit={handleSubmit}
@@ -213,12 +208,6 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
           </button>
         </div>
       </form>
-  
-      {/* Success Modal */}
-      {showSuccessModal && <SuccessModal onClose={handleCloseSuccessModal} />}
-    </div>
-  </div>
-  
   )
 };
 

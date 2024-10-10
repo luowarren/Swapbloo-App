@@ -87,7 +87,7 @@ export default function ShowMap({
   });
 
   return (
-    <div style={{ position: "relative", width, height, }}>
+    <div style={{ position: "relative", width, height }}>
       {/* Map */}
       <MapContainer
         center={userLocation || [selected.latitude, selected.longitude]}
