@@ -29,7 +29,7 @@ const ImageUpload = ({ setImages, currentImages }) => {
     >
       <input
         type="file"
-        accept="image/*"
+        accept="image/jpeg, image/png" 
         onChange={handleImageChange}
         id="file-upload"
         multiple // Allow multiple file uploads
