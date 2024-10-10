@@ -22,6 +22,7 @@ import {
   getChat,
   sendMessage,
   getUserIdsFromChat,
+  toggleViewed
 } from "../../service/chat";
 sortData(data);
 
@@ -93,6 +94,33 @@ const ChatPage: React.FC = () => {
     otherUserDataRef.current = otherUserData;
   }, [otherUserData]);
 
+  const sortChats = (c: Array<{
+    id: string;
+    created_at: string;
+    user1_id: string;
+    user2_id: string;
+    status: string;
+    viewed: boolean;
+    profilePic: string;
+    username: string;
+    latestMessage: {
+      created_at: string;
+      chat_id: string;
+      sender_id: string;
+      content: string;
+    };
+  }> | null) => {
+    if (c) {
+      const sortedChats = [...c].sort((a, b) => {
+        return new Date(b.latestMessage.created_at).getTime() - new Date(a.latestMessage.created_at).getTime();
+      });
+      console.log("Sorted chats")
+      console.log(sortedChats)
+      return sortedChats;
+    }
+    return null;
+  };
+
   useEffect(() => {
     const channel = supabase
       .channel("chat-room")
@@ -101,15 +129,19 @@ const ChatPage: React.FC = () => {
         { event: "INSERT", schema: "public", table: "Messages" },
         (payload) => {
           console.log("Change received!", payload);
+          handleInitialDataFetches();
+          console.log("Allan checks: ", otherUserDataRef, payload, activeChat)
 
           // update messages
           if (
             otherUserDataRef.current != null &&
             payload.new.chat_id == otherUserDataRef.current.chat_id
           ) {
+            // handleInitialDataFetches('0');
+            console.log("setting messages")
             setMessages((prevMessages) => {
               if (prevMessages != null) {
-                return [
+                const updatedMessages = [
                   ...prevMessages,
                   {
                     type: "text",
@@ -119,11 +151,14 @@ const ChatPage: React.FC = () => {
                     sender_id: payload.new.sender_id,
                   },
                 ];
+                
+                return updatedMessages;
               } else {
                 return null;
               }
             });
           } else {
+            // handleInitialDataFetches(payload.new.chat_id);
             console.log("not right chat");
           }
         }
@@ -135,15 +170,41 @@ const ChatPage: React.FC = () => {
     };
   }, []);
 
-  const handleInitialDataFetches = async () => {
-    // get all chats
+  const handleInitialDataFetches = async (c_id: string | null = null) => {
+    // get users current chat id (if any)
+    // let keepActiveChat = false;
+    // let curr_chat_id: string | undefined;
+    // if (activeChat !== null) {
+    //   if (chats !== null) {
+    //     keepActiveChat = true;
+    //     curr_chat_id = chats[activeChat].id
+    //   }
+    // }
+
     const uid = await getUserId();
-    console.log(uid);
     setCurrUserId(uid);
+    let sortedChats;
     if (uid != null) {
       const c = await getChats(uid);
-      setChats(c);
+      sortedChats = sortChats(c);
+      setChats(sortedChats);
+      setActiveChat(0);
+    
+
+    // restore active chat
+    // console.log(keepActiveChat, sortedChats, curr_chat_id);
+      // if (c_id !== null && sortedChats !== null) {
+      //   console.log("new index:", sortedChats.findIndex((c) => c.id==c_id), c_id)
+      //   console.log(sortedChats)
+      //   setActiveChat(sortedChats.findIndex((c) => c.id==c_id));
+      // }
     }
+    // if (keepActiveChat && sortedChats !== undefined && sortedChats !== null && curr_chat_id !== undefined) {
+    //   setActiveChat(sortedChats.findIndex((c) => c.id==curr_chat_id));
+    // } else {
+    //   console.log("setting to 0")
+    //   setActiveChat(0);
+    // }
   };
 
   useEffect(() => {
@@ -282,6 +343,7 @@ const ChatPage: React.FC = () => {
       if (currUserId != null && otherUserDataRef.current != null) {
         sendMessage(currUserId, otherUserDataRef.current.chat_id, meInput);
         setMeInput("");
+        setActiveChat(0);
       }
 
       // data[activeChat]["lastMessage"] = meInput;
