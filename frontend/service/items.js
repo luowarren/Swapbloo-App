@@ -252,13 +252,19 @@ export async function getImageFromId(imageId, bucket) {
   if (imageId != null) {
     const { data, error } = await supabase.storage.from(bucket).download(imageId);
     console.log("getting data from buckets", data);
+    console.log("getting data from buckets2", data);
 
     if (error) {
+      console.log("simga error", error)
       return error;
-    }
+    } 
+    console.log("getting data from buckets3", data)
+    
+    return data;
   }
 
-  return data;
+  console.log("getting data from buckets", data);
+
 }
 
 /**
@@ -363,7 +369,7 @@ export async function getUserProfileImageUrl(userId) {
 
   if (!error) {
     const image = await getImageFromId(data.image, "profilePictures");
-    console.log("imagee", image);
+    console.log("imageey", image);
     if (image instanceof Blob) {
       return image;
     } else {
