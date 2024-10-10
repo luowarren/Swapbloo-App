@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { getItem, getUserProfileImageUrl } from '../../service/items';
-import { useRouter } from 'next/navigation'; // Import useRouter to handle navigation
-import ItemImages from '../components/ItemImages';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { getItem, getUserProfileImageUrl } from "../../service/items";
+import { useRouter } from "next/navigation"; // Import useRouter to handle navigation
+import ItemImages from "../components/ItemImages";
 
 export interface ItemData {
   id: number;
@@ -51,7 +51,7 @@ const Item = () => {
   const [profilePic, setProfilePic] = useState<string | null>(null); // State for profile picture
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter(); // Initialize the router for navigation
-  
+
   /**
    *  {profilePic && <img src={profilePic} alt={itemData.ownerName} className="w-16 h-16 rounded-full" />}
    */
@@ -101,7 +101,9 @@ const Item = () => {
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
-        <ItemImages itemId={itemData.id} />
+        <div className="scale-150">
+          <ItemImages itemId={itemData.id} />
+        </div>
       </div>
 
       <div className="p-4 w-1/2 my-20">
@@ -110,7 +112,7 @@ const Item = () => {
           {itemData.size} • {itemData.condition} • {itemData.brand}
         </p>
         <div className="flex space-x-2">
-        <button
+          <button
             onClick={handleMakeOffer}
             className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-full"
           >
@@ -175,7 +177,6 @@ const Item = () => {
               Ask a question
             </button>
           </div>
-
         </div>
       </div>
     </div>
