@@ -8,7 +8,7 @@ const MessagePreview = ({
   date,
   viewed,
   isSelected,
-  maxLength = 30,
+  maxLength = 20,
 }) => {
   const truncateMessage = (msg) => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;

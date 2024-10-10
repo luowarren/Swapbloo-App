@@ -154,15 +154,37 @@ async function getViewedStatus(chat_id) {
   return Chats[0].viewed;
 }
 
+/**
+ * Retrieves the user IDs (requester and accepter) from the 'Chats' table using the chat_id.
+ *
+ * @param {string} chatId - The chat ID.
+ * @returns {Promise<{ requesterId: string, accepterId: string } | null>} - The user IDs if found, or null if not.
+ */
+export async function getUserIdsFromChat(chatId) {
+  const { data: chat, error } = await supabase
+    .from("Chats")
+    .select("user1_id, user2_id")
+    .eq("id", chatId)
+    .single();
+
+  if (error || !chat) {
+    console.error("Error retrieving chat details:", error?.message || "Chat not found");
+    return null;
+  }
+
+  return {
+    requesterId: chat.user1_id,
+    accepterId: chat.user2_id,
+  };
+}
+
+
 (async () => {
     try {
       // const uid = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"
       const uid = "797fbccf-0b76-4a60-8406-a3ecd0408e69"
       const chat_id = "16";
       // const chats = await getChats(uid);
-      // console.log("gaga")
-      // console.log(chats);
-      // console.log("gaga")
       // const messsages = await getChat(uid, chat_id);
       // console.log(messages);
       // const s = await sendMessage(uid, chat_id, "test fuck");

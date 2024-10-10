@@ -22,7 +22,19 @@
     }
   },
 
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "services/items.js", "services/server.js", "services/swaps.js", "services/users.js", "app/chats/helpers.js", "app/components/UserRating.js"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "services/items.js",
+    "services/server.js",
+    "services/swaps.js",
+    "services/users.js",
+    "app/chats/helpers.js",
+    "app/components/UserRating.tsx",
+    "app/components/ItemImages.js"
+  ],
 
   "exclude": ["node_modules"]
 }

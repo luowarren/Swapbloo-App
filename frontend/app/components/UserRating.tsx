@@ -4,7 +4,17 @@ import { faStar, faStarHalfAlt } from "@fortawesome/free-solid-svg-icons";
 import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // Regular star
 import GenericButton from "./GenericButton";
 
-const UserRating = ({ rating = 0, num = -1, size = "text-sm" }) => {
+const UserRating = ({
+  rating = 0,
+  num = -1,
+  size = "text-sm",
+  reviewButton = true,
+}: {
+  rating?: number;
+  num?: number;
+  size?: string;
+  reviewButton?: boolean;
+}) => {
   const [currentRating, setCurrentRating] = useState(rating);
   const clampedRating = Math.min(Math.max(currentRating, 0), 5);
 
@@ -13,14 +23,14 @@ const UserRating = ({ rating = 0, num = -1, size = "text-sm" }) => {
     setCurrentRating(rating);
   }, [rating]);
 
-  const handleStarClick = (index) => {
+  const handleStarClick = (index: number) => {
     if (num === -1) {
       // Update to the clicked star's whole number rating (1-5)
       setCurrentRating(index);
     }
   };
 
-  const submitReview = (rating) => {
+  const submitReview = (rating: number) => {
     alert(`Thank you for you ${rating} star review!`);
   };
 
@@ -54,27 +64,34 @@ const UserRating = ({ rating = 0, num = -1, size = "text-sm" }) => {
   };
 
   return (
-    <div style={{ textAlign: "center" }} className="my-3 text-sm">
+    <div style={{ textAlign: "center" }} className="text-sm">
       <div
         style={{
           display: "flex",
-          justifyContent: "center",
           alignItems: "center",
-          marginBottom: num === -1 ? "20px" : null,
+          marginBottom: num === -1 ? "20px" : undefined,
         }}
       >
         {renderStars()}
-        {num === -1 ? null : <div className="ml-3 text-gray-500">({num})</div>}
+        {num === -1 ? null : <div className="text-gray-500">({num})</div>}
       </div>
-      {num === -1 && currentRating !== 0 ? (
-        <GenericButton
-          text="Leave a review"
-          click={() => submitReview(currentRating)}
-        />
-      ) : null}
-      {num === -1 && currentRating === 0 ? (
-        <GenericButton text="Leave a review" inverse={true} noClick={true} />
-      ) : null}
+      {reviewButton && (
+        <>
+          {num === -1 && currentRating !== 0 ? (
+            <GenericButton
+              text="Leave a review"
+              click={() => submitReview(currentRating)}
+            />
+          ) : null}
+          {num === -1 && currentRating === 0 ? (
+            <GenericButton
+              text="Leave a review"
+              inverse={true}
+              noClick={true}
+            />
+          ) : null}
+        </>
+      )}
     </div>
   );
 };

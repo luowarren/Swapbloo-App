@@ -2,45 +2,48 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-const notInverseCSS = {
-  color: "#4F46E5", // text-indigo-800
-  fontSize: "0.875rem", // text-sm
-  border: "2px solid #4F46E5", // border-2 border-indigo-800
-  borderRadius: "0.5rem", // rounded-lg
-  padding: "1.6px 16px", // px-4 py-1
-  fontWeight: "bold", // font-bold
-};
-
-const inverseCSS = {
-  color: "#FFFFFF", // text-white
-  backgroundColor: "#4F46E5", // bg-indigo-800
-  fontSize: "0.875rem", // text-sm
-  border: "2px solid #4F46E5", // border-2 border-indigo-800
-  borderRadius: "0.5rem", // rounded-lg
-  padding: "1.6px 16px", // px-4 py-1
-  fontWeight: "bold", // font-bold
-};
-
-const inverseNoClick = {
-  color: "#C7D2FE", 
-  fontSize: "0.875rem", // text-sm
-  border: "2px solid #C7D2FE", 
-  borderRadius: "0.5rem", // rounded-lg
-  padding: "1.6px 16px", // px-4 py-1
-  fontWeight: "bold", // font-bold
-};
-
-const notInverseNoClick = {
-  color: "#FFFFFF", // text-white
-  backgroundColor: "#C7D2FE", 
-  fontSize: "0.875rem", // text-sm
-  border: "2px solid #C7D2FE", 
-  borderRadius: "0.5rem", // rounded-lg
-  padding: "1.6px 16px", // px-4 py-1
-  fontWeight: "bold", // font-bold
-};
-
-const GenericButton = ({ text, inverse = false, noClick = false, click }) => {
+const GenericButton = ({ text, inverse = false, noClick = false, click, width="auto", fontSize="0.875rem" }) => {
+  const notInverseCSS = {
+    color: "#4F46E5", // text-indigo-800
+    fontSize: fontSize, // text-sm
+    border: "2px solid #4F46E5", // border-2 border-indigo-800
+    borderRadius: "0.5rem", // rounded-lg
+    padding: "1.6px 16px", // px-4 py-1
+    fontWeight: "bold", // font-bold
+    width,
+  };
+  
+  const inverseCSS = {
+    color: "#FFFFFF", // text-white
+    backgroundColor: "#4F46E5", // bg-indigo-800
+    fontSize: fontSize, // text-sm
+    border: "2px solid #4F46E5", // border-2 border-indigo-800
+    borderRadius: "0.5rem", // rounded-lg
+    padding: "1.6px 16px", // px-4 py-1
+    fontWeight: "bold", // font-bold
+    width,
+  };
+  
+  const inverseNoClick = {
+    color: "#C7D2FE", 
+    fontSize: fontSize, // text-sm
+    border: "2px solid #C7D2FE", 
+    borderRadius: "0.5rem", // rounded-lg
+    padding: "1.6px 16px", // px-4 py-1
+    fontWeight: "bold", // font-bold
+    width,
+  };
+  
+  const notInverseNoClick = {
+    color: "#FFFFFF", // text-white
+    backgroundColor: "#C7D2FE", 
+    fontSize: fontSize, // text-sm
+    border: "2px solid #C7D2FE", 
+    borderRadius: "0.5rem", // rounded-lg
+    padding: "1.6px 16px", // px-4 py-1
+    fontWeight: "bold", // font-bold
+    width,
+  };
   const [isPressed, setIsPressed] = useState(false);
 
   const handleMouseDown = () => {
