@@ -531,6 +531,14 @@ export async function setSwapLocation(sid, location) {
   return { data, error };
 }
 
+export async function getSwapId(chat_id) {
+  const {data: swap_id, swapidError} = await supabase
+    .from("Swaps")
+    .select("id")
+    .eq("chat_id",chat_id);
+  return swap_id
+}
+
 // what about when a user wants to edit which items are apart of the swap????
 async function runTest() {
   (async () => {
