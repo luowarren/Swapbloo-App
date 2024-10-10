@@ -242,6 +242,7 @@ const ChatPage: React.FC = () => {
 
   const setNotification = (notif: string, location: string, date: string, time: string) => {
     const type = "notification";
+    console.log("Updating:", location, date, time)
     updateMeetUp(swapId, location, date, time);
     if (activeChat != null) {
       // data[activeChat]["lastMessage"] = notif;
@@ -305,32 +306,6 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // Handle receiving messages from "Other Guy"
-  const handleReceive = (e: FormEvent) => {
-    e.preventDefault();
-    if (otherGuyInput.trim() && activeChat != null) {
-      data[activeChat]["lastMessage"] = otherGuyInput;
-      data[activeChat]["date"] = new Date().toISOString();
-
-      sortData(data);
-      setActiveChat(0);
-
-      if (otherUserData != null) {
-        setMessages((prevMessages) => [
-          // ...prevMessages,
-          {
-            type: "text",
-            chat_id: otherUserData.chat_id,
-            content: otherGuyInput,
-            sender_id: "other",
-            created_at: new Date().toISOString(),
-          },
-        ]);
-        console.log(messages);
-        setOtherGuyInput(""); // Clear "Other Guy" input after receiving
-      }
-    }
-  };
 
   // Switch active chat
   const switchChat = (chat: number) => {
