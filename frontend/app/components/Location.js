@@ -30,14 +30,16 @@ const LocationSelector = ({ click, meetUpInfo }) => {
       alert("Something is empty...");
     } else {
       alert("Meet up updated!");
-      click("notif", selectedLocation, selectedDate, selectedTime);
+      click(selectedLocation, selectedDate, selectedTime);
     }
   };
 
   return (
+    <div>
+    <ShowMap setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
     <form onSubmit={handleSubmit}>
       <div style={{ margin: "0.5em", marginTop: "1em" }}>
-        <div>
+        {/* <div>
           <label htmlFor="date">Location: </label>
           <select
             id="location"
@@ -63,7 +65,7 @@ const LocationSelector = ({ click, meetUpInfo }) => {
               }
             })}
           </select>
-        </div>
+        </div> */}
 
         <div>
           <label htmlFor="date">Date: </label>
@@ -101,6 +103,7 @@ const LocationSelector = ({ click, meetUpInfo }) => {
           <GenericButton type="submit" text="Update Meetup" inverse={true} width="100%"/>
         </div>
       </form>
+      </div>
   );
 };
 
