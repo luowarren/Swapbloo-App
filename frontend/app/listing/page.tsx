@@ -55,7 +55,6 @@ const ListAnItemPage: React.FC = () => {
       const uploadUrl = `https://93c9-61-68-215-159.ngrok-free.app/login`; // Generate unique upload URL
       QRCode.toCanvas(canvasRef.current, uploadUrl, function (error) {
         if (error) console.error(error);
-        console.log("QR Code generated!");
       });
     }
   }, [uploadedImages, listingId]); // Regenerate QR code when images are uploaded or listingId changes

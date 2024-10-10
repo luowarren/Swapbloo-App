@@ -9,10 +9,6 @@ dotenv.config(); // Load environment variables from .env file
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
-// const supabaseUrl = process.env.SUPABASE_URL;
-// const supabaseKey = process.env.SUPABASE_KEY;
-
-console.log("sigma rizz", supabaseUrl, supabaseKey);
 // Log the environment variables to check their values
 console.log("Supabase URL:", supabaseUrl);
 console.log("Supabase Key:", supabaseKey);
@@ -42,7 +38,6 @@ export async function getActiveListings() {
     .select("*")
     .eq("swapped", "false");
 
-  console.log("data trip", Items);
   if (error) {
     console.error("Error Items:", error.message);
     return { data: null, error };
@@ -60,7 +55,6 @@ async function runTest() {
       }
       for (let i = 0; i < Items.length; i++) {
         console.log("title: ", Items[i]["title"]);
-        // console.log("caption: ", Items[i]["caption"]);
       }
       console.log("concluding search");
     } catch (error) {
@@ -77,7 +71,6 @@ export async function getListingsByUsers(userIds) {
     .in("owner_id", userIds)
     .eq("swapped", "false");
 
-  console.log("itemsssss 90", Items);
   if (error) {
     console.error("Error fetching listings by users:", error.message);
     return { data: null, error: error };
@@ -275,15 +268,11 @@ export async function getItemImages(imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
 
-    // Log the image path to verify it's correct
-    console.log("Attempting to download image from path:", imagePath);
-
     // Download the image from the Supabase storage bucket
     const { data, error } = await supabase.storage
       .from("images")
       .download(imagePath);
 
-    console.log(data);
     if (error) {
       console.log("error" + error);
       return { data: null, error: error };
@@ -291,8 +280,6 @@ export async function getItemImages(imageIds) {
     // Convert the image data to a URL or Blob (if needed)
     images.push(data);
   }
-
-  console.log(images);
   return { data: images, error: null };
 }
 
@@ -329,8 +316,6 @@ export async function getItemImageLinks(imageIds) {
     //const imageUrl = URL.createObjectURL(data);
     images.push(data);
   }
-  console.log("done");
-  console.log(images);
 
   return { data, error: null };
 }
@@ -363,7 +348,6 @@ export async function getUserProfileImageUrl(userId) {
 
   if (!error) {
     const image = await getImageFromId(data.image, "profilePictures");
-    console.log("imagee", image);
     if (image instanceof Blob) {
       return image;
     } else {
@@ -381,21 +365,15 @@ export async function getUserProfileImageUrl(userId) {
  * @returns {Object} - An object containing either the image data or an error.
  */
 export async function getImages(id) {
-  console.log("itemId is this:", id);
   const imageIds = await getItemImageIds(id);
-  console.log(imageIds);
   if (imageIds.error) {
     return { data: null, error: imageIds.error };
   }
-  console.log("ligm");
   const itemImages = await getItemImages(imageIds.data);
-  console.log(itemImages);
-  console.log("Type of data:", typeof itemImages);
 
   if (itemImages.error) {
     return { data: null, error: itemImages.error };
   }
-  console.log("sgi");
   return { data: itemImages.data, error: null };
 }
 

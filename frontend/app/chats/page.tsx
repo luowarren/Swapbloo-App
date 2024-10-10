@@ -7,6 +7,7 @@ import UserRating from "../components/UserRating";
 import UpdateSwapModal from "../components/UpdateSwapModal";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
 import ItemPreview from "../components/ItemPreview";
+import locations from "./locations"
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
@@ -83,9 +84,6 @@ const ChatPage: React.FC = () => {
         setRequesterId(users.requesterId); // Other user's ID
         setAccepterId(users.accepterId); // Your ID
       }
-
-      console.log("User 1 ID:", users.requesterId);
-      console.log("User 2 ID:", users.accepterId);
     } else {
       console.log("No users found for the given chat ID");
     }
@@ -93,8 +91,6 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     otherUserDataRef.current = otherUserData;
-    console.log("changed");
-    console.log(otherUserData);
   }, [otherUserData]);
 
   useEffect(() => {
@@ -157,7 +153,6 @@ const ChatPage: React.FC = () => {
 
   const getAllMessages = async (chat_id: string) => {
     const c = await getChat(chat_id);
-    console.log("current chat data:", c);
     setMessages(c);
   };
 
@@ -166,7 +161,6 @@ const ChatPage: React.FC = () => {
       // update list of messages
       const chat_id = chats[activeChat].id;
       getAllMessages(chat_id);
-      console.log("what the fuck", data[activeChat]);
       // Fetch and set the UUID (requesterId) for the other user by their username
       fetchChatUsers(chat_id);
       // update otherUserData
@@ -246,7 +240,6 @@ const ChatPage: React.FC = () => {
       //     date: new Date().toISOString(),
       //   },
       // ]);
-      // //   console.log(messages);
     }
   };
 
@@ -282,7 +275,6 @@ const ChatPage: React.FC = () => {
       //       created_at: new Date().toISOString(),
       //     },
       //   ]);
-      //   console.log(messages);
       //   setMeInput(""); // Clear "Me" input after sending
       // }
     }
@@ -332,7 +324,6 @@ const ChatPage: React.FC = () => {
   // Toggle selection of a lastMessage preview
   const toggleMessageSelection = (index: number) => {
     if (chats != null) {
-      console.log("allan", chats[index]);
       if (chats[index].viewed == false) {
         // set to viewed!!!!
       }
@@ -340,9 +331,6 @@ const ChatPage: React.FC = () => {
     switchChat(index);
     data[index]["viewed"] = true;
   };
-
-  console.log("hello sigma");
-  console.log(data[activeChat]);
 
   return (
     <div className="relative">
@@ -525,7 +513,6 @@ const ChatPage: React.FC = () => {
                           </div>
                         );
                       default:
-                        console.log(accepted);
                         return (
                           <div
                             key={index}
