@@ -12,12 +12,9 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import {
-  getUserIdByUsername,
-  getSwapDetailsBetweenUsers,
-} from "../../service/swaps";
+import { getUserIdByUsername, getSwapDetailsBetweenUsers, getSwapId } from "../../service/swaps"
+import { updateMeetUp, getMeetUp } from "../../service/meetups"
 import SwapDetails from "../components/SwapDetails";
-
 import { getUserId } from "../../service/users";
 import {
   supabase,
@@ -54,8 +51,11 @@ const ChatPage: React.FC = () => {
     sender_id: string;
   }> | null>(null);
   const [otherUserData, setOtherUserData] = useState<{
-    name: string;
-    chat_id: string;
+    name: string, chat_id: string
+  } | null> (null);
+  const [swapId, setSwapId] = useState<string | null>(null);
+  const [meetUpInfo, setMeetUpInfo] = useState<{
+    location: string, date: string, time: string
   } | null>(null);
   const [user, setUser] = useState<any>(null); // State for user
   const [loading, setLoading] = useState(true); // For handling the loading state
@@ -143,7 +143,6 @@ const ChatPage: React.FC = () => {
     if (uid != null) {
       const c = await getChats(uid);
       setChats(c);
-      console.log("Available chats:", chats);
     }
   };
 
@@ -156,6 +155,46 @@ const ChatPage: React.FC = () => {
     setMessages(c);
   };
 
+  async function getMeetUpData(swap_id: string) {
+    const meetUpData = await getMeetUp(swap_id);
+    console.log("Fetching meet up data")
+    if (meetUpData && meetUpData.length > 0) {
+      const new_meet_up_data = {
+        location: meetUpData[0].location,
+        date: meetUpData[0].date,
+        time: meetUpData[0].time
+      };
+      console.log(new_meet_up_data);
+      setMeetUpInfo(new_meet_up_data);
+    } else {
+      console.log("failed to update meet up data poop")
+    }
+  }
+
+  useEffect(() => {
+    console.log("Current swap id " + swapId);
+    // update meet up data
+    if (swapId !== null) {
+      getMeetUpData(swapId);
+    } else {
+      console.log("couldnt get swap data! cnt")
+      setMeetUpInfo(null)
+    }
+  }, [swapId])
+
+  async function updateSwapId(chat_id: string) {
+    const curr_swap_id = await getSwapId(chat_id);
+    if (curr_swap_id !== null && curr_swap_id.length > 0) {
+      // console.log("Got swap id:")
+      // console.log(curr_swap_id)
+      setSwapId(curr_swap_id[0].id);
+    } else {
+      console.log("epic fail, couldn't find swap id")
+      setSwapId(null);
+      setMeetUpInfo(null);
+    }
+  }
+
   useEffect(() => {
     if (chats != null && activeChat != null) {
       // update list of messages
@@ -163,6 +202,10 @@ const ChatPage: React.FC = () => {
       getAllMessages(chat_id);
       // Fetch and set the UUID (requesterId) for the other user by their username
       fetchChatUsers(chat_id);
+
+      // update current swap id
+      updateSwapId(chat_id);
+
       // update otherUserData
       setOtherUserData((prevObj) => ({
         // ...prevObj,
@@ -185,7 +228,7 @@ const ChatPage: React.FC = () => {
       // Update otherUserData
       setOtherUserData({
         name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
+        chat_id: chats[activeChat].id
       });
     }
   }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
@@ -197,49 +240,31 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
-  const setNotification = (notif: string, type: string = "notification") => {
-    //   useEffect(() => {
-    //     const checkUser = async () => {
-    //       const { data, error } = await supabase.auth.getUser();
-    //       if (data?.user) {
-    //         setUser(data.user);
-    //       } else {
-    //         router.push('/login'); // Redirect to /login if no user is found
-    //       }
-    //       setLoading(false);
-    //     };
-    //     checkUser();
-    //   }, [router]);
-
+  const setNotification = (notif: string, location: string, date: string, time: string) => {
+    const type = "notification";
+    updateMeetUp(swapId, location, date, time);
     if (activeChat != null) {
-      data[activeChat]["lastMessage"] = notif;
-      data[activeChat]["date"] = new Date().toISOString();
+      // data[activeChat]["lastMessage"] = notif;
+      // data[activeChat]["date"] = new Date().toISOString();
 
-      sortData(data);
-      setActiveChat(0);
 
-      if (otherUserData != null) {
-        setMessages((prevMessages) => [
-          // ...prevMessages,
-          {
-            type: "notification",
-            chat_id: otherUserData.chat_id,
-            content: notif,
-            sender_id: "me",
-            created_at: new Date().toISOString(),
-          },
-        ]);
-        console.log(messages);
-      }
-      // setMessages((prevMessages) => [
-      //   // ...prevMessages,
-      //   {
-      //     type: type,
-      //     text: notif,
-      //     sender: "me",
-      //     date: new Date().toISOString(),
-      //   },
-      // ]);
+      // sortData(data);
+      // setActiveChat(0);
+      
+
+      // if (otherUserData != null) {
+      //   setMessages((prevMessages) => [
+      //     prevMessages,
+      //     {
+      //       type: "notification",
+      //       chat_id: otherUserData.chat_id,
+      //       content: notif,
+      //       sender_id: "me",
+      //       created_at: new Date().toISOString(),
+      //     },
+      //   ]);
+      //   console.log(messages);
+      // }
     }
   };
 
@@ -316,7 +341,9 @@ const ChatPage: React.FC = () => {
     setAccepterId(null);
 
     // Fetch new data for the selected chat
-    fetchChatUsers(chats[chat].id);
+    if (chats != null) {
+      fetchChatUsers(chats[chat].id);
+    }
 
     setAccepted(false);
   };
@@ -604,14 +631,20 @@ const ChatPage: React.FC = () => {
               />
             </div>
           </div>
-        )}
-        {activeChat === null && (
-          <div className="flex-grow grid place-items-center h-full p-4 bg-gray-100">
-            <img
-              src="https://nuynivbpnulznjcmtvpq.supabase.co/storage/v1/object/public/images/test_image.jpeg"
-              alt="placeholder"
-              className="w-[600px] h-[600px]"
-            />
+          <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+            <div className="font-bold text-2xl">Meetup Info</div>
+            {meetUpInfo !== null ? (
+              <LocationSelector
+                click={(location: string, date: string, time: string) => {
+                  setNotification(
+                    `You updated the meetup details with ${data[activeChat].name}`,
+                    location, date, time
+                  );
+                }}
+              meetUpInfo={meetUpInfo}
+              />) : (
+                <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
+            )}
           </div>
         )}
       </div>
