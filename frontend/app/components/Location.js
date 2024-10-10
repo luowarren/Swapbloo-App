@@ -65,6 +65,16 @@ const LocationSelector = ({ click, meetUpInfo }) => {
           </select>
         </div>
 
+        <div>
+          <label htmlFor="date">Date: </label>
+          <input
+            type="date"
+            id="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+        </div>
+
           <div>
             <label htmlFor="time">Time: </label>
             <input
@@ -91,7 +101,6 @@ const LocationSelector = ({ click, meetUpInfo }) => {
           <GenericButton type="submit" text="Update Meetup" inverse={true} width="100%"/>
         </div>
       </form>
-    </div>
   );
 };
 

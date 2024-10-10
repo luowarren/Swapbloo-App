@@ -620,18 +620,9 @@ const ChatPage: React.FC = () => {
                 <GenericButton text="Visit Shop" inverse={true} width="90%"/>
             </div>
 
-            <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border z-10">
-              <div className="font-bold text-xl pb-2">Meetup Info</div>
-              <LocationSelector
-                click={() => {
-                  setNotification(
-                    `You updated the meetup details with ${data[activeChat].name}`
-                  );
-                }}
-              />
-            </div>
-          </div>
+           
           <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+          </div>
             <div className="font-bold text-2xl">Meetup Info</div>
             {meetUpInfo !== null ? (
               <LocationSelector
