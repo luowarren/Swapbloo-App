@@ -1,7 +1,7 @@
-import dotenv from 'dotenv'; // Import dotenv
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
-import { search } from "./listings"
-import { data } from '@/app/chats/data';
+import dotenv from "dotenv"; // Import dotenv
+import { createClient } from "@supabase/supabase-js"; // Import Supabase client
+import { search } from "./listings";
+import { data } from "@/app/chats/data";
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -9,13 +9,9 @@ dotenv.config(); // Load environment variables from .env file
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
-// const supabaseUrl = process.env.SUPABASE_URL;
-// const supabaseKey = process.env.SUPABASE_KEY;
-
-console.log('sigma rizz', supabaseUrl, supabaseKey)
 // Log the environment variables to check their values
-console.log('Supabase URL:', supabaseUrl);
-console.log('Supabase Key:', supabaseKey);
+console.log("Supabase URL:", supabaseUrl);
+console.log("Supabase Key:", supabaseKey);
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -42,10 +38,9 @@ export async function getActiveListings() {
     .select("*")
     .eq("swapped", "false");
 
-  console.log('data trip', Items);  
   if (error) {
     console.error("Error Items:", error.message);
-    return { data: null, error };;
+    return { data: null, error };
   }
   return { data: Items, error };
 }
@@ -60,7 +55,6 @@ async function runTest() {
       }
       for (let i = 0; i < Items.length; i++) {
         console.log("title: ", Items[i]["title"]);
-        // console.log("caption: ", Items[i]["caption"]);
       }
       console.log("concluding search");
     } catch (error) {
@@ -76,11 +70,10 @@ export async function getListingsByUsers(userIds) {
     .select("*")
     .in("owner_id", userIds)
     .eq("swapped", "false");
-    
-  console.log('itemsssss 90', Items)
+
   if (error) {
     console.error("Error fetching listings by users:", error.message);
-    return { data: null, error: error };;
+    return { data: null, error: error };
   }
   return { data: Items, error };
 }
@@ -95,8 +88,6 @@ export async function getListingsByUsers(userIds) {
  * @param {string} category - type of clothing the item is
  * @param {string} demographic - target demographic for this item
  * @param {string} title - listing title
- * @param {Array<string???>} images - images of the item TODO figure out data type
- * @param {Array<string???>} images - images of the item TODO figure out data type
  * @param {string} caption - OPTIONAL listing caption
  * @param {string} brand - OPTIONAL item brand
  * @returns
@@ -108,9 +99,8 @@ export async function createItemListing(
   category,
   demographic,
   title,
-  images = null,
-  caption = null,
-  brand = null
+  caption = "",
+  brand = ""
 ) {
   let { data: Item, error } = await supabase
     .from("Items")
@@ -129,6 +119,37 @@ export async function createItemListing(
     ])
     .select();
   return { data: Item, error };
+}
+
+/**
+ * creates an entry in the ItemImages table
+ * @param {string} item_id item associated with this image
+ * @param {string} image name of the image in the storage bucket
+ * @returns
+ */
+export async function createItemImage(item_id, image) {
+  const { data, error } = await supabase
+    .from("ItemImages")
+    .insert([{ item_id: item_id, image: image }])
+    .select();
+  return { data, error };
+}
+
+/**
+ * upload an image to the storage bucket
+ * @param {string} image - big thing
+ * @param {string} fileName - name of the image i want to put in the bucket
+ * @returns
+ */
+export async function uploadImage(image, fileName) {
+  const response = await fetch(image);
+  const blob = await response.blob();
+  const { data, error } = await supabase.storage
+    .from("images")
+    .upload(fileName, blob, {
+      contentType: "image/*", // Adjust content type as needed
+    });
+  return { data, error };
 }
 
 /**
@@ -197,19 +218,18 @@ export async function getItemImageIds(itemId) {
  * @returns {Array<string>|null} - An array of filenames from the bucket, or null if an error occurred.
  */
 export async function listFilenamesFromBucket() {
-  const { data, error } = await supabase
-    .storage
-    .from('images') // Replace 'images' with your bucket name
-    .list(''); // Provide the path inside the bucket, '' lists all files in the root
+  const { data, error } = await supabase.storage
+    .from("images") // Replace 'images' with your bucket name
+    .list(""); // Provide the path inside the bucket, '' lists all files in the root
 
   if (error) {
-    console.error('Error listing files:', error);
+    console.error("Error listing files:", error);
     return null;
   }
 
   // Map through the data to get an array of filenames
-  const filenames = data.map(file => file.name);
-  console.log('Filenames:', filenames);
+  const filenames = data.map((file) => file.name);
+  console.log("Filenames:", filenames);
 
   return filenames;
 }
@@ -222,14 +242,13 @@ export async function listFilenamesFromBucket() {
  */
 export async function getImageFromId(imageId, bucket) {
   console.log("image id and bucket:", bucket, imageId);
-  const { data, error } = await supabase
-    .storage
-    .from(bucket)
-    .download(imageId);
-  console.log("getting data from buckets", data);
+  if (imageId != null) {
+    const { data, error } = await supabase.storage.from(bucket).download(imageId);
+    console.log("getting data from buckets", data);
 
-  if (error) {
-    return error;
+    if (error) {
+      return error;
+    }
   }
 
   return data;
@@ -243,23 +262,17 @@ export async function getImageFromId(imageId, bucket) {
 export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
-  console.log('starting');
-  
+  console.log("starting");
+
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
 
-    // Log the image path to verify it's correct
-    console.log('Attempting to download image from path:', imagePath);
-
     // Download the image from the Supabase storage bucket
-    const { data, error } = await supabase
-      .storage
-      .from('images')
+    const { data, error } = await supabase.storage
+      .from("images")
       .download(imagePath);
 
-
-    console.log(data);
     if (error) {
       console.log("error" + error);
       return { data: null, error: error };
@@ -267,8 +280,6 @@ export async function getItemImages(imageIds) {
     // Convert the image data to a URL or Blob (if needed)
     images.push(data);
   }
-
-  console.log(images)
   return { data: images, error: null };
 }
 
@@ -282,19 +293,18 @@ export async function getItemImageLinks(imageIds) {
   const images = [];
   // Calculate the expiry time in seconds (1 month = 30 days = 2592000 seconds)
   const expiresIn = 30 * 24 * 60 * 60;
-  
+
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
-    console.log('Path:' + imagePath)
+    console.log("Path:" + imagePath);
 
     // Log the image path to verify it's correct
-    console.log('Attempting to download image from path:', imagePath);
+    console.log("Attempting to download image from path:", imagePath);
 
     // Download the image from the Supabase storage bucket
-    const { data, error } = await supabase
-      .storage
-      .from('images')
+    const { data, error } = await supabase.storage
+      .from("images")
       .createSignedUrl(imagePath, expiresIn);
 
     console.log(data);
@@ -306,8 +316,6 @@ export async function getItemImageLinks(imageIds) {
     //const imageUrl = URL.createObjectURL(data);
     images.push(data);
   }
-  console.log('done')
-  console.log(images);
 
   return { data, error: null };
 }
@@ -338,22 +346,18 @@ export async function getUserProfileImageUrl(userId) {
     .eq("id", userId)
     .single();
 
-    if (!error) {
-      const image = await getImageFromId(data.image, "profilePictures");
-      console.log("imagee", image);
-      if (image instanceof Blob) {
-        return image;
-      } else {
-        console.error('Element is not a Blob:', error1);
-        return null;
-      }
-
+  if (!error) {
+    const image = await getImageFromId(data.image, "profilePictures");
+    if (image instanceof Blob) {
+      return image;
     } else {
-      console.error('no profile pic:', error); 
+      console.error("Element is not a Blob:", error1);
+      return null;
     }
-    
+  } else {
+    console.error("no profile pic:", error);
+  }
 }
-
 
 /**
  * Fetches item images by first getting their image IDs and then downloading the images from Supabase storage.
@@ -361,22 +365,16 @@ export async function getUserProfileImageUrl(userId) {
  * @returns {Object} - An object containing either the image data or an error.
  */
 export async function getImages(id) {
-  console.log('itemId is this:', id);
   const imageIds = await getItemImageIds(id);
-  console.log(imageIds);
   if (imageIds.error) {
-    return {data: null, error: imageIds.error};
-  } 
-  console.log('ligm')
+    return { data: null, error: imageIds.error };
+  }
   const itemImages = await getItemImages(imageIds.data);
-  console.log(itemImages);
-  console.log('Type of data:', typeof itemImages);
 
   if (itemImages.error) {
-    return {data: null, error: itemImages.error};
-  } 
-  console.log('sgi')
-  return {data: itemImages.data, error: null};
+    return { data: null, error: itemImages.error };
+  }
+  return { data: itemImages.data, error: null };
 }
 
 /**
@@ -385,44 +383,41 @@ export async function getImages(id) {
  * @returns {Object} - An object containing either the signed URLs or an error.
  */
 export async function getImageLinks(id) {
-  console.log('getting image ids');
+  console.log("getting image ids");
 
   // gets the imges for the item
   const imageIds = await getItemImageIds(id);
   console.log(imageIds);
   if (imageIds.error) {
-    return {data: null, error: imageIds.error};
-  } 
+    return { data: null, error: imageIds.error };
+  }
   const itemImages = await getItemImageLinks(imageIds.data);
   if (itemImages.error) {
-    return {data: null, error: itemImages.error};
-  } 
+    return { data: null, error: itemImages.error };
+  }
 
-  return {data: itemImages.data, error: null};
+  return { data: itemImages.data, error: null };
 }
 //await loginUser("warrenluo14@gmail.com", "Jojoseawaa3.1415");
 //let x = await getfilteredItems(["6"], CATEGORIES, CONDITIONS, DEMOGRAPHICS);
 //console.log(x["data"]);
 
 async function runTest1() {
-  
   (async () => {
     try {
-      console.log('attemping');
+      console.log("attemping");
       //console.log(listFilenamesFromBucket());
-      const ims = await getImages('54');
-      console.log('wowo')
+      const ims = await getImages("54");
+      console.log("wowo");
       console.log(ims);
 
-      console.log("going for number two")
+      console.log("going for number two");
 
-      const imageLinks = await getImageLinks('54');
+      const imageLinks = await getImageLinks("54");
       console.log(imageLinks);
-
     } catch {
       //
     }
   })();
-
 }
 // runTest()

@@ -53,18 +53,14 @@ const Item = () => {
       } else {
         data.ownerRating = 5;
         setItemData(data);
-        console.log('item data', data);
 
         // Fetch profile picture using owner_id and handle undefined return values
         const profilePicBlob = await getUserProfileImageUrl(data.owner_id);
-        console.log(profilePicBlob);
-        console.log("pROFILE PICS ABOVE");
         if (profilePicBlob) {
           // Only create URL if profilePicBlob is not null or undefined
           const profilePicUrl = URL.createObjectURL(profilePicBlob);
           setProfilePic(profilePicUrl); // Set the profile picture URL in the state
         } else {
-          console.log("NO PRIFLE PICS !!!!!!!!!");
           setProfilePic(null); // Handle the case where no profile picture is available
         }
       }

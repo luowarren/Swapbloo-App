@@ -70,7 +70,6 @@ const MakeOffer = () => {
 
       // Submit the offer to the backend with item details
       const result = await createSwapRequest([selectedItemId], [itemId], ownerId, requestingUserId);
-      console.log("Offer Submitted:", result);
 
       // If successful, show the popup
       setIsPopupVisible(true);
