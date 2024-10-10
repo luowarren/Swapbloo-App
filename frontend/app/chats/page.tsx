@@ -139,7 +139,8 @@ const ChatPage: React.FC = () => {
 
   async function getMeetUpData(swap_id: string) {
     const meetUpData = await getMeetUp(swap_id);
-    if (meetUpData) {
+    console.log("Fetching meet up data")
+    if (meetUpData && meetUpData.length > 0) {
       const new_meet_up_data = {
         location: meetUpData[0].location,
         date: meetUpData[0].date,
@@ -602,16 +603,17 @@ const ChatPage: React.FC = () => {
           </div>
           <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
             <div className="font-bold text-2xl">Meetup Info</div>
-            {meetUpInfo!== null ? (<LocationSelector
-              click={(location: string, date: string, time: string) => {
-                setNotification(
-                  `You updated the meetup details with ${data[activeChat].name}`,
-                  location, date, time
-                );
-              }}
+            {meetUpInfo !== null ? (
+              <LocationSelector
+                click={(location: string, date: string, time: string) => {
+                  setNotification(
+                    `You updated the meetup details with ${data[activeChat].name}`,
+                    location, date, time
+                  );
+                }}
               meetUpInfo={meetUpInfo}
-            />) : (
-              <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
+              />) : (
+                <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
             )}
           </div>
         </div>

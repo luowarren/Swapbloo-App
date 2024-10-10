@@ -27,7 +27,7 @@ const LocationSelector = ({ click, meetUpInfo }) => {
     if ((selectedLocation && selectedDate && selectedTime) == "") {
       alert("Something is empty...");
     } else {
-      click(selectedLocation, selectedDate, selectedTime);
+      click("notif", selectedLocation, selectedDate, selectedTime);
     }
   };
 
@@ -44,11 +44,21 @@ const LocationSelector = ({ click, meetUpInfo }) => {
             <option value="" style={{}}>
               None
             </option>
-            {locations.map((location) => (
-              <option key={location.id} value={location.name}>
-                {location.name}
-              </option>
-            ))}
+            {locations.map((location) => {
+              if (location.name == selectedLocation) {
+                return (
+                  <option key={location.id} value={location.name} selected={true}>
+                    {location.name}
+                  </option>
+                )
+              } else {
+                return (
+                  <option key={location.id} value={location.name}>
+                    {location.name}
+                  </option>
+                )
+              }
+            })}
           </select>
         </div>
 
