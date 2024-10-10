@@ -4,6 +4,10 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import GenericButton from "./GenericButton";
 import { Minus, Search } from "lucide-react";
+import { getLocations, getSwapLocation } from "@/service/swaps";
+
+const l = await getLocations()
+// const preferredLocation = await getSwapLocation()
 
 // Custom hook to center the map
 function CenterMap({ selected, zoom }) {
@@ -21,13 +25,15 @@ function CenterMap({ selected, zoom }) {
 
 // Main component
 export default function ShowMap({
-  locations,
   setter= () => {},
   width = "25rem",
   height = "15rem",
   zoom = 11,
   iconSize = 35,
 }) {
+  var locations = l.data
+  console.log("hiii", locations)
+
   const [userLocation, setUserLocation] = useState(null);
   const [selected, setSelected] = useState(locations[0]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,9 +42,6 @@ export default function ShowMap({
   const mapRef = useRef(); // Ref to store map instance
 
   // Sort locations and initialize
-  locations = locations.sort((a, b) =>
-    a.pinned === b.pinned ? 0 : a.pinned ? -1 : 1
-  );
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(

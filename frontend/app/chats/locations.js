@@ -29,8 +29,8 @@ const locations = [
   },
   {
     id: "9",
-    latitude: -27.4896,
-    longitude: 153.0427,
+    latitude: -27.500329, 
+    longitude: 152.973456,
     name: "Indooroopilly Shopping Centre",
     pinned: false,
   },

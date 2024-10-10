@@ -9,8 +9,11 @@ const ListingCard = ({ data }: { data: any }) => {
     <div>
       <ItemModal item={data}>
         <div className="flex flex-col p-2 hover:bg-slate-200 transition rounded-sm cursor-pointer h-fit w-full">
-          <ItemImages itemId={data.id} className="" />
-          {/* <div className="bg-indigo-500 h-56 rounded-sm" /> */}
+          <div className="bg-indigo-500 h-56 rounded-sm overflow-hidden">
+            <div className="scale-125">
+              <ItemImages itemId={data.id} className="" />
+            </div>
+          </div>
           <div className="flex flex-col text-start">
             <span className="text-slate-700 font-bold">{data.title}</span>
             <span className="text-slate-500 text-xs">

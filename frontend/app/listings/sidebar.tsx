@@ -32,8 +32,6 @@ const Sidebar = ({
     setFilter((prev: any) => ({ ...prev, category: categ }));
   };
 
-  console.log(filter);
-
   return (
     <div className="h-[85vh] w-80 border-r border-r-slate-300 p-5 overflow-y-scroll">
       <div className="flex flex-col p-4 items-center w-full border-b border-b-slate-300">

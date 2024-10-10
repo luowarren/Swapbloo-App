@@ -1,10 +1,9 @@
 // LocationSelector.js
 import React, { useState } from "react";
-import locations from "../chats/locations";
 import GenericButton from "./GenericButton";
 import ShowMap from "./Map";
 
-const LocationSelector = ({ click }) => {
+const LocationSelector = ({click }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -33,7 +32,7 @@ const LocationSelector = ({ click }) => {
 
   return (
     <div>
-      <ShowMap locations={locations} setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
+      <ShowMap setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
       <form onSubmit={handleSubmit}>
         <div style={{ margin: "0.5em", marginTop: "1em" }}>
           <div>
