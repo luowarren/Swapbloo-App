@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 // import pkg from "@supabase/supabase-js";
-import { getUserProfilePhoto, getUserName } from './users.js'
-import { getMostRecentMessage, censorMessage } from './messages.js'
-import { createClient } from '@supabase/supabase-js';
+import { getUserProfilePhoto, getUserName } from "./users.js";
+import { getMostRecentMessage, censorMessage } from "./messages.js";
+import { createClient } from "@supabase/supabase-js";
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
@@ -25,46 +25,46 @@ if (!supabaseUrl || !supabaseKey) {
  * @returns object containing attributes of all chats (all messages with relevant timestamps, sender etc)
  */
 export async function getChats(uid) {
-    // Fetch Chats where either user1_id or user2_id matches uid
-    let { data: Chats, error: chatError } = await supabase
-      .from("Chats")
-      .select("*")
-      .or(`user1_id.eq.${uid},user2_id.eq.${uid}`)
-      .eq("status", "Active");
+  // Fetch Chats where either user1_id or user2_id matches uid
+  let { data: Chats, error: chatError } = await supabase
+    .from("Chats")
+    .select("*")
+    .or(`user1_id.eq.${uid},user2_id.eq.${uid}`)
+    .eq("status", "Active");
 
-    const promises = Chats.map(async(obj) => {
-        let userProfilePic;
-        let username;
-        if (obj.user1_id == uid) {
-            userProfilePic = await getUserProfilePhoto(obj.user2_id);
-            username = await getUserName(obj.user2_id);
-        } else {
-            userProfilePic = await getUserProfilePhoto(obj.user1_id);
-            username = await getUserName(obj.user1_id);
-        }
-        let latestMessage = await getMostRecentMessage(obj.id);
-        if (latestMessage == null) {
-          latestMessage = {
-            created_at: obj.created_at,
-            chat_id: obj.id,
-            sender_id: null,
-            content: ""
-          }
-        }
-        return {
-            ...obj,
-            profilePic: userProfilePic.data[0].image,
-            username: username.data[0].name,
-            latestMessage: latestMessage
-        }
-    });
+  const promises = Chats.map(async (obj) => {
+    let userProfilePic;
+    let username;
+    if (obj.user1_id == uid) {
+      userProfilePic = await getUserProfilePhoto(obj.user2_id);
+      username = await getUserName(obj.user2_id);
+    } else {
+      userProfilePic = await getUserProfilePhoto(obj.user1_id);
+      username = await getUserName(obj.user1_id);
+    }
+    let latestMessage = await getMostRecentMessage(obj.id);
+    if (latestMessage == null) {
+      latestMessage = {
+        created_at: obj.created_at,
+        chat_id: obj.id,
+        sender_id: null,
+        content: "",
+      };
+    }
+    return {
+      ...obj,
+      profilePic: userProfilePic.data[0].image,
+      username: username.data[0].name,
+      latestMessage: latestMessage,
+    };
+  });
 
-    return Promise.all(promises);
+  return Promise.all(promises);
 }
 
 /**
  * Get 1 current chat
- * 
+ *
  * @param {string} chat_id - the id of a chat
  * @returns object contianing chat attributes (all messages with relevant timestamps, sender, profile picture)
  */
@@ -75,9 +75,9 @@ export async function getChat(chat_id) {
     .select("*")
     .eq("chat_id", chat_id);
 
-  const updatedMessages = messages.map(message => ({
+  const updatedMessages = messages.map((message) => ({
     ...message,
-    type: "text"
+    type: "text",
   }));
 
   return updatedMessages;
@@ -85,42 +85,42 @@ export async function getChat(chat_id) {
 
 /**
  * Send a message
- * 
+ *
  * @param {string} uid - the id of the current user
  * @param {string} chat_id - the id of current chat
  * @param {string} message - message to send
  * @returns inserts (censored) record into Messages table
  */
 export async function sendMessage(uid, chat_id, message) {
-  const {data, error} = await supabase
-    .from("Messages")
-    .insert([{
+  const { data, error } = await supabase.from("Messages").insert([
+    {
       chat_id: chat_id,
       sender_id: uid,
-      content: censorMessage(message)
-    }]);
+      content: censorMessage(message),
+    },
+  ]);
 
-    if (error) {
-      console.log("Error sending message", error.message);
-      throw error;
-    } else{
-      return data;
-    }
+  if (error) {
+    console.log("Error sending message", error.message);
+    throw error;
+  } else {
+    return data;
+  }
 }
 
 /**
  * Delete a chat
- * 
+ *
  * @param {string} chat_id - the id of current chat
  */
 export async function deleteChat(chat_id) {
-  let {error} = await supabase.from("Chats").delete().eq("id", chat_id);
-  return {error};
+  let { error } = await supabase.from("Chats").delete().eq("id", chat_id);
+  return { error };
 }
 
 /**
  * Update chat viewed status
- * 
+ *
  * @param {string} chat_id - the id of current chat
  */
 export async function toggleViewed(chat_id) {
@@ -128,29 +128,31 @@ export async function toggleViewed(chat_id) {
   const viewed = await getViewedStatus(chat_id);
 
   const { error } = await supabase
-  .from('Chats')
-  .update({ viewed: !viewed})
-  .eq('id', chat_id);
+    .from("Chats")
+    .update({ viewed: !viewed })
+    .eq("id", chat_id);
 
   if (error) {
-    console.error(`Error updating viewed status for chat_id: ${chat_id}`, error);
+    console.error(
+      `Error updating viewed status for chat_id: ${chat_id}`,
+      error
+    );
   } else {
     console.log(`Successfully updated viewed status for chat_id: ${chat_id}`);
   }
-
 }
 
 /**
- * 
+ *
  * @param {string} chat_id - the id of current chat
  * @returns boolean whether latest message in chat has been viewed
  */
 async function getViewedStatus(chat_id) {
   let { data: Chats, error: chatError } = await supabase
-      .from("Chats")
-      .select("*")
-      .eq("id", chat_id);
-    
+    .from("Chats")
+    .select("*")
+    .eq("id", chat_id);
+
   return Chats[0].viewed;
 }
 
@@ -168,7 +170,10 @@ export async function getUserIdsFromChat(chatId) {
     .single();
 
   if (error || !chat) {
-    console.error("Error retrieving chat details:", error?.message || "Chat not found");
+    console.error(
+      "Error retrieving chat details:",
+      error?.message || "Chat not found"
+    );
     return null;
   }
 
@@ -178,25 +183,22 @@ export async function getUserIdsFromChat(chatId) {
   };
 }
 
-
 (async () => {
-    try {
-      // const uid = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"
-      const uid = "797fbccf-0b76-4a60-8406-a3ecd0408e69"
-      const chat_id = "16";
-      // const chats = await getChats(uid);
-      // const messsages = await getChat(uid, chat_id);
-      // console.log(messages);
-      // const s = await sendMessage(uid, chat_id, "test fuck");
+  try {
+    // const uid = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"
+    const uid = "797fbccf-0b76-4a60-8406-a3ecd0408e69";
+    const chat_id = "16";
+    // const chats = await getChats(uid);
+    // const messsages = await getChat(uid, chat_id);
+    // console.log(messages);
+    // const s = await sendMessage(uid, chat_id, "test fuck");
 
-      // const d = await deleteChat('15');
-      // console.log(d);
+    // const d = await deleteChat('15');
+    // console.log(d);
 
-      // const v = await getViewedStatus(chat_id);
-      await toggleViewed(chat_id);
-
-
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  })();
+    // const v = await getViewedStatus(chat_id);
+    await toggleViewed(chat_id);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+})();

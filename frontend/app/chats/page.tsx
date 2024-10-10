@@ -7,7 +7,7 @@ import UserRating from "../components/UserRating";
 import UpdateSwapModal from "../components/UpdateSwapModal";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
 import ItemPreview from "../components/ItemPreview";
-import locations from "./locations"
+import locations from "./locations";
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
@@ -25,6 +25,7 @@ import {
   getChat,
   sendMessage,
   getUserIdsFromChat,
+  deleteChat,
 } from "../../service/chat";
 sortData(data);
 
@@ -72,6 +73,17 @@ const ChatPage: React.FC = () => {
   const lastScrollTop = useRef(0); // Track the last scroll position
   const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] =
     useState(false); // State to control modal visibility
+
+  const handleDeleteChat = (chatId: string) => {
+    setChats(
+      (prevChats) => prevChats?.filter((chat) => chat.id !== chatId) || null
+    );
+    deleteChat(chatId);
+
+      
+    
+    handleInitialDataFetches();
+  };
 
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
@@ -137,6 +149,7 @@ const ChatPage: React.FC = () => {
 
   const handleInitialDataFetches = async () => {
     // get all chats
+    setActiveChat(null)
     const uid = await getUserId();
     console.log(uid);
     setCurrUserId(uid);
@@ -348,11 +361,13 @@ const ChatPage: React.FC = () => {
               chats.map((msg, index) => (
                 <div key={index} onClick={() => toggleMessageSelection(index)}>
                   <MessagePreview
+                    id={msg.id}
                     name={msg.username}
                     lastMessage={msg.latestMessage.content}
                     date={msg.latestMessage.created_at}
                     viewed={msg.viewed}
-                    isSelected={activeChat === index} // Pass selection state
+                    isSelected={activeChat === index}
+                    handleDelete={handleDeleteChat} // Pass selection state
                   />
                 </div>
               ))}
@@ -591,7 +606,7 @@ const ChatPage: React.FC = () => {
                   />
                 </div>
               </div>
-                <GenericButton text="Visit Shop" inverse={true} width="90%"/>
+              <GenericButton text="Visit Shop" inverse={true} width="90%" />
             </div>
 
             <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
