@@ -1,31 +1,100 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../service/supabaseClient";
 import { Cake, CakeSlice, MapPin, Shirt } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import ShowMap from "../components/Map";
 import { uploadImage } from "@/service/items";
+import { createUser, getUser } from "@/service/users";
+import { locations } from "../profile/locations";
 
 const Onboard: React.FC = () => {
   const router = useRouter();
+  const [userId, setUserId] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [profilePic, setProfilePic] = useState<File | null>(null);
+  const [imageName, setImageName] = useState<string>("");
   const [dob, setDob] = useState<string>("");
   const [storeDescription, setStoreDescription] = useState<string>("");
   const [location, setLocation] = useState<string>("UQ Union");
   const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [pageLoading, setPageLoading] = useState(true);
 
-  const handleOnboard = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    // Handle the submission logic here (e.g., supabase or API calls)
-    if (name == "" || profilePic != null || dob != "") {
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data?.user) {
+        window.location.href = "/";
+        return;
+      }
+
+      const userId = data.user.id;
+      setUserId(userId);
+
+      const { Users, error: userError } = await getUser(userId);
+      if (userError) {
+        console.error("Error fetching user:", userError);
+        window.location.href = "/";
+        return;
+      }
+
+      if (Users && Users.length > 0) {
+        window.location.href = "/listings";
+      }
+
+      setPageLoading(false);
+    };
+    checkUser(); // Run the check on component mount
+  }, [router]);
+
+  if (pageLoading) {
+    return (
+      <div className="flex w-[100vw] h-[100vh] justify-center items-center">
+        <div className="animate-spin">
+          <Shirt className="text-white" />
+        </div>
+      </div>
+    );
+  }
+
+  const handleOnboard = async () => {
+    // return;
+    try {
+      // Ensure all required fields are filled out
+      if (name == "" || uploadedImages.length === 0 || dob == "") {
+        setError(true);
+        setLoading(false);
+        console.log("Validation error: One or more fields are missing.");
+        return;
+      }
+
+      // Upload images
+      await handleUpload();
+
+      // Create user with the uploaded data
+      const userResponse = await createUser(
+        userId,
+        name,
+        dob,
+        storeDescription,
+        location,
+        imageName
+      );
+
+      if (userResponse.error) {
+        throw new Error(userResponse.error);
+      }
+
+      console.log("User successfully onboarded.");
+      window.location.href = "/listings";
+    } catch (error: any) {
+      console.error("Error during onboarding:", error.message);
       setError(true);
+    } finally {
       setLoading(false);
-      return;
     }
   };
 
@@ -33,12 +102,12 @@ const Onboard: React.FC = () => {
     try {
       const uploadPromises = uploadedImages.map(async (image, index) => {
         const fileName = `image_${Date.now()}_${index}.png`;
+        setImageName(fileName);
         let uploadedImage = await uploadImage(image, fileName);
         if (uploadedImage.error) throw uploadedImage.error;
       });
 
       await Promise.all(uploadPromises);
-      alert("Listing uploaded successfully!");
     } catch (error) {
       console.error("Error uploading listing:", error);
       alert("Failed to upload listing.");
@@ -66,7 +135,7 @@ const Onboard: React.FC = () => {
             <p className="text-red-500">Please fill in all the fields!!</p>
           )}
 
-          <form onSubmit={handleOnboard} className="space-y-4">
+          <div className="space-y-4">
             <h1 className="text-5xl font-bold mb-6 italic text-indigo-700 text-center">
               Finish signing up
             </h1>
@@ -139,11 +208,11 @@ const Onboard: React.FC = () => {
               </label>
             </div>
 
-            <ShowMap selectedLocation={location} setter={setLocation} />
+            <ShowMap selectedLocation={locations[0]} setter={setLocation} />
 
             {/* Submit Button */}
             <button
-              type="submit"
+              onClick={() => handleOnboard()}
               className="w-full bg-indigo-500 text-white p-2 rounded-t-md hover:bg-indigo-800 transition"
             >
               {loading ? (
@@ -156,7 +225,7 @@ const Onboard: React.FC = () => {
                 "Take me to my store"
               )}
             </button>
-          </form>
+          </div>
         </div>
 
         {/* PREVIEW */}

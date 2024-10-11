@@ -34,7 +34,7 @@ const SignUp: React.FC = () => {
 
       // Check if user was successfully created
       if (data?.user) {
-        setError("Check your email for the confirmation link.");
+        window.location.href = "/onboard";
       }
     } catch (error) {
       console.error("Error occurred during sign up:", error);

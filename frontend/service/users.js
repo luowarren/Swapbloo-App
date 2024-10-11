@@ -284,17 +284,29 @@ export async function addRating(userId, rating) {
 }
 
 export async function createUser(
+  userId,
   name,
   dob,
   description,
   location,
-  image = null
+  image
 ) {
-  const { data, error } = await supabase
-    .from("Users")
-    .insert([{ name, dob, description, location, image }])
-    .select();
-  return { data, error };
+  try {
+    const { data, error } = await supabase
+      .from("Users")
+      .insert([{ id: userId, name, dob, description, location, image }])
+      .select();
+
+    if (error) {
+      throw error; // Throw the error so it can be caught below
+    }
+
+    console.log("User created successfully:", data);
+    return { data };
+  } catch (err) {
+    console.error("Error creating user:", err.message);
+    return { error: err.message };
+  }
 }
 
 async function runTest() {

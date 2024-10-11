@@ -33,7 +33,8 @@
     "services/users.js",
     "app/chats/helpers.js",
     "app/components/UserRating.tsx",
-    "app/components/ItemImages.js"
+    "app/components/ItemImages.js",
+    "app/components/ImageUpload.js"
   ],
 
   "exclude": ["node_modules"]
