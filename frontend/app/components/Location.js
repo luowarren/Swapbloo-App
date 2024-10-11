@@ -4,11 +4,13 @@ import React, { useEffect, useState } from "react";
 import locations from "../chats/locations";
 import GenericButton from "./GenericButton";
 import ShowMap from "./Map";
+import { getLocations, getSwapLocation, getCoordinates } from "@/service/swaps";
 
-const LocationSelector = ({ click, meetUpInfo }) => {
+const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
   const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
   const [selectedDate, setSelectedDate] = useState(meetUpInfo.date);
   const [selectedTime, setSelectedTime] = useState(meetUpInfo.time);
+  const [locationCoords, setLocationCoords] = useState(null);
 
   const handleLocationChange = (event) => {
     setSelectedLocation(event.target.value);
@@ -34,9 +36,38 @@ const LocationSelector = ({ click, meetUpInfo }) => {
     }
   };
 
+  async function fetchCurrLoc() {
+    const currLocation = await getSwapLocation(swap_id);
+    console.log("found current location:", currLocation);
+    if (currLocation.data !== null) {
+      console.log(currLocation.data[0].location)
+      const coords = await getCoordinates(currLocation.data[0].location);
+      console.log("aa", coords)
+      if (coords.data) {
+        console.log("setting, ", coords.data[0])
+        setLocationCoords(coords.data[0])
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchCurrLoc();
+  }, [])
+
   return (
     <div>
-    <ShowMap setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
+    {locationCoords !== null ? (
+      <ShowMap setter={setSelectedLocation} width="20rem" height="18rem" selectedLocation={locationCoords}></ShowMap> 
+      )
+      : (
+        <div>Loading map...</div>
+        // <ShowMap setter={setSelectedLocation} width="20rem" height="18rem" selectedLocation={{
+        //   name: "UQ Union",
+        //   latitude: -27.496203,
+        //   longitude: 153.017277
+        // }}></ShowMap> 
+      )
+    }
     <form onSubmit={handleSubmit}>
       <div style={{ margin: "0.5em", marginTop: "1em" }}>
         {/* <div>

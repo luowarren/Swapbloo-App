@@ -503,8 +503,16 @@ export async function getSwapLocation(sid) {
   let { data, error } = await supabase
     .from("MeetUps")
     .select("location")
-    .eq("name", `${sid}`);
+    .eq("swap_id", sid);
   return { data, error };
+}
+
+export async function getCoordinates(name) {
+  let {data, error} = await supabase
+    .from("Locations")
+    .select("*")
+    .eq("name", name);
+  return {data, error};
 }
 
 /**
@@ -519,14 +527,6 @@ export async function setSwapLocation(sid, location) {
   .eq('id', sid)
   .select()
   return { data, error };
-}
-
-export async function getSwapId(chat_id) {
-  const {data: swap_id, swapidError} = await supabase
-    .from("Swaps")
-    .select("id")
-    .eq("chat_id",chat_id);
-  return swap_id
 }
 
 // what about when a user wants to edit which items are apart of the swap????

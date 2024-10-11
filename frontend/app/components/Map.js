@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import GenericButton from "./GenericButton";
 import { Minus, Search } from "lucide-react";
-import { getLocations, getSwapLocation } from "@/service/swaps";
+import { getLocations, getSwapLocation, getCoordinates } from "@/service/swaps";
 
 const l = await getLocations()
 // const preferredLocation = await getSwapLocation()
@@ -30,18 +30,16 @@ export default function ShowMap({
   height = "15rem",
   zoom = 11,
   iconSize = 35,
+  selectedLocation
 }) {
   var locations = l.data
-  // console.log("hiii", locations)
 
   const [userLocation, setUserLocation] = useState(null);
-  const [selected, setSelected] = useState(locations[0]);
+  const [selected, setSelected] = useState(selectedLocation);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredLocations, setFilteredLocations] = useState(locations);
   const [isSearchVisible, setIsSearchVisible] = useState(false); // State for search bar visibility
   const mapRef = useRef(); // Ref to store map instance
-
-  // Sort locations and initialize
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -53,6 +51,29 @@ export default function ShowMap({
       { enableHighAccuracy: true }
     );
   }, []);
+
+  function sameLoc(loc) {
+    return areObjectsEqual(loc, selected)
+  }
+  function areObjectsEqual(obj1, obj2) {
+    if (typeof obj1 !== 'object' || obj1 === null || 
+        typeof obj2 !== 'object' || obj2 === null) {
+        return false;
+    }
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+
+    for (const key of keys1) {
+        if (obj1[key] !== obj2[key]) {
+            return false;
+        }
+    }
+    return true;
+}
 
   // Search functionality
   useEffect(() => {
@@ -111,7 +132,7 @@ export default function ShowMap({
           <Marker
             key={location.id}
             position={[location.latitude, location.longitude]}
-            icon={location == selected ? selectedIcon : locationIcon}
+            icon={sameLoc(location) ? selectedIcon : locationIcon}
           >
             <Popup>
               <div className="flex flex-col justify-center items-center h-full">
@@ -119,8 +140,8 @@ export default function ShowMap({
                 {/* Ensure h-full or a specific height */}
                 <span className="mb-2">{location.name}</span>
                 <GenericButton
-                  text={location === selected ? "Selected" : "Select"}
-                  noClick={location === selected}
+                  text={sameLoc(location) ? "Selected" : "Select"}
+                  noClick={sameLoc(location)}
                   click={() => {
                     locations.forEach((l) => (l.pinned = false));
                     location.pinned = true;

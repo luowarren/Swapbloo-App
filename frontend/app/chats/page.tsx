@@ -12,7 +12,7 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import { getUserIdByUsername, getSwapDetailsBetweenUsers, getSwapId } from "../../service/swaps"
+import { getUserIdByUsername, getSwapDetailsBetweenUsers } from "../../service/swaps"
 import { updateMeetUp, getMeetUp } from "../../service/meetups"
 import SwapDetails from "../components/SwapDetails";
 import { getUserId } from "../../service/users";
@@ -243,12 +243,12 @@ const ChatPage: React.FC = () => {
     }
   }, [swapId])
 
-  async function updateSwapId(chat_id: string) {
-    const curr_swap_id = await getSwapId(chat_id);
-    if (curr_swap_id !== null && curr_swap_id.length > 0) {
-      // console.log("Got swap id:")
-      // console.log(curr_swap_id)
-      setSwapId(curr_swap_id[0].id);
+  function updateSwapId(chat_id: string) {
+    const curr_swap_id = chat_id;
+    if (curr_swap_id !== null) {
+      console.log("Got swap id:")
+      console.log(curr_swap_id)
+      setSwapId(curr_swap_id);
     } else {
       console.log("epic fail, couldn't find swap id")
       setSwapId(null);
@@ -417,6 +417,7 @@ const ChatPage: React.FC = () => {
                     date={msg.latestMessage.created_at}
                     viewed={msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
+                    userId={currUserId}
                   />
                 </div>
               ))}
@@ -670,7 +671,8 @@ const ChatPage: React.FC = () => {
                     location, date, time
                   );
                 }}
-              meetUpInfo={meetUpInfo}
+                meetUpInfo={meetUpInfo}
+                swap_id={swapId}
               />) : (
                 <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
             )}
