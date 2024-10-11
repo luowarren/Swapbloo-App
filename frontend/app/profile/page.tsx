@@ -107,7 +107,7 @@ const Login: React.FC = () => {
     <div className="max-w-4xl mx-auto bg-white">
       <div className="w-1/2 bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 ">
         <div className="flex flex-row items-center justify-evenly w-full mb-4">
-          <div className="w-16 h-16 bg-yellow-500 rounded-full"></div>
+          <ProfileImage userId={user.id}/>
           <div className="flex flex-col items-start align-middle">
             <div className="font-bold overflow-auto text-center">
               {user.name}'s Swap Shop
@@ -135,14 +135,15 @@ const Login: React.FC = () => {
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4"></div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
+            
             {items.length > 0 ? (
               items.map((item, index) => (
                 <ListingCard key={index} data={item} />
               ))
             ) : (
               <p>No items currently listed</p>
-            )}
+            )}</div>
           </div>
         )}
       </div>
