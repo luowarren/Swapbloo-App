@@ -126,7 +126,14 @@ const Login: React.FC = () => {
       <div className="space-x-8 mt-5 mx-4">Description</div>
       <div className="space-x-8 mt-5 mx-4">{user.description}</div>
       <div className="py-6 px-6 ">
-        <ShowMap setter={() => {}}></ShowMap>
+        <ShowMap
+          setter={() => {}}
+          selectedLocation={{
+            name: "Westfield Chermside",
+            latitude: -27.383085,
+            longitude: 153.030924,
+          }}
+        ></ShowMap>
       </div>
       <div className="flex space-x-8 mt-5 mx-4">Listings</div>
       {/* Tab Content */}
