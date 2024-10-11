@@ -172,7 +172,7 @@ export default function ShowMap({
             padding: "1rem",
             borderRadius: "8px",
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-            zIndex: 1000, // Ensure it appears above the map
+            zIndex: 10, // Ensure it appears above the map
           }}
           onClick={() => setIsSearchVisible(!isSearchVisible)}
         >
@@ -192,7 +192,7 @@ export default function ShowMap({
             backgroundColor: "white",
             borderRadius: "8px",
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-            zIndex: 1000, // Ensure it appears above the map
+            zIndex: 10, // Ensure it appears above the map
             maxHeight: "90%",
           }}
         >
@@ -205,7 +205,7 @@ export default function ShowMap({
               backgroundColor: "white",
               padding: "0.5rem",
               borderRadius: "8px",
-              zIndex: 1000, // Ensure it appears above the map
+              zIndex: 10, // Ensure it appears above the map
             }}
           >
             <button
