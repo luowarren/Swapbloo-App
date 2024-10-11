@@ -44,9 +44,7 @@ const Login: React.FC = () => {
   const [outgoingSwaps, setOutgoingSwaps] = useState<ItemData[]>([]); // State to store requested swaps
   const [incomingSwaps, setIncomingSwaps] = useState<ItemData[]>([]); // State to store incoming swap requests
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<
-    "listings"
-  >("listings"); // State to manage active tab
+  const [activeTab, setActiveTab] = useState<"listings">("listings"); // State to manage active tab
   const router = useRouter(); // Move useRouter outside useEffect
   const [uid, setUserId] = useState<UserData | null>(null);
   useEffect(() => {
@@ -114,9 +112,7 @@ const Login: React.FC = () => {
             <div className="font-bold overflow-auto text-center">
               {user.name}'s Swap Shop
             </div>
-            <div className="text-sm text-gray-500">
-              {user.username}
-            </div>
+            <div className="text-sm text-gray-500">{user.username}</div>
             <UserRating
               rating={Number(user.rating)}
               num={Number(user.num_of_ratings)}
@@ -127,25 +123,19 @@ const Login: React.FC = () => {
       <hr className="border-gray-600 mx-4" />
 
       {/* Tab Buttons */}
-      <div className="flex space-x-8 mt-5 mx-4">
-        <button
-          className={`font-semibold px-2 pb-2 ${activeTab === "listings" ? "underline" : ""
-            }`}
-          onClick={() => handleTabSwitch("listings")}
-        >
-          Listings
-        </button>
+      <div className="mt-5 mb-3">Description</div>
+      <div>
+        {user.description}
       </div>
       <div className="py-6 px-6 ">
-        <ShowMap ></ShowMap>
+        <ShowMap></ShowMap>
       </div>
-
+      <div className="flex space-x-8 mt-5 mx-4">Listings</div>
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
-            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4"></div>
             {items.length > 0 ? (
               items.map((item, index) => (
                 <ListingCard key={index} data={item} />
