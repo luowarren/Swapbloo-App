@@ -23,13 +23,19 @@ const Upload = () => {
       alert("Failed to upload listing.");
     }
   };
+  console.log(uploadedImages)
 
   return (
     <div>
+      <ImageUpload currentImages={uploadedImages} setImages={setUploadedImages} />
+      <button onClick={handleUpload}>Upload</button>
 
-   
-    <ImageUpload currentImages={uploadedImages} setImages={setUploadedImages} />
-    <button onClick={handleUpload}>Upload</button>
+      {/* Display uploaded images */}
+      <div className="uploaded-images">
+        {uploadedImages.map((image, index) => (
+          <img key={index} src={image} alt={`Uploaded Image ${index + 1}`} style={{ width: '100px', height: '100px', margin: '5px' }} />
+        ))}
+      </div>
     </div>
   );
 };
