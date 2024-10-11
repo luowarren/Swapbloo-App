@@ -17,6 +17,7 @@ import GenericButton from "../components/GenericButton";
 import { useRouter } from "next/navigation";
 import UserRating from "../components/UserRating";
 import { locations } from "./locations";
+import ListingCard from "../listings/listing-card";
 
 // Define types for UserData and ItemData
 interface UserData {
@@ -139,71 +140,23 @@ const Login: React.FC = () => {
         <ShowMap ></ShowMap>
       </div>
 
+      <ShowMap></ShowMap>
+
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
+            </div>
             {items.length > 0 ? (
-              items.map((item) => (
-                <ListingCard
-                  key={item.id}
-                  name={item.title}
-                  size={item.size}
-                  brand={item.brand || "Unknown"}
-                  id={item.id}
-                />
+              items.map((item, index) => (
+                <ListingCard key={index} data={item} />
               ))
             ) : (
               <p>No items currently listed</p>
             )}
           </div>
         )}
-      </div>
-    </div>
-  );
-};
-
-interface ListingCardProps {
-  id: number; // Add `id` to the props definition
-  name: string;
-  size: string;
-  brand: string | null;
-}
-
-const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
-  const router = useRouter(); // Move useRouter to the top of the component
-
-  const handleCardClick = (id: number) => {
-    router.push(`/item?itemId=${id}`); // Use router here
-  };
-
-  const truncateMessage = (msg: string, maxLength: number) => {
-    return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
-  };
-  return (
-    <div>
-      <div
-        className="relative flex flex-col w-46 h-46 mx-2 rounded-md  bg-white overflow-hidden"
-        onClick={() => handleCardClick(id)} // Wrap the function call in an arrow function
-        style={{ cursor: "pointer" }}
-      >
-        {/* Main image area */}
-        <div className="relative w-full rounded-md">
-          {" "}
-          {/* Set height to 75% of the card */}
-          {/* Item image */}
-          <ItemImages itemId={id} className="w-full h-full rounded-md object-cover" />
-        </div>
-      </div>
-      {/* Text below the image */}
-      <div className="mt-2 text-center">
-        <div className="text-sm font-semibold text-indigo-900">
-          {truncateMessage(name, 15)}
-        </div>
-        <p className="text-xs text-gray-600">
-          {truncateMessage(`${size} • ${brand}`, 15)}
-
-        </p>
       </div>
     </div>
   );

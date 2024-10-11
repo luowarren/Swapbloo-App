@@ -25,7 +25,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
       <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
           <div className="w-1/2 flex-col justify-center relative">
-            <ItemImages className="rounded-md" itemId={item.id} />
+            <ItemImages buttons={true} className="rounded-md" itemId={item.id} />
           </div>
 
           <div className="p-4 w-1/2">
