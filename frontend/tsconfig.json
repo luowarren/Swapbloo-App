@@ -34,7 +34,7 @@
     "app/chats/helpers.js",
     "app/components/UserRating.tsx",
     "app/components/ItemImages.js"
-  ],
+, "app/components/VisitShopModal.js"  ],
 
   "exclude": ["node_modules"]
 }

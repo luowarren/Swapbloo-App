@@ -5,7 +5,6 @@ import MessagePreview from "../components/MessagePreview";
 import MessageBubble from "../components/MessageBubble";
 import UserRating from "../components/UserRating";
 import UpdateSwapModal from "../components/UpdateSwapModal";
-import VisitShopModal from "../components/VisitShopModal";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
 import ItemPreview from "../components/ItemPreview";
 import locations from "./locations";
@@ -28,6 +27,7 @@ import {
   getUserIdsFromChat,
   toggleViewed,
 } from "../../service/chat";
+import VisitShopModal from "../components/VisitShopModal";
 sortData(data);
 
 const ChatPage: React.FC = () => {

@@ -25,7 +25,7 @@ const MessageBubble = ({ sender, text, uid }) => {
         color: isMe ? "#FFF" : "#000",
         marginLeft: isMe ? "auto" : "0",
         marginRight: isMe ? "0" : "auto",
-        width: "60%",
+        maxWidth: "60%",
       }}
     >
       {text}

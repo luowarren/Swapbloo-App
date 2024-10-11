@@ -5,6 +5,7 @@ import UserRating from "../components/UserRating";
 import { Heart, MoreHorizontal, Share } from "lucide-react";
 import { getUser } from "@/service/users";
 import ProfileImage from "../components/ProfileImage";
+import VisitShopModal from "../components/VisitShopModal";
 
 const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const handleMakeOffer = () => {};
@@ -103,11 +104,8 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     </div>
                   </div>
                   <div className="flex space-x-2 text-sm">
-                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
+                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50" onClick={openModal}>
                       Visit Shop
-                    </button>
-                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm hover:bg-indigo-50">
-                      Ask a question
                     </button>
                   </div>
                 </div>
