@@ -283,10 +283,16 @@ export async function addRating(userId, rating) {
   return ratingData;
 }
 
-export async function createUser(name, dob, description, location, image) {
+export async function createUser(
+  name,
+  dob,
+  description,
+  location,
+  image = null
+) {
   const { data, error } = await supabase
     .from("Users")
-    .insert([{ some_column: "someValue", other_column: "otherValue" }])
+    .insert([{ name, dob, description, location, image }])
     .select();
   return { data, error };
 }
