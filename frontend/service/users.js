@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { createClient } from '@supabase/supabase-js'; // Correct named import
+import { createClient } from "@supabase/supabase-js"; // Correct named import
 // import twilio from "twilio";
 
 // Load environment variables from .env file
@@ -19,15 +19,15 @@ async function loginUser(email, password) {
     email: email,
     password: password,
   });
-  return {data , error};
+  return { data, error };
 }
 
 export async function getUserId() {
   const userBlob = await supabase.auth.getUser();
   if (userBlob.error || userBlob.data == null) {
-      return null;
+    return null;
   } else {
-      return userBlob.data.user.id;
+    return userBlob.data.user.id;
   }
 }
 /**
@@ -140,13 +140,12 @@ export async function getUserName(uid) {
   return { data: Users, error };
 }
 
-
 export async function getUser(uid) {
   let { data: Users, error } = await supabase
     .from("Users")
     .select("*")
     .eq("id", uid);
-  return { Users , error };
+  return { Users, error };
 }
 
 /**
@@ -183,17 +182,16 @@ async function getItems() {
   return { data: Items, error };
 }
 
-
 // Function to fetch user data based on username
 export const fetchUserData = async (username) => {
   const { data: users, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username);
+    .from("users")
+    .select("*")
+    .eq("username", username);
 
   if (error) {
-      console.error('Error fetching user data:', error);
-      return null;
+    console.error("Error fetching user data:", error);
+    return null;
   }
 
   return users?.[0] || null;
@@ -202,13 +200,13 @@ export const fetchUserData = async (username) => {
 // Function to fetch items owned by the user
 export const fetchUserItems = async (owner_id) => {
   const { data: items, error } = await supabase
-      .from('items')
-      .select('*')
-      .eq('owner_id', owner_id);
+    .from("items")
+    .select("*")
+    .eq("owner_id", owner_id);
 
   if (error) {
-      console.error('Error fetching items:', error);
-      return [];
+    console.error("Error fetching items:", error);
+    return [];
   }
 
   return items || [];
@@ -285,6 +283,20 @@ export async function addRating(userId, rating) {
   return ratingData;
 }
 
+export async function createUser(
+  name,
+  dob,
+  description,
+  location,
+  image = null
+) {
+  const { data, error } = await supabase
+    .from("Users")
+    .insert([{ name, dob, description, location, image }])
+    .select();
+  return { data, error };
+}
+
 async function runTest() {
   (async () => {
     try {
@@ -299,7 +311,7 @@ async function runTest() {
 
       // const items = await getItems();
       // console.log(items);
-      console.log(await addRating("74bfae90-2b0c-4c62-be92-1f9fc867b943", 3))
+      console.log(await addRating("74bfae90-2b0c-4c62-be92-1f9fc867b943", 3));
       // const reqesteditems = await viewUser();
       // console.log(reqesteditems);
     } catch (error) {
