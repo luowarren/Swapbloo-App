@@ -82,12 +82,17 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
 
   async function acceptSwap(swapId: number) {
-    updateSwapStatus(swapId, "Accepted");
-    onSwapUpdate();
-    setAccepted(true);
+    // need to check if other user can already accepted, if so then can set accept to true
+
+    // updateSwapStatus(swapId, "Accepted");
+    // onSwapUpdate();
+    // setAccepted(true);
   }
 
-  console.log("simgrig55555555555555555", swapExists, ownerId, requesterId)
+  async function unAcceptSwap(swapId: number) {
+    updateSwapStatus(swapId, "Pending")
+    setAccepted(false);
+  }
   
   // useEffect(() => {
 
@@ -207,8 +212,15 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
           onUpdate={() => console.log("Swap updated!")} // Handle post-update logic here
         /> */}
 
-        {accepted ? (
-          <GenericButton text="Accepted Offer" noClick={true} />
+        {/* {accepted ? (
+          <GenericButton 
+            text="Accepted Offer"
+            click={async () => {
+              // un accept the swap
+              setAccepted(false);
+              console.log("Offer un-accept (cancelled)")
+            }}
+          />
         ) : (
           <GenericButton
             text="Accept Offer"
@@ -219,7 +231,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
               console.log("Offer accepted");
             }}
           />
-        )}
+        )} */}
       </div>
     </div>
   );
