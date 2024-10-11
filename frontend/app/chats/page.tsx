@@ -176,7 +176,9 @@ const ChatPage: React.FC = () => {
       const c = await getChats(uid);
       sortedChats = sortChats(c);
       setChats(sortedChats);
-      setActiveChat(0);
+      if (activeChat !== null) {
+        setActiveChat(0);
+      }
     }
   };
 
