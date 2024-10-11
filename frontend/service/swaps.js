@@ -1,20 +1,5 @@
 import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js"; // Correct named import
-
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" });
-
-import { SWAP_STATUS } from "./constants.js";
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL and key are required.");
-}
+import { supabase } from "./supabaseClient.js";
 
 /**
  * NOTE: does not follow function protocals, only used internally
@@ -198,6 +183,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     .or(`requester_id.eq.${userId1},accepter_id.eq.${userId1}`)
     .or(`requester_id.eq.${userId2},accepter_id.eq.${userId2}`)
     .single(); // Ensures there's only one swap
+  console.log(swap, "44444444", error);
 
   if (error || !swap) {
     // No swap found between the users
@@ -206,9 +192,11 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
       user1Items: [],
       user2Items: [],
       swapId: null,
+      status: null,
     };
   }
 
+  
   // Swap found
   const swapId = swap.id;
 
@@ -224,6 +212,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
       user1Items: [],
       user2Items: [],
       swapId: swapId,
+      status: swap.status,
     };
   }
 
@@ -242,6 +231,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     user1Items,
     user2Items,
     swapId,
+    status: swap.status,
   };
 }
 
@@ -376,7 +366,7 @@ export async function getSwapById(swapId) {
  * Updates an Item in the Items table to have swapped = true, indicating that
  * the item has been successfully swapped.
  *
- * @param {string} swapId - the id of the Item being swapped
+ * @param {number} swapId - the id of the Item being swapped
  * @param {string} status - the updated status of the swap
  * @returns Item is a list containing the Item we just swapped.
  */

@@ -13,9 +13,11 @@ import {
 import ProfileImage from "../components/ProfileImage";
 import ItemImages from "../components/ItemImages";
 import ShowMap from "../components/Map";
+import GenericButton from "../components/GenericButton";
 import { useRouter } from "next/navigation";
 import UserRating from "../components/UserRating";
 import { locations } from "./locations";
+import ListingCard from "../listings/listing-card";
 
 // Define types for UserData and ItemData
 interface UserData {
@@ -43,7 +45,7 @@ const Login: React.FC = () => {
   const [incomingSwaps, setIncomingSwaps] = useState<ItemData[]>([]); // State to store incoming swap requests
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "listings" | "requested" | "incoming"
+    "listings"
   >("listings"); // State to manage active tab
   const router = useRouter(); // Move useRouter outside useEffect
   const [uid, setUserId] = useState<UserData | null>(null);
@@ -99,20 +101,27 @@ const Login: React.FC = () => {
   }
 
   // Function to switch tabs
-  const handleTabSwitch = (tab: "listings" | "requested" | "incoming") => {
+  const handleTabSwitch = (tab: "listings") => {
     setActiveTab(tab);
   };
 
   return (
     <div className="max-w-4xl mx-auto bg-white">
-      <div className="flex items-center space-x-4 p-4">
-        <ProfileImage userId={user.id}></ProfileImage>
-        <div>
-          <h2 className="text-xl font-bold">{user.username}</h2>
-          <div className="flex items-center">
-            <UserRating rating={user.rating} num={8} />
+      <div className="w-1/2 bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 ">
+        <div className="flex flex-row items-center justify-evenly w-full mb-4">
+          <div className="w-16 h-16 bg-yellow-500 rounded-full"></div>
+          <div className="flex flex-col items-start align-middle">
+            <div className="font-bold overflow-auto text-center">
+              {user.name}'s Swap Shop
+            </div>
+            <div className="text-sm text-gray-500">
+              {user.username}
+            </div>
+            <UserRating
+              rating={Number(user.rating)}
+              num={8}
+            />
           </div>
-          <p className="text-sm text-gray-500">{user.location}</p>
         </div>
       </div>
       <hr className="border-gray-600 mx-4" />
@@ -120,126 +129,34 @@ const Login: React.FC = () => {
       {/* Tab Buttons */}
       <div className="flex space-x-8 mt-5 mx-4">
         <button
-          className={`font-semibold pb-2 ${
-            activeTab === "listings" ? "underline" : ""
-          }`}
+          className={`font-semibold px-2 pb-2 ${activeTab === "listings" ? "underline" : ""
+            }`}
           onClick={() => handleTabSwitch("listings")}
         >
           Listings
         </button>
-        <button
-          className={`font-semibold pb-2 ${
-            activeTab === "requested" ? "underline" : ""
-          }`}
-          onClick={() => handleTabSwitch("requested")}
-        >
-          Requested Swaps
-        </button>
-        <button
-          className={`font-semibold pb-2 ${
-            activeTab === "incoming" ? "underline" : ""
-          }`}
-          onClick={() => handleTabSwitch("incoming")}
-        >
-          Incoming Swap Requests
-        </button>
+      </div>
+      <div className="py-6 px-6 ">
+        <ShowMap ></ShowMap>
       </div>
 
-      <ShowMap ></ShowMap>
+      <ShowMap></ShowMap>
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
+            </div>
             {items.length > 0 ? (
-              items.map((item) => (
-                <ListingCard
-                  key={item.id}
-                  name={item.title}
-                  size={item.size}
-                  brand={item.brand || "Unknown"}
-                  id={item.id}
-                />
+              items.map((item, index) => (
+                <ListingCard key={index} data={item} />
               ))
             ) : (
               <p>No items currently listed</p>
             )}
           </div>
         )}
-
-        {activeTab === "requested" && (
-          <div>
-            {outgoingSwaps.length > 0 ? (
-              outgoingSwaps.map((swapItem) => (
-                <div key={swapItem.id} className="border p-2 mb-2">
-                  <p>{swapItem.title}</p>
-                </div>
-              ))
-            ) : (
-              <p>No requested swaps.</p>
-            )}
-          </div>
-        )}
-
-        {activeTab === "incoming" && (
-          <div>
-            {incomingSwaps.length > 0 ? (
-              incomingSwaps.map((swapItem) => (
-                <div key={swapItem.id} className="border p-2 mb-2">
-                  <p>{swapItem.title}</p>
-                </div>
-              ))
-            ) : (
-              <p>No incoming swap requests.</p>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-interface ListingCardProps {
-  id: number; // Add `id` to the props definition
-  name: string;
-  size: string;
-  brand: string | null;
-}
-
-const ListingCard: React.FC<ListingCardProps> = ({ name, size, brand, id }) => {
-  const router = useRouter(); // Move useRouter to the top of the component
-
-  const handleCardClick = (id: number) => {
-    router.push(`/item?itemId=${id}`); // Use router here
-  };
-
-  const truncateMessage = (msg: string, maxLength: number) => {
-    return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
-  };
-  return (
-    <div>
-      <div
-        className="relative flex flex-col w-40 h-56 mx-2 rounded-md border shadow-md bg-white overflow-hidden"
-        onClick={() => handleCardClick(id)} // Wrap the function call in an arrow function
-        style={{ cursor: "pointer" }}
-      >
-        {/* Main image area */}
-        <div className="relative w-full h-3/4">
-          {" "}
-          {/* Set height to 75% of the card */}
-          {/* Item image */}
-          <ItemImages itemId={id} className="w-full h-full object-cover" />
-        </div>
-      </div>
-      {/* Text below the image */}
-      <div className="mt-2 text-center">
-        <div className="text-sm font-semibold text-indigo-900">
-          {truncateMessage(name, 15)}
-        </div>
-        <p className="text-xs text-gray-600">
-        {truncateMessage(`${size} • ${brand}`, 15)}
-          
-        </p>
       </div>
     </div>
   );

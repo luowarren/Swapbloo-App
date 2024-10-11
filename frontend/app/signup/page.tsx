@@ -13,21 +13,38 @@ const SignUp: React.FC = () => {
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
-    // Sign up the user
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      // Attempt user sign-up
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (signUpError) {
-      setError(signUpError.message);
+      // Log data and error for debugging purposes
+      console.log("Data:", data);
+      console.log("SignUp Error:", signUpError);
+
+      if (signUpError) {
+        setError(`Sign up failed: ${signUpError.message}`);
+        setLoading(false);
+        return;
+      }
+
+      // Check if user was successfully created
+      if (data?.user) {
+        setError("Check your email for the confirmation link.");
+      }
+    } catch (error) {
+      console.error("Error occurred during sign up:", error);
+      setError("An unexpected error occurred.");
+    } finally {
       setLoading(false);
-      return;
     }
 
     // Redirect to the marketplace or login after successful signup
-    router.push("/marketplace");
+    //router.push('/marketplace');
 
     setLoading(false);
   };

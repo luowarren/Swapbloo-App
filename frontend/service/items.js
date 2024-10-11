@@ -270,6 +270,9 @@ export async function getItemImages(imageIds) {
   const images = [];
   console.log("starting");
 
+  imageIds.sort((a, b) => a.created_at - b.created_at);
+
+  console.log("list of 677", imageIds)
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
