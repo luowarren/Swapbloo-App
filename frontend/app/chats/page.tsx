@@ -279,7 +279,7 @@ const ChatPage: React.FC = () => {
     console.log("Updating:", location, date, time)
     updateMeetUp(swapId, location, date, time);
     // send message to chat notifying users that meetup has been updated
-    const text = "I've just updated our meetup to: " + time + " on the " + date + " at " + location
+    const text = "Meetup agreement updated to: " + time + " on the " + date + " at " + location
     if (currUserId !== null && swapId !== null) {
       sendMessage(currUserId, swapId, text);
     }
