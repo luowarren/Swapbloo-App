@@ -18,7 +18,7 @@ import {
 } from "../../service/swaps";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
-import { getUserId } from "../../service/users";
+import { getUserId, getUser } from "../../service/users";
 import {
   supabase,
   getChats,
@@ -59,6 +59,14 @@ const ChatPage: React.FC = () => {
   const [otherUserData, setOtherUserData] = useState<{
     name: string;
     chat_id: string;
+    location: string;
+    description: string;
+    dob: string;
+    image: string;
+    rating: string;
+    num_of_ratings: string;
+    swap_count: string;
+    blocked: string;
   } | null>(null);
   const [swapId, setSwapId] = useState<string | null>(null);
   const [meetUpInfo, setMeetUpInfo] = useState<{
@@ -103,6 +111,8 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     otherUserDataRef.current = otherUserData;
+    // update shop
+    // console.log("Other user data: ", otherUserData, otherUserDataRef)
   }, [otherUserData]);
 
   const sortChats = (
@@ -249,6 +259,33 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
+    console.log("Other use data: ", otherUserData);
+  }, [otherUserData])
+
+  async function updateOtherUserData() {
+    let other_user_id;
+    console.log("alfjnwasfklujbwsolfjkdb", currUserId, requesterId)
+    if (currUserId === requesterId) {
+      other_user_id = accepterId;
+    } else {
+      other_user_id = requesterId; // here
+    }
+    if (other_user_id !== null) {
+      const other_user_data = await getUser(other_user_id);
+      console.log("Other user data: ", other_user_data);
+
+      if (chats != null && activeChat != null && other_user_data.Users !== null) {
+        console.log("Updating other use")
+        setOtherUserData(other_user_data.Users[0]);
+      }
+    }
+  }
+
+  useEffect(() => {
+    updateOtherUserData();
+  }, [requesterId, accepterId])
+
+  useEffect(() => {
     if (chats != null && activeChat != null) {
       // update list of messages
       const chat_id = chats[activeChat].id;
@@ -260,13 +297,7 @@ const ChatPage: React.FC = () => {
       updateSwapId(chat_id);
 
       // update otherUserData
-      setOtherUserData((prevObj) => ({
-        // ...prevObj,
-        name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
-      }));
-
-
+      // updateOtherUserData();
     }
   }, [activeChat]);
 
@@ -281,10 +312,11 @@ const ChatPage: React.FC = () => {
       fetchChatUsers(chat_id);
 
       // Update otherUserData
-      setOtherUserData({
-        name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
-      });
+      updateOtherUserData();
+      // setOtherUserData({
+      //   name: chats[activeChat].username,
+      //   chat_id: chats[activeChat].id,
+      // });
     }
   }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
 
@@ -578,16 +610,23 @@ const ChatPage: React.FC = () => {
               <div className="flex flex-row items-center justify-evenly w-full mb-4">
                 <div className="w-16 h-16 bg-yellow-500 rounded-full"></div>
                 <div className="flex flex-col items-start align-middle">
+                {otherUserData !== null ? (
+                  <div>
                   <div className="font-bold overflow-auto text-center">
-                    {data[activeChat].name}'s Swap Shop
+                    {otherUserData.name}'s Swap Shop
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {data[activeChat].username}
+                  {otherUserData !== null ? (
+                    <UserRating size="text-sm" rating={Number(otherUserData.rating)} num={Number(otherUserData.num_of_ratings)}></UserRating> 
+                    ) : (
+                      <UserRating size="text-sm" num={0}></UserRating>
+                    )}
                   </div>
-                  <UserRating
-                    rating={Number(data[activeChat].rating)}
-                    num={8}
-                  />
+                ) : (
+                  <div className="font-bold overflow-auto text-center">
+                    Loading...
+                  </div>
+                )
+                } 
                 </div>
               </div>
               <GenericButton text="Visit Shop" inverse={true} width="90%" click={openModal}/>
