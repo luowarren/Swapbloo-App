@@ -6,6 +6,7 @@ import { Heart, MoreHorizontal, Share } from "lucide-react";
 import { getUser } from "@/service/users";
 import ProfileImage from "../components/ProfileImage";
 import VisitShopModal from "../components/VisitShopModal";
+import ShowMap from "../components/Map";
 
 const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const handleMakeOffer = () => {};
@@ -85,6 +86,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
+                
               </div>
               <p className="text-sm text-gray-700 mb-2">{item.location}</p>
 
