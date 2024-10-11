@@ -3,19 +3,23 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from "react-router-dom";
 import articlesData from './content.json'; // Import the JSON data
-import ReactMarkdown from 'react-markdown';
+
+
+type Section = {
+    heading: string;
+    content: string;
+};
 
 type Article = {
     id: number;
     title: string;
-    content: string;
     image: string;
+    sections: Section[];
 };
 
 const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
     return (
         <div className="max-w-lg rounded-lg overflow-hidden shadow-lg bg-white">
-
             <div className="h-60 bg-gray-300">
                 <img src={article.image} alt={article.title} className="w-full h-full object-cover rounded-lg" />
             </div>
@@ -58,7 +62,6 @@ const ArticleDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [article, setArticle] = useState<Article | undefined>();
 
-
     useEffect(() => {
         const foundArticle = articlesData.find((article) => article.id === parseInt(id!));
         setArticle(foundArticle);
@@ -68,14 +71,17 @@ const ArticleDetail: React.FC = () => {
         return <p className="text-center text-gray-500">Article not found...</p>;
     }
 
-
-
     return (
         <div className="min-h-screen py-6 flex flex-col justify-center">
             <div className="max-w-2xl mx-auto bg-white rounded-lg p-4">
                 <h1 className="text-3xl font-semibold mb-4">{article.title}</h1>
                 <img src={article.image} alt={article.title} className="w-full h-80 object-cover rounded-lg mb-4" />
-                <div className="text-gray-700 text-lg leading-relaxed"><ReactMarkdown>{article.content}</ReactMarkdown></div>
+                {article.sections.map((section, index) => (
+                    <div key={index} className="mb-6">
+                        <h2 className="text-2xl font-bold mb-2">{section.heading}</h2>
+                        <p className="text-gray-700 text-lg leading-relaxed">{section.content}</p>
+                    </div>
+                ))}
             </div>
         </div>
     );
