@@ -123,6 +123,9 @@ const Login: React.FC = () => {
             />
           </div>
         </div>
+        <div className="py-3 px-3 ">
+         <ShowMap ></ShowMap>
+        </div>
       </div>
       <hr className="border-gray-600 mx-4" />
 
@@ -136,23 +139,21 @@ const Login: React.FC = () => {
           Listings
         </button>
       </div>
-      <div className="py-6 px-6 ">
-        <ShowMap ></ShowMap>
-      </div>
+      
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
-            </div>
+            
             {items.length > 0 ? (
               items.map((item, index) => (
                 <ListingCard key={index} data={item} />
               ))
             ) : (
               <p>No items currently listed</p>
-            )}
+            )}</div>
           </div>
         )}
       </div>
