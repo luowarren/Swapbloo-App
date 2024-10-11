@@ -1,6 +1,7 @@
-import React from "react";
+import React, { use } from "react";
 import { displayTime } from "../chats/helpers";
 import { cn } from "@/lib/utils";
+import ProfileImage from "./ProfileImage";
 
 const MessagePreview = ({
   name,
@@ -9,6 +10,7 @@ const MessagePreview = ({
   viewed,
   isSelected,
   maxLength = 20,
+  userId,
 }) => {
   const truncateMessage = (msg) => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
@@ -22,7 +24,7 @@ const MessagePreview = ({
     <div
       className={`flex items-center p-5 ${isSelected ? "bg-gray-100" : null}`}
     >
-      <div className="w-12 h-12 bg-yellow-500 rounded-full mr-3" />
+      <ProfileImage userId={userId}/>
       <div className="flex-grow flex flex-col">
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold text-black">{name}</div>

@@ -12,10 +12,6 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import {
-  getUserIdByUsername,
-  getSwapDetailsBetweenUsers,
-} from "../../service/swaps";
 import SwapDetails from "../components/SwapDetails";
 
 import { getUserId } from "../../service/users";
