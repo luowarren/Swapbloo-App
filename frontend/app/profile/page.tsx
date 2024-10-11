@@ -119,7 +119,7 @@ const Login: React.FC = () => {
             </div>
             <UserRating
               rating={Number(user.rating)}
-              num={8}
+              num={Number(user.num_of_ratings)}
             />
           </div>
         </div>
@@ -139,8 +139,6 @@ const Login: React.FC = () => {
       <div className="py-6 px-6 ">
         <ShowMap ></ShowMap>
       </div>
-
-      <ShowMap></ShowMap>
 
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">

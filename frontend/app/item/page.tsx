@@ -25,6 +25,7 @@ export interface ItemData {
   location: string;
   ownerName: string;
   ownerRating: number;
+  // ownerRatingNum: number;
   imageUrl: string;
 }
 
@@ -82,7 +83,7 @@ const Item = () => {
   const handleMakeOffer = () => {
     router.push(`/offer?itemId=${itemData.id}&ownerId=${itemData.owner_id}`);
   };
-
+  console.log("adeline", itemData)
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
@@ -147,6 +148,7 @@ const Item = () => {
               <p className="text-black font-semibold">{itemData.ownerName}</p>
               <div className="flex items-center text-sm text-gray-700">
                 <UserRating rating={itemData.ownerRating} num={8} />
+                
               </div>
             </div>
           </div>
