@@ -18,7 +18,7 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   const handleDateChange = (event) => {
     // console.log("new date" + event.target.value)
-    setSelectedDate(event.target.value);//new Date(event.target.value).toISOString());
+    setSelectedDate(event.target.value); //new Date(event.target.value).toISOString());
   };
 
   const handleTimeChange = (event) => {
@@ -52,25 +52,28 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   useEffect(() => {
     fetchCurrLoc();
-  }, [])
+  }, []);
 
   return (
     <div>
-    {locationCoords !== null ? (
-      <ShowMap setter={setSelectedLocation} width="20rem" height="18rem" selectedLocation={locationCoords}></ShowMap> 
-      )
-      : (
+      {locationCoords !== null ? (
+        <ShowMap
+          setter={setSelectedLocation}
+          width="20rem"
+          height="18rem"
+          selectedLocation={locationCoords}
+        ></ShowMap>
+      ) : (
         <div>Loading map...</div>
         // <ShowMap setter={setSelectedLocation} width="20rem" height="18rem" selectedLocation={{
         //   name: "UQ Union",
         //   latitude: -27.496203,
         //   longitude: 153.017277
-        // }}></ShowMap> 
-      )
-    }
-    <form onSubmit={handleSubmit}>
-      <div style={{ margin: "0.5em", marginTop: "1em" }}>
-        {/* <div>
+        // }}></ShowMap>
+      )}
+      <form onSubmit={handleSubmit}>
+        <div style={{ margin: "0.5em", marginTop: "1em" }}>
+          {/* <div>
           <label htmlFor="date">Location: </label>
           <select
             id="location"
@@ -98,15 +101,15 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
           </select>
         </div> */}
 
-        <div>
-          <label htmlFor="date">Date: </label>
-          <input
-            type="date"
-            id="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </div>
+          <div>
+            <label htmlFor="date">Date: </label>
+            <input
+              type="date"
+              id="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+            />
+          </div>
 
           <div>
             <label htmlFor="time">Time: </label>
@@ -131,10 +134,15 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
             height: "auto",
           }}
         >
-          <GenericButton type="submit" text="Update Meetup" inverse={true} width="100%"/>
+          <GenericButton
+            type="submit"
+            text="Update Meetup"
+            inverse={true}
+            width="100%"
+          />
         </div>
       </form>
-      </div>
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-const locations = [
+export const locations = [
   {
     id: "1",
     latitude: -27.49620324556435,
@@ -29,7 +29,7 @@ const locations = [
   },
   {
     id: "9",
-    latitude: -27.500329, 
+    latitude: -27.500329,
     longitude: 152.973456,
     name: "Indooroopilly Shopping Centre",
     pinned: false,
