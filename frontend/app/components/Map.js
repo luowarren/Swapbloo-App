@@ -6,7 +6,7 @@ import GenericButton from "./GenericButton";
 import { Minus, Search } from "lucide-react";
 import { getLocations, getSwapLocation } from "@/service/swaps";
 
-const l = await getLocations()
+const l = await getLocations();
 // const preferredLocation = await getSwapLocation()
 
 // Custom hook to center the map
@@ -25,13 +25,13 @@ function CenterMap({ selected, zoom }) {
 
 // Main component
 export default function ShowMap({
-  setter= () => {},
+  setter,
   width = "25rem",
   height = "15rem",
   zoom = 11,
   iconSize = 35,
 }) {
-  var locations = l.data
+  var locations = l.data;
   // console.log("hiii", locations)
 
   const [userLocation, setUserLocation] = useState(null);
@@ -198,18 +198,29 @@ export default function ShowMap({
               placeholder="Search by location"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: "200px", padding: "8px", borderWidth: "1px", borderRadius: "8px" }}
+              style={{
+                width: "200px",
+                padding: "8px",
+                borderWidth: "1px",
+                borderRadius: "8px",
+              }}
             />
           </div>
           {/* Search results */}
           {searchTerm && (
-            <ul style={{ listStyleType: "none", paddingBottom: "8px", overflow: "scroll"}}>
+            <ul
+              style={{
+                listStyleType: "none",
+                paddingBottom: "8px",
+                overflow: "scroll",
+              }}
+            >
               {filteredLocations.map((location) => (
                 <li
                   key={location.id}
                   onClick={() => {
                     setSelected(location);
-                    setter(location.name)
+                    setter(location.name);
                     setSearchTerm(""); // Clear search when selecting a location
                     setIsSearchVisible(false); // Hide search bar on selection
                   }}

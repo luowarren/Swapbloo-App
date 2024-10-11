@@ -126,7 +126,7 @@ const Login: React.FC = () => {
       <div className="space-x-8 mt-5 mx-4">Description</div>
       <div className="space-x-8 mt-5 mx-4">{user.description}</div>
       <div className="py-6 px-6 ">
-        <ShowMap></ShowMap>
+        <ShowMap setter={() => {}}></ShowMap>
       </div>
       <div className="flex space-x-8 mt-5 mx-4">Listings</div>
       {/* Tab Content */}

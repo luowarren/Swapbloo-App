@@ -16,7 +16,7 @@ const LocationSelector = ({ click, meetUpInfo }) => {
 
   const handleDateChange = (event) => {
     // console.log("new date" + event.target.value)
-    setSelectedDate(event.target.value);//new Date(event.target.value).toISOString());
+    setSelectedDate(event.target.value); //new Date(event.target.value).toISOString());
   };
 
   const handleTimeChange = (event) => {
@@ -36,10 +36,14 @@ const LocationSelector = ({ click, meetUpInfo }) => {
 
   return (
     <div>
-    <ShowMap setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
-    <form onSubmit={handleSubmit}>
-      <div style={{ margin: "0.5em", marginTop: "1em" }}>
-        {/* <div>
+      <ShowMap
+        setter={setSelectedLocation}
+        width="20rem"
+        height="18rem"
+      ></ShowMap>
+      <form onSubmit={handleSubmit}>
+        <div style={{ margin: "0.5em", marginTop: "1em" }}>
+          {/* <div>
           <label htmlFor="date">Location: </label>
           <select
             id="location"
@@ -67,15 +71,15 @@ const LocationSelector = ({ click, meetUpInfo }) => {
           </select>
         </div> */}
 
-        <div>
-          <label htmlFor="date">Date: </label>
-          <input
-            type="date"
-            id="date"
-            value={selectedDate}
-            onChange={handleDateChange}
-          />
-        </div>
+          <div>
+            <label htmlFor="date">Date: </label>
+            <input
+              type="date"
+              id="date"
+              value={selectedDate}
+              onChange={handleDateChange}
+            />
+          </div>
 
           <div>
             <label htmlFor="time">Time: </label>
@@ -100,10 +104,15 @@ const LocationSelector = ({ click, meetUpInfo }) => {
             height: "auto",
           }}
         >
-          <GenericButton type="submit" text="Update Meetup" inverse={true} width="100%"/>
+          <GenericButton
+            type="submit"
+            text="Update Meetup"
+            inverse={true}
+            width="100%"
+          />
         </div>
       </form>
-      </div>
+    </div>
   );
 };
 

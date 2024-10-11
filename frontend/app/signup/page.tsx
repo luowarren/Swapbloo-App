@@ -94,7 +94,7 @@ const SignUp: React.FC = () => {
             type="submit"
             className="w-full bg-indigo-500 text-white p-2 rounded hover:bg-indigo-800 transition"
           >
-            Login
+            Sign up
           </button>
         </form>
         <p className="mt-4 text-center">
@@ -106,13 +106,13 @@ const SignUp: React.FC = () => {
         <div className="w-full flex my-4 text-gray-400 font-bold justify-center">
           OR
         </div>
-        <div className="w-full flex flex-row items-center my-2 py-2 rounded-md bg-gray-100 font-medium justify-center text-gray-600">
+        <div className="w-full flex flex-row items-center my-2 py-2 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer transition font-medium justify-center text-gray-600">
           <img
             src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
             alt="Google logo"
             className="w-7 h-7 mr-2"
           />
-          Sign in with Google
+          Sign up with Google
         </div>
       </div>
     </div>
