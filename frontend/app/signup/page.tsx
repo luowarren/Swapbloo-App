@@ -1,79 +1,105 @@
 "use client";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '../../service/supabaseClient';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../service/supabaseClient";
 
 const SignUp: React.FC = () => {
-    const router = useRouter();
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-    const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 
-        // Sign up the user
-        const { data, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-        });
+    // Sign up the user
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-        if (signUpError) {
-            setError(signUpError.message);
-            setLoading(false);
-            return;
-        }
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
 
-        // Redirect to the marketplace or login after successful signup
-        router.push('/marketplace');
+    // Redirect to the marketplace or login after successful signup
+    router.push("/marketplace");
 
-        setLoading(false);
-    };
+    setLoading(false);
+  };
 
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded shadow-md w-full max-w-lg">
-                <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
-                {error && <p className="text-red-500">{error}</p>}
-                {loading && <p className="text-blue-500">Loading...</p>}
-                <form onSubmit={handleSignUp} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium">Email:</label>
-                        <input 
-                            type="email" 
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            required 
-                            className="mt-1 p-2 border rounded w-full"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium">Password:</label>
-                        <input 
-                            type="password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            required 
-                            className="mt-1 p-2 border rounded w-full"
-                        />
-                    </div>
-                    <div>
-                        <button 
-                            type="submit" 
-                            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                        >
-                            Sign Up
-                        </button>
-                    </div>
-                </form>
-                <p className="mt-4 text-center">
-                    Already a customer? <a href="/login" className="text-blue-500 hover:underline">Login here</a>
-                </p>
-            </div>
+  return (
+    <div
+      className="flex items-center justify-center min-h-screen bg-indigo-500"
+      style={{
+        backgroundImage:
+          "url(https://img.freepik.com/free-vector/seamless-woman-s-stylish-bags-sketch_98292-4347.jpg?t=st=1728605120~exp=1728608720~hmac=61089c7da794f909b80d339eb78cab0540624f18bb6216f2955b7946ddb9e25f&w=1380)",
+        backgroundSize: "800px", // Adjust the size of the image
+        backgroundRepeat: "repeat", // Set the background to repeat
+        backgroundPosition: "top left", // Set the starting point of the image
+      }}
+    >
+      <div className="bg-white p-8 rounded-lg shadow-md w-96">
+        <h1 className="text-4xl font-bold mb-6 italic text-indigo-700">
+          Sign up
+        </h1>
+        {error && <p className="text-red-500">{error}</p>}
+        <form onSubmit={handleSignUp}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-400">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="mt-1 p-2 border rounded w-full"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-400">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="mt-1 p-2 border rounded w-full"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-indigo-500 text-white p-2 rounded hover:bg-indigo-800 transition"
+          >
+            Login
+          </button>
+        </form>
+        <p className="mt-4 text-center">
+          Already with us?{" "}
+          <a href="/signup" className="text-indigo-500 hover:underline">
+            Log in here
+          </a>
+        </p>
+        <div className="w-full flex my-4 text-gray-400 font-bold justify-center">
+          OR
         </div>
-    );
+        <div className="w-full flex flex-row items-center my-2 py-2 rounded-md bg-gray-100 font-medium justify-center text-gray-600">
+          <img
+            src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
+            alt="Google logo"
+            className="w-7 h-7 mr-2"
+          />
+          Sign in with Google
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SignUp;

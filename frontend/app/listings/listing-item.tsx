@@ -101,9 +101,7 @@ const Item = () => {
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-1/2 flex flex-col items-center justify-center relative my-20 space-y-4">
-        <div className="scale-150">
-          <ItemImages itemId={itemData.id} />
-        </div>
+        <ItemImages itemId={itemData.id} />
       </div>
 
       <div className="p-4 w-1/2 my-20">
