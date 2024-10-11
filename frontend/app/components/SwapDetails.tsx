@@ -6,17 +6,26 @@ import UpdateSwapModal from "../components/UpdateSwapModal"; // Import your moda
 import ItemImages from "./ItemImages";
 import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 import { getUserId } from "@/service/auth";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 interface SwapDetailsProps {
     ownerId: string | null;
     requesterId: string | null;
 }
   
+function onSwapUpdate() {
+  return (
+    <DialogContent>
+      <div> Successfull swap update</div>
+    </DialogContent>
+  )
+}
 
 const SwapDetails: React.FC<SwapDetailsProps> = ({
   ownerId,
   requesterId,
 }) => {
+  const [modalOpen, setModalOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [myItems, setMyItems] = useState<string[]>([]); // Your items
   const [requestingItems, setRequestingItems] = useState<string[]>([]); // Other user's items
@@ -67,7 +76,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
   return (
     
-    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 ">
+    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">
       <div className="font-bold text-2xl mb-4">Swap Details</div>
       <div
         style={{
@@ -131,14 +140,34 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
         {accepted ? (
           <GenericButton text="Update Offer" noClick={true} />
         ) : (
-          <GenericButton
+          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+            <DialogTrigger asChild>
+            {/* <GenericButton
             text="Update Offer"
-            click={() => setIsUpdateSwapModalVisible(true)}
-          />
+            // click={() => setIsUpdateSwapModalVisible(true)}
+            /> */}
+            <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">Update Offer</div>
+            </DialogTrigger>
+            <DialogContent className="min-w-[80%] min-h-[80%]" >
+            <div>  </div>
+              <UpdateSwapModal
+                  isVisible={true} // Modal visibility from parent state
+                  onClose={() => setModalOpen(false)} // Close modal when done
+                  swapId={swapId}
+                  myItems={myItems} // Your items
+                  requestingItems={requestingItems} // Their items
+                  ownerId={ownerId}
+                  requesterId={requesterId}
+                  onUpdate={() => setModalOpen(false)} // Handle post-update logic here
+                />
+               
+            </DialogContent>
+          </Dialog>
+          
         )}
 
         {/* Update Swap Modal */}
-        <UpdateSwapModal
+        {/* <UpdateSwapModal
           isVisible={isUpdateSwapModalVisible} // Modal visibility from parent state
           onClose={() => setIsUpdateSwapModalVisible(false)} // Close modal when done
           swapId={swapId}
@@ -147,7 +176,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
           ownerId={ownerId}
           requesterId={requesterId}
           onUpdate={() => console.log("Swap updated!")} // Handle post-update logic here
-        />
+        /> */}
 
         {accepted ? (
           <GenericButton text="Accept Offer" noClick={true} />

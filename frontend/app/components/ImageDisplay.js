@@ -18,7 +18,7 @@ const ImageDisplay = ({ imageUrl, className }) => {
         style={{ maxWidth: '100%', height: 'auto' }} // Ensuring the image is responsive
         onError={(e) => {
           // Handle cases where the image fails to load
-          e.target.src = "/fallback-image.png"; // Replace with a fallback image if needed
+          e.target.src = "https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png"; // Replace with a fallback image if needed
         }} 
       />
     </div>

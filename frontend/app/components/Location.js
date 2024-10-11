@@ -1,22 +1,26 @@
 // LocationSelector.js
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
+import locations from "../chats/locations";
 import GenericButton from "./GenericButton";
 import ShowMap from "./Map";
 
-const LocationSelector = ({click }) => {
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
+const LocationSelector = ({ click, meetUpInfo }) => {
+  const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
+  const [selectedDate, setSelectedDate] = useState(meetUpInfo.date);
+  const [selectedTime, setSelectedTime] = useState(meetUpInfo.time);
 
   const handleLocationChange = (event) => {
     setSelectedLocation(event.target.value);
   };
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+    // console.log("new date" + event.target.value)
+    setSelectedDate(event.target.value);//new Date(event.target.value).toISOString());
   };
 
   const handleTimeChange = (event) => {
+    // console.log("new time" + event.target.value)
     setSelectedTime(event.target.value);
   };
 
@@ -25,25 +29,53 @@ const LocationSelector = ({click }) => {
     if ((selectedLocation && selectedDate && selectedTime) == "") {
       alert("Something is empty...");
     } else {
-      alert(`Location: ${selectedLocation} Date: ${selectedDate} Time: ${selectedTime}`)
-      click();
+      alert("Meet up updated!");
+      click(selectedLocation, selectedDate, selectedTime);
     }
   };
 
   return (
     <div>
-      <ShowMap setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
-      <form onSubmit={handleSubmit}>
-        <div style={{ margin: "0.5em", marginTop: "1em" }}>
-          <div>
-            <label htmlFor="date">Date: </label>
-            <input
-              type="date"
-              id="date"
-              value={selectedDate}
-              onChange={handleDateChange}
-            />
-          </div>
+    <ShowMap setter={setSelectedLocation} width="20rem" height="18rem"></ShowMap>
+    <form onSubmit={handleSubmit}>
+      <div style={{ margin: "0.5em", marginTop: "1em" }}>
+        {/* <div>
+          <label htmlFor="date">Location: </label>
+          <select
+            id="location"
+            value={selectedLocation}
+            onChange={handleLocationChange}
+          >
+            <option value="" style={{}}>
+              None
+            </option>
+            {locations.map((location) => {
+              if (location.name == selectedLocation) {
+                return (
+                  <option key={location.id} value={location.name} selected={true}>
+                    {location.name}
+                  </option>
+                )
+              } else {
+                return (
+                  <option key={location.id} value={location.name}>
+                    {location.name}
+                  </option>
+                )
+              }
+            })}
+          </select>
+        </div> */}
+
+        <div>
+          <label htmlFor="date">Date: </label>
+          <input
+            type="date"
+            id="date"
+            value={selectedDate}
+            onChange={handleDateChange}
+          />
+        </div>
 
           <div>
             <label htmlFor="time">Time: </label>
@@ -71,7 +103,7 @@ const LocationSelector = ({click }) => {
           <GenericButton type="submit" text="Update Meetup" inverse={true} width="100%"/>
         </div>
       </form>
-    </div>
+      </div>
   );
 };
 

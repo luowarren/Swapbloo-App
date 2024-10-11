@@ -12,12 +12,9 @@ import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import {
-  getUserIdByUsername,
-  getSwapDetailsBetweenUsers,
-} from "../../service/swaps";
+import { getUserIdByUsername, getSwapDetailsBetweenUsers, getSwapId } from "../../service/swaps"
+import { updateMeetUp, getMeetUp } from "../../service/meetups"
 import SwapDetails from "../components/SwapDetails";
-
 import { getUserId } from "../../service/users";
 import {
   supabase,
@@ -25,6 +22,7 @@ import {
   getChat,
   sendMessage,
   getUserIdsFromChat,
+  toggleViewed
 } from "../../service/chat";
 sortData(data);
 
@@ -54,8 +52,11 @@ const ChatPage: React.FC = () => {
     sender_id: string;
   }> | null>(null);
   const [otherUserData, setOtherUserData] = useState<{
-    name: string;
-    chat_id: string;
+    name: string, chat_id: string
+  } | null> (null);
+  const [swapId, setSwapId] = useState<string | null>(null);
+  const [meetUpInfo, setMeetUpInfo] = useState<{
+    location: string, date: string, time: string
   } | null>(null);
   const [user, setUser] = useState<any>(null); // State for user
   const [loading, setLoading] = useState(true); // For handling the loading state
@@ -93,6 +94,33 @@ const ChatPage: React.FC = () => {
     otherUserDataRef.current = otherUserData;
   }, [otherUserData]);
 
+  const sortChats = (c: Array<{
+    id: string;
+    created_at: string;
+    user1_id: string;
+    user2_id: string;
+    status: string;
+    viewed: boolean;
+    profilePic: string;
+    username: string;
+    latestMessage: {
+      created_at: string;
+      chat_id: string;
+      sender_id: string;
+      content: string;
+    };
+  }> | null) => {
+    if (c) {
+      const sortedChats = [...c].sort((a, b) => {
+        return new Date(b.latestMessage.created_at).getTime() - new Date(a.latestMessage.created_at).getTime();
+      });
+      console.log("Sorted chats")
+      console.log(sortedChats)
+      return sortedChats;
+    }
+    return null;
+  };
+
   useEffect(() => {
     const channel = supabase
       .channel("chat-room")
@@ -101,15 +129,19 @@ const ChatPage: React.FC = () => {
         { event: "INSERT", schema: "public", table: "Messages" },
         (payload) => {
           console.log("Change received!", payload);
+          handleInitialDataFetches();
+          console.log("Allan checks: ", otherUserDataRef, payload, activeChat)
 
           // update messages
           if (
             otherUserDataRef.current != null &&
             payload.new.chat_id == otherUserDataRef.current.chat_id
           ) {
+            // handleInitialDataFetches('0');
+            console.log("setting messages")
             setMessages((prevMessages) => {
               if (prevMessages != null) {
-                return [
+                const updatedMessages = [
                   ...prevMessages,
                   {
                     type: "text",
@@ -119,11 +151,14 @@ const ChatPage: React.FC = () => {
                     sender_id: payload.new.sender_id,
                   },
                 ];
+                
+                return updatedMessages;
               } else {
                 return null;
               }
             });
           } else {
+            // handleInitialDataFetches(payload.new.chat_id);
             console.log("not right chat");
           }
         }
@@ -135,16 +170,41 @@ const ChatPage: React.FC = () => {
     };
   }, []);
 
-  const handleInitialDataFetches = async () => {
-    // get all chats
+  const handleInitialDataFetches = async (c_id: string | null = null) => {
+    // get users current chat id (if any)
+    // let keepActiveChat = false;
+    // let curr_chat_id: string | undefined;
+    // if (activeChat !== null) {
+    //   if (chats !== null) {
+    //     keepActiveChat = true;
+    //     curr_chat_id = chats[activeChat].id
+    //   }
+    // }
+
     const uid = await getUserId();
-    console.log(uid);
     setCurrUserId(uid);
+    let sortedChats;
     if (uid != null) {
       const c = await getChats(uid);
-      setChats(c);
-      console.log("Available chats:", chats);
+      sortedChats = sortChats(c);
+      setChats(sortedChats);
+      setActiveChat(0);
+    
+
+    // restore active chat
+    // console.log(keepActiveChat, sortedChats, curr_chat_id);
+      // if (c_id !== null && sortedChats !== null) {
+      //   console.log("new index:", sortedChats.findIndex((c) => c.id==c_id), c_id)
+      //   console.log(sortedChats)
+      //   setActiveChat(sortedChats.findIndex((c) => c.id==c_id));
+      // }
     }
+    // if (keepActiveChat && sortedChats !== undefined && sortedChats !== null && curr_chat_id !== undefined) {
+    //   setActiveChat(sortedChats.findIndex((c) => c.id==curr_chat_id));
+    // } else {
+    //   console.log("setting to 0")
+    //   setActiveChat(0);
+    // }
   };
 
   useEffect(() => {
@@ -156,6 +216,46 @@ const ChatPage: React.FC = () => {
     setMessages(c);
   };
 
+  async function getMeetUpData(swap_id: string) {
+    const meetUpData = await getMeetUp(swap_id);
+    console.log("Fetching meet up data")
+    if (meetUpData && meetUpData.length > 0) {
+      const new_meet_up_data = {
+        location: meetUpData[0].location,
+        date: meetUpData[0].date,
+        time: meetUpData[0].time
+      };
+      console.log(new_meet_up_data);
+      setMeetUpInfo(new_meet_up_data);
+    } else {
+      console.log("failed to update meet up data poop")
+    }
+  }
+
+  useEffect(() => {
+    console.log("Current swap id " + swapId);
+    // update meet up data
+    if (swapId !== null) {
+      getMeetUpData(swapId);
+    } else {
+      console.log("couldnt get swap data! cnt")
+      setMeetUpInfo(null)
+    }
+  }, [swapId])
+
+  async function updateSwapId(chat_id: string) {
+    const curr_swap_id = await getSwapId(chat_id);
+    if (curr_swap_id !== null && curr_swap_id.length > 0) {
+      // console.log("Got swap id:")
+      // console.log(curr_swap_id)
+      setSwapId(curr_swap_id[0].id);
+    } else {
+      console.log("epic fail, couldn't find swap id")
+      setSwapId(null);
+      setMeetUpInfo(null);
+    }
+  }
+
   useEffect(() => {
     if (chats != null && activeChat != null) {
       // update list of messages
@@ -163,6 +263,10 @@ const ChatPage: React.FC = () => {
       getAllMessages(chat_id);
       // Fetch and set the UUID (requesterId) for the other user by their username
       fetchChatUsers(chat_id);
+
+      // update current swap id
+      updateSwapId(chat_id);
+
       // update otherUserData
       setOtherUserData((prevObj) => ({
         // ...prevObj,
@@ -185,7 +289,7 @@ const ChatPage: React.FC = () => {
       // Update otherUserData
       setOtherUserData({
         name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
+        chat_id: chats[activeChat].id
       });
     }
   }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
@@ -197,49 +301,32 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
-  const setNotification = (notif: string, type: string = "notification") => {
-    //   useEffect(() => {
-    //     const checkUser = async () => {
-    //       const { data, error } = await supabase.auth.getUser();
-    //       if (data?.user) {
-    //         setUser(data.user);
-    //       } else {
-    //         router.push('/login'); // Redirect to /login if no user is found
-    //       }
-    //       setLoading(false);
-    //     };
-    //     checkUser();
-    //   }, [router]);
-
+  const setNotification = (notif: string, location: string, date: string, time: string) => {
+    const type = "notification";
+    console.log("Updating:", location, date, time)
+    updateMeetUp(swapId, location, date, time);
     if (activeChat != null) {
-      data[activeChat]["lastMessage"] = notif;
-      data[activeChat]["date"] = new Date().toISOString();
+      // data[activeChat]["lastMessage"] = notif;
+      // data[activeChat]["date"] = new Date().toISOString();
 
-      sortData(data);
-      setActiveChat(0);
 
-      if (otherUserData != null) {
-        setMessages((prevMessages) => [
-          // ...prevMessages,
-          {
-            type: "notification",
-            chat_id: otherUserData.chat_id,
-            content: notif,
-            sender_id: "me",
-            created_at: new Date().toISOString(),
-          },
-        ]);
-        console.log(messages);
-      }
-      // setMessages((prevMessages) => [
-      //   // ...prevMessages,
-      //   {
-      //     type: type,
-      //     text: notif,
-      //     sender: "me",
-      //     date: new Date().toISOString(),
-      //   },
-      // ]);
+      // sortData(data);
+      // setActiveChat(0);
+      
+
+      // if (otherUserData != null) {
+      //   setMessages((prevMessages) => [
+      //     prevMessages,
+      //     {
+      //       type: "notification",
+      //       chat_id: otherUserData.chat_id,
+      //       content: notif,
+      //       sender_id: "me",
+      //       created_at: new Date().toISOString(),
+      //     },
+      //   ]);
+      //   console.log(messages);
+      // }
     }
   };
 
@@ -256,6 +343,7 @@ const ChatPage: React.FC = () => {
       if (currUserId != null && otherUserDataRef.current != null) {
         sendMessage(currUserId, otherUserDataRef.current.chat_id, meInput);
         setMeInput("");
+        setActiveChat(0);
       }
 
       // data[activeChat]["lastMessage"] = meInput;
@@ -280,32 +368,6 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // Handle receiving messages from "Other Guy"
-  const handleReceive = (e: FormEvent) => {
-    e.preventDefault();
-    if (otherGuyInput.trim() && activeChat != null) {
-      data[activeChat]["lastMessage"] = otherGuyInput;
-      data[activeChat]["date"] = new Date().toISOString();
-
-      sortData(data);
-      setActiveChat(0);
-
-      if (otherUserData != null) {
-        setMessages((prevMessages) => [
-          // ...prevMessages,
-          {
-            type: "text",
-            chat_id: otherUserData.chat_id,
-            content: otherGuyInput,
-            sender_id: "other",
-            created_at: new Date().toISOString(),
-          },
-        ]);
-        console.log(messages);
-        setOtherGuyInput(""); // Clear "Other Guy" input after receiving
-      }
-    }
-  };
 
   // Switch active chat
   const switchChat = (chat: number) => {
@@ -316,7 +378,9 @@ const ChatPage: React.FC = () => {
     setAccepterId(null);
 
     // Fetch new data for the selected chat
-    fetchChatUsers(chats[chat].id);
+    if (chats != null) {
+      fetchChatUsers(chats[chat].id);
+    }
 
     setAccepted(false);
   };
@@ -337,7 +401,7 @@ const ChatPage: React.FC = () => {
       {" "}
       {/* The relative container to position the grey overlay */}
       {/* Grey overlay */}
-      <div className="flex h-[85vh] z-100 bg-gray-100">
+      <div className="flex h-[85vh] bg-gray-100">
         {/* Sidebar for other chats */}
         <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
           <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
@@ -370,12 +434,11 @@ const ChatPage: React.FC = () => {
               height: "100%", // 'h-full'
               padding: "1rem", // 'p-4' (4 units in Tailwind is usually 1rem)
               position: "relative",
-              zIndex: 200, // 'z-200'
             }}
           >
             {/* SwapDetails */}
             <div
-              className={`sticky top-0 z-10 bg-white border-b transition-transform duration-300 ${
+              className={`sticky top-0 bg-white border-b transition-transform duration-300 ${
                 isSwapDetailsVisible ? "translate-y-0" : "-translate-y-full"
               }`}
             >
@@ -594,25 +657,22 @@ const ChatPage: React.FC = () => {
                 <GenericButton text="Visit Shop" inverse={true} width="90%"/>
             </div>
 
-            <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
-              <div className="font-bold text-xl pb-2">Meetup Info</div>
+           
+          <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+          </div>
+            <div className="font-bold text-2xl">Meetup Info</div>
+            {meetUpInfo !== null ? (
               <LocationSelector
-                click={() => {
+                click={(location: string, date: string, time: string) => {
                   setNotification(
-                    `You updated the meetup details with ${data[activeChat].name}`
+                    `You updated the meetup details with ${data[activeChat].name}`,
+                    location, date, time
                   );
                 }}
-              />
-            </div>
-          </div>
-        )}
-        {activeChat === null && (
-          <div className="flex-grow grid place-items-center h-full p-4 bg-gray-100">
-            <img
-              src="https://nuynivbpnulznjcmtvpq.supabase.co/storage/v1/object/public/images/test_image.jpeg"
-              alt="placeholder"
-              className="w-[600px] h-[600px]"
-            />
+              meetUpInfo={meetUpInfo}
+              />) : (
+                <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
+            )}
           </div>
         )}
       </div>

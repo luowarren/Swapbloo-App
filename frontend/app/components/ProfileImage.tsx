@@ -48,6 +48,8 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
     );
   }
 
+  console.log("5678",profilePicUrl)
+
   return (
     <div>
       {profilePicUrl ? (
