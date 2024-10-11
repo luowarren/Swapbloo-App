@@ -652,6 +652,7 @@ const ChatPage: React.FC = () => {
                     rating={Number(data[activeChat].rating)}
                     num={8}
                   />
+                  
                 </div>
               </div>
                 <GenericButton text="Visit Shop" inverse={true} width="90%"/>

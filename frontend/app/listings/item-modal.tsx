@@ -96,8 +96,8 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     <ProfileImage userId={item.owner_id} />
                     <div className="flex flex-col pt-4">
                       <p className="text-gray-700 font-semibold">{user.name}</p>
-                      <div className="flex items-center text-sm text-gray-700">
-                        <UserRating rating={item.rating} reviewButton={false} />
+                      <div className="flex items-center text-sm text-gray-700 mb-5">
+                        <UserRating rating={user.rating} num={user.num_of_ratings} reviewButton={false} />
                         {/* <span className="ml-1">(8)</span> */}
                       </div>
                     </div>
