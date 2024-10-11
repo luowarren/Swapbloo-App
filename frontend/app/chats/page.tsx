@@ -568,7 +568,7 @@ const ChatPage: React.FC = () => {
 
            
           <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
-          </div>
+          
             <div className="font-bold text-2xl">Meetup Info</div>
             {meetUpInfo !== null ? (
               <LocationSelector
@@ -583,6 +583,7 @@ const ChatPage: React.FC = () => {
               />) : (
                 <div>Loading... (unless there's a missing swap record in DB...oop!)</div>
             )}
+          </div>
           </div>
         )}
       </div>
