@@ -38,13 +38,13 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   async function fetchCurrLoc() {
     const currLocation = await getSwapLocation(swap_id);
-    console.log("found current location:", currLocation);
+    // console.log("found current location:", currLocation);
     if (currLocation.data !== null) {
-      console.log(currLocation.data[0].location)
+      // console.log(currLocation.data[0].location)
       const coords = await getCoordinates(currLocation.data[0].location);
-      console.log("aa", coords)
+      // console.log("aa", coords)
       if (coords.data) {
-        console.log("setting, ", coords.data[0])
+        // console.log("setting, ", coords.data[0])
         setLocationCoords(coords.data[0])
       }
     }
