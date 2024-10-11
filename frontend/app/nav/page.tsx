@@ -52,6 +52,8 @@ const NavBar: React.FC = () => {
     };
   }, []);
 
+  if (pathname === "/onboard") return;
+
   // Function to handle the search input submission (pressing Enter)
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && search.trim() !== "") {

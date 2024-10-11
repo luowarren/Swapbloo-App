@@ -2,20 +2,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../service/supabaseClient";
-import { Cake, CakeSlice, Shirt } from "lucide-react";
+import { Cake, CakeSlice, MapPin, Shirt } from "lucide-react";
 import ImageUpload from "../components/ImageUpload";
 import ShowMap from "../components/Map";
+import { uploadImage } from "@/service/items";
 
 const Onboard: React.FC = () => {
   const router = useRouter();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [dob, setDob] = useState<string>("");
   const [storeDescription, setStoreDescription] = useState<string>("");
   const [location, setLocation] = useState<string>("UQ Union");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
@@ -23,24 +22,54 @@ const Onboard: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     // Handle the submission logic here (e.g., supabase or API calls)
+    if (name == "" || profilePic != null || dob != "") {
+      setError(true);
+      setLoading(false);
+      return;
+    }
   };
 
-  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setProfilePic(e.target.files[0]);
+  const handleUpload = async () => {
+    try {
+      const uploadPromises = uploadedImages.map(async (image, index) => {
+        const fileName = `image_${Date.now()}_${index}.png`;
+        let uploadedImage = await uploadImage(image, fileName);
+        if (uploadedImage.error) throw uploadedImage.error;
+      });
+
+      await Promise.all(uploadPromises);
+      alert("Listing uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading listing:", error);
+      alert("Failed to upload listing.");
     }
   };
 
   return (
-    <div className="flex justify-center min-h-screen bg-indigo-500">
-      <div className="flex flex-row  gap-10 bg-white p-8 rounded-lg shadow-md min-w-[80vw] justify-center my-20 py-14">
-        <div>
-          <h1 className="text-4xl font-bold mb-6 italic text-indigo-700">
-            Just one more thing...
-          </h1>
-          {error && <p className="text-red-500">{error}</p>}
+    <div
+      className="flex justify-center items-center h-[100vh] bg-indigo-700"
+      style={{
+        backgroundImage:
+          "url(https://img.freepik.com/free-vector/seamless-woman-s-stylish-bags-sketch_98292-4347.jpg?t=st=1728605120~exp=1728608720~hmac=61089c7da794f909b80d339eb78cab0540624f18bb6216f2955b7946ddb9e25f&w=1380)",
+        backgroundSize: "800px", // Adjust the size of the image
+        backgroundRepeat: "repeat", // Set the background to repeat
+        backgroundPosition: "top left", // Set the starting point of the image
+      }}
+    >
+      {/* <h1 className="text-5xl font-bold mb-6 italic text-indigo-700 text-center">
+        Finish signing up
+      </h1> */}
+
+      <div className="flex flex-row gap-0 bg-white border border-gray-300 rounded-lg min-w-[70vw] justify-center shadow-md h-[80vh] overflow-hidden">
+        <div className="flex max-h-[80vh] overflow-scroll w-full p-8 pb-10">
+          {error && (
+            <p className="text-red-500">Please fill in all the fields!!</p>
+          )}
+
           <form onSubmit={handleOnboard} className="space-y-4">
-            {/* Name Input */}
+            <h1 className="text-5xl font-bold mb-6 italic text-indigo-700 text-center">
+              Finish signing up
+            </h1>
             <div>
               <label className="block font-medium text-gray-500">Name</label>
               <input
@@ -110,12 +139,12 @@ const Onboard: React.FC = () => {
               </label>
             </div>
 
-            <ShowMap setter={setLocation} />
+            <ShowMap selectedLocation={location} setter={setLocation} />
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-indigo-500 text-white p-2 rounded hover:bg-indigo-800 transition"
+              className="w-full bg-indigo-500 text-white p-2 rounded-t-md hover:bg-indigo-800 transition"
             >
               {loading ? (
                 <div className="flex w-full justify-center items-center">
@@ -131,44 +160,55 @@ const Onboard: React.FC = () => {
         </div>
 
         {/* PREVIEW */}
-        <div className="w-[30%] border-2 rounded-lg h-40 p-5">
-          <div className="flex flex-row gap-2">
-            <div className="h-12 w-12 rounded-full bg-gray-300 overflow-hidden">
-              {uploadedImages.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Uploaded Image ${index + 1}`}
-                  style={{ width: "48px", height: "48px" }}
-                />
-              ))}
+        <div className="h-full flex bg-indigo-500 border-l-2 border-l-indigo-800 w-[80%] items-center justify-center">
+          <div className="max-w-[80%] w-[80%] border-2 border-gray-200 bg-white rounded-lg h-fit p-5">
+            <div className="my-1 text-sm text-gray-500 font-bold mb-4">
+              PREVIEW
             </div>
-            <div className="flex flex-col">
-              <div className="font-medium text-gray-700">
-                <span className="font-bold text-indigo-700">
-                  {name === "" ? (
-                    <span className="text-gray-400">Your name</span>
-                  ) : (
-                    name
-                  )}
-                </span>
-                's Store
+            <div className="flex flex-row gap-2">
+              <div className="h-12 w-12 rounded-full bg-gray-300 overflow-hidden">
+                {uploadedImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Uploaded Image ${index + 1}`}
+                    style={{ width: "48px", height: "48px" }}
+                  />
+                ))}
               </div>
-              <div className="flex gap-1 items-center text-sm rounded-full bg-indigo-100 text-indigo-700 font-medium w-fit py-1 px-2">
-                <Cake className="w-4 h-4" />
-                {dob === "" ? "Your birthday" : dob}
+              <div className="flex flex-col">
+                <div className="font-medium text-gray-700">
+                  <span className="font-bold text-indigo-700">
+                    {name === "" ? (
+                      <span className="text-gray-400">Your name</span>
+                    ) : (
+                      name
+                    )}
+                  </span>
+                  's Store
+                </div>
+                <div className="flex gap-1 items-center text-sm rounded-full bg-indigo-100 text-indigo-700 font-medium w-fit py-1 px-2">
+                  <Cake className="w-4 h-4" />
+                  {dob === "" ? "Your birthday" : dob}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-4 text-gray-700">
-            {storeDescription === "" ? (
-              <span className="text-gray-400">Your store description...</span>
-            ) : (
-              storeDescription
-            )}
-          </div>
+            <div className="mt-4 text-gray-700">
+              {storeDescription === "" ? (
+                <span className="text-gray-400">Your store description...</span>
+              ) : (
+                storeDescription
+              )}
+            </div>
 
-          <div>{location}</div>
+            <div className="p-2 bg-gray-100 w-full flex flex-col text-gray-600 rounded my-2">
+              <div className="text-sm text-gray-500">Preferred location:</div>
+              <div className="font-semibold flex gap-1 items-center mb-2">
+                <MapPin className="w-5 h-5" />
+                {location}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
