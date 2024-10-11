@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 
-const ImageUpload = ({ setImages, currentImages }) => {
+const ImageUpload = ({ setImages, currentImages, max=4 }) => {
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
 
     // Check for upload limit
-    if (currentImages.length + files.length > 4) {
+    if (currentImages.length + files.length > max) {
       alert("You can only upload up to 4 images.");
       return;
     }
