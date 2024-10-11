@@ -109,7 +109,7 @@ const Login: React.FC = () => {
     <div className="max-w-4xl mx-auto bg-white">
       <div className="w-1/2 bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 ">
         <div className="flex flex-row items-center justify-evenly w-full mb-4">
-          <div className="w-16 h-16 bg-yellow-500 rounded-full"></div>
+          <ProfileImage userId={user.id}/>
           <div className="flex flex-col items-start align-middle">
             <div className="font-bold overflow-auto text-center">
               {user.name}'s Swap Shop
