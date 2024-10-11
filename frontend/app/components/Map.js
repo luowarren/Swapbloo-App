@@ -32,7 +32,7 @@ export default function ShowMap({
   iconSize = 35,
 }) {
   var locations = l.data
-  console.log("hiii", locations)
+  // console.log("hiii", locations)
 
   const [userLocation, setUserLocation] = useState(null);
   const [selected, setSelected] = useState(locations[0]);
