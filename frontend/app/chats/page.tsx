@@ -137,7 +137,6 @@ const ChatPage: React.FC = () => {
             otherUserDataRef.current != null &&
             payload.new.chat_id == otherUserDataRef.current.chat_id
           ) {
-            // handleInitialDataFetches('0');
             console.log("setting messages")
             setMessages((prevMessages) => {
               if (prevMessages != null) {
@@ -158,7 +157,6 @@ const ChatPage: React.FC = () => {
               }
             });
           } else {
-            // handleInitialDataFetches(payload.new.chat_id);
             console.log("not right chat");
           }
         }
@@ -171,16 +169,6 @@ const ChatPage: React.FC = () => {
   }, []);
 
   const handleInitialDataFetches = async (c_id: string | null = null) => {
-    // get users current chat id (if any)
-    // let keepActiveChat = false;
-    // let curr_chat_id: string | undefined;
-    // if (activeChat !== null) {
-    //   if (chats !== null) {
-    //     keepActiveChat = true;
-    //     curr_chat_id = chats[activeChat].id
-    //   }
-    // }
-
     const uid = await getUserId();
     setCurrUserId(uid);
     let sortedChats;
@@ -189,22 +177,7 @@ const ChatPage: React.FC = () => {
       sortedChats = sortChats(c);
       setChats(sortedChats);
       setActiveChat(0);
-    
-
-    // restore active chat
-    // console.log(keepActiveChat, sortedChats, curr_chat_id);
-      // if (c_id !== null && sortedChats !== null) {
-      //   console.log("new index:", sortedChats.findIndex((c) => c.id==c_id), c_id)
-      //   console.log(sortedChats)
-      //   setActiveChat(sortedChats.findIndex((c) => c.id==c_id));
-      // }
     }
-    // if (keepActiveChat && sortedChats !== undefined && sortedChats !== null && curr_chat_id !== undefined) {
-    //   setActiveChat(sortedChats.findIndex((c) => c.id==curr_chat_id));
-    // } else {
-    //   console.log("setting to 0")
-    //   setActiveChat(0);
-    // }
   };
 
   useEffect(() => {
@@ -306,27 +279,6 @@ const ChatPage: React.FC = () => {
     console.log("Updating:", location, date, time)
     updateMeetUp(swapId, location, date, time);
     if (activeChat != null) {
-      // data[activeChat]["lastMessage"] = notif;
-      // data[activeChat]["date"] = new Date().toISOString();
-
-
-      // sortData(data);
-      // setActiveChat(0);
-      
-
-      // if (otherUserData != null) {
-      //   setMessages((prevMessages) => [
-      //     prevMessages,
-      //     {
-      //       type: "notification",
-      //       chat_id: otherUserData.chat_id,
-      //       content: notif,
-      //       sender_id: "me",
-      //       created_at: new Date().toISOString(),
-      //     },
-      //   ]);
-      //   console.log(messages);
-      // }
     }
   };
 
@@ -334,37 +286,11 @@ const ChatPage: React.FC = () => {
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
     if (meInput.trim() && activeChat != null) {
-      // sendMessage(uid, chat_id, message)
-      // send message!
-      // if (currUserId != null && otherUserData != null) {
-      //   sendMessage(currUserId, otherUserData.chat_id, meInput);
-      //   setMeInput("");
-      // }
       if (currUserId != null && otherUserDataRef.current != null) {
         sendMessage(currUserId, otherUserDataRef.current.chat_id, meInput);
         setMeInput("");
         setActiveChat(0);
       }
-
-      // data[activeChat]["lastMessage"] = meInput;
-      // data[activeChat]["date"] = new Date().toISOString();
-
-      // sortData(data);
-      // setActiveChat(0);
-
-      // if (otherUserData != null) {
-      //   setMessages((prevMessages) => [
-      //     // ...prevMessages,
-      //     {
-      //       type: "text",
-      //       chat_id: otherUserData.chat_id,
-      //       content: meInput,
-      //       sender_id: "me",
-      //       created_at: new Date().toISOString(),
-      //     },
-      //   ]);
-      //   setMeInput(""); // Clear "Me" input after sending
-      // }
     }
   };
 
@@ -615,25 +541,6 @@ const ChatPage: React.FC = () => {
                 Send
               </button>
             </form>
-
-            {/* Form for receiving messages from "Other Guy" */}
-            {/* <form onSubmit={handleReceive} className="flex mt-4">
-            <input
-              type="text"
-              value={otherGuyInput}
-              onChange={(e) => {
-                setOtherGuyInput(e.target.value);
-              }}
-              className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-              placeholder="Type a response from Other Guy..."
-            />
-            <button
-              type="submit"
-              className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
-            >
-              Receive
-            </button>
-          </form> */}
           </div>
         )}
         {/* Other users info and meetup info */}
