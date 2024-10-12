@@ -6,15 +6,10 @@ import GenericButton from "./GenericButton";
 import ShowMap from "./Map";
 import { getLocations, getSwapLocation, getCoordinates } from "@/service/swaps";
 
-const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
+const LocationSelector = ({ click, meetUpInfo, swap_id, activeChat }) => {
   const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
   const [selectedDate, setSelectedDate] = useState(meetUpInfo.date);
   const [selectedTime, setSelectedTime] = useState(meetUpInfo.time);
-  const [locationName, setLocationNames] = useState(null);
-
-  const handleLocationChange = (event) => {
-    setSelectedLocation(event.target.value);
-  };
 
   const handleDateChange = (event) => {
     // console.log("new date" + event.target.value)
@@ -25,7 +20,7 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
     // console.log("new time" + event.target.value)
     setSelectedTime(event.target.value);
   };
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     if ((selectedLocation && selectedDate && selectedTime) == "") {
@@ -36,26 +31,22 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
     }
   };
 
-  async function fetchCurrLoc() {
-    const currLocation = await getSwapLocation(swap_id);
-    console.log("found current location:", currLocation);
-    if (currLocation.data !== null) {
-      setLocationNames(currLocation.data[0].location);
-    }
-  }
-
   useEffect(() => {
-    fetchCurrLoc();
-  }, [swap_id, meetUpInfo]);
+    setSelectedLocation(meetUpInfo.location);
+    setSelectedTime(meetUpInfo.time ?? undefined)
+    setSelectedDate(meetUpInfo.date);
+    console.log("new meetup info: ", meetUpInfo);
+  }, [swap_id, meetUpInfo, activeChat]);
 
+  
   return (
-    <div>
-      {locationName !== null ? (
+    <div key={activeChat}>
+      { selectedLocation !== null ? (
         <ShowMap
           setter={setSelectedLocation}
           width="20rem"
           height="37vh"
-          selectedLocation={locationName}
+          selectedLocation={selectedLocation}
         ></ShowMap>
       ) : (
         <div>Loading map...</div>
@@ -67,34 +58,6 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
       )}
       <form onSubmit={handleSubmit}>
         <div style={{ margin: "0.5em", marginTop: "1em" }}>
-          {/* <div>
-          <label htmlFor="date">Location: </label>
-          <select
-            id="location"
-            value={selectedLocation}
-            onChange={handleLocationChange}
-          >
-            <option value="" style={{}}>
-              None
-            </option>
-            {locations.map((location) => {
-              if (location.name == selectedLocation) {
-                return (
-                  <option key={location.id} value={location.name} selected={true}>
-                    {location.name}
-                  </option>
-                )
-              } else {
-                return (
-                  <option key={location.id} value={location.name}>
-                    {location.name}
-                  </option>
-                )
-              }
-            })}
-          </select>
-        </div> */}
-
           <div>
             <label htmlFor="date">Date: </label>
             <input

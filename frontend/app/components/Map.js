@@ -13,7 +13,7 @@ function CenterMap({ selected, zoom }) {
 
   useEffect(() => {
     if (selected) {
-      console.log(selected)
+      console.log(selected);
       map.closePopup();
       map.setView([selected.latitude, selected.longitude], zoom);
     }
@@ -34,7 +34,7 @@ export default function ShowMap({
   selectedLocation == null
     ? (selectedLocation = "UQ Union")
     : (selectedLocation = selectedLocation);
-  
+
   const [userLocation, setUserLocation] = useState(null);
   const [selected, setSelected] = useState(
     locations.find(
@@ -70,6 +70,15 @@ export default function ShowMap({
       setFilteredLocations([]);
     }
   }, [searchTerm, locations]);
+
+  useEffect(() => {
+    setSelected(
+      locations.find(
+        (location) =>
+          location.name.toLowerCase() === selectedLocation.toLowerCase()
+      )
+    );
+  }, [selectedLocation]);
 
   // Create a location icon
   const locationIcon = new L.Icon({
@@ -121,18 +130,21 @@ export default function ShowMap({
               <div className="flex flex-col justify-center items-center h-full">
                 {" "}
                 <span className="mb-2">{location.name}</span>
-                {setter ?
-                <GenericButton
-                  text={location.name == selected.name ? "Selected" : "Select"}
-                  noClick={location.name == selected.name}
-                  click={() => {
-                    locations.forEach((l) => (l.pinned = false));
-                    location.pinned = true;
-                    setter(location.name);
-                    selectedLocation = location.name
-                    setSelected(location)
-                  }}
-                /> : null}
+                {setter ? (
+                  <GenericButton
+                    text={
+                      location.name == selected.name ? "Selected" : "Select"
+                    }
+                    noClick={location.name == selected.name}
+                    click={() => {
+                      locations.forEach((l) => (l.pinned = false));
+                      location.pinned = true;
+                      setter(location.name);
+                      selectedLocation = location.name;
+                      setSelected(location);
+                    }}
+                  />
+                ) : null}
               </div>
             </Popup>
           </Marker>
@@ -224,8 +236,8 @@ export default function ShowMap({
                   key={location.id}
                   onClick={() => {
                     setter(location.name);
-                    selectedLocation = location.name
-                    setSelected(location)
+                    selectedLocation = location.name;
+                    setSelected(location);
                     setSearchTerm(""); // Clear search when selecting a location
                     setIsSearchVisible(false); // Hide search bar on selection
                   }}
