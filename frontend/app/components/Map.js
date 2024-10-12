@@ -5,9 +5,7 @@ import L from "leaflet";
 import GenericButton from "./GenericButton";
 import { Minus, Search } from "lucide-react";
 import { getLocations, getSwapLocation, getCoordinates } from "@/service/swaps";
-
-const l = await getLocations();
-// const preferredLocation = await getSwapLocation()
+import { locations } from "./static/locations";
 
 // Custom hook to center the map
 function CenterMap({ selected, zoom }) {
@@ -15,6 +13,7 @@ function CenterMap({ selected, zoom }) {
 
   useEffect(() => {
     if (selected) {
+      console.log(selected)
       map.closePopup();
       map.setView([selected.latitude, selected.longitude], zoom);
     }
@@ -30,12 +29,19 @@ export default function ShowMap({
   height = "15rem",
   zoom = 11,
   iconSize = 35,
-  selectedLocation,
+  selectedLocation = "UQ Union",
 }) {
-  var locations = l.data;
-
+  selectedLocation == null
+    ? (selectedLocation = "UQ Union")
+    : (selectedLocation = selectedLocation);
+  
   const [userLocation, setUserLocation] = useState(null);
-  const [selected, setSelected] = useState(selectedLocation);
+  const [selected, setSelected] = useState(
+    locations.find(
+      (location) =>
+        location.name.toLowerCase() === selectedLocation.toLowerCase()
+    )
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredLocations, setFilteredLocations] = useState(locations);
   const [isSearchVisible, setIsSearchVisible] = useState(false); // State for search bar visibility
@@ -51,33 +57,6 @@ export default function ShowMap({
       { enableHighAccuracy: true }
     );
   }, []);
-
-  function sameLoc(loc) {
-    return areObjectsEqual(loc, selected);
-  }
-  function areObjectsEqual(obj1, obj2) {
-    if (
-      typeof obj1 !== "object" ||
-      obj1 === null ||
-      typeof obj2 !== "object" ||
-      obj2 === null
-    ) {
-      return false;
-    }
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    if (keys1.length !== keys2.length) {
-      return false;
-    }
-
-    for (const key of keys1) {
-      if (obj1[key] !== obj2[key]) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   // Search functionality
   useEffect(() => {
@@ -134,35 +113,35 @@ export default function ShowMap({
         )}
         {locations.map((location) => (
           <Marker
-            key={location.id}
+            key={location.name}
             position={[location.latitude, location.longitude]}
-            icon={sameLoc(location) ? selectedIcon : locationIcon}
+            icon={location.name == selected.name ? selectedIcon : locationIcon}
           >
             <Popup>
               <div className="flex flex-col justify-center items-center h-full">
                 {" "}
-                {/* Ensure h-full or a specific height */}
                 <span className="mb-2">{location.name}</span>
+                {setter ?
                 <GenericButton
-                  text={sameLoc(location) ? "Selected" : "Select"}
-                  noClick={sameLoc(location)}
+                  text={location.name == selected.name ? "Selected" : "Select"}
+                  noClick={location.name == selected.name}
                   click={() => {
                     locations.forEach((l) => (l.pinned = false));
                     location.pinned = true;
-                    setSelected(location);
                     setter(location.name);
+                    selectedLocation = location.name
+                    setSelected(location)
                   }}
-                />
+                /> : null}
               </div>
             </Popup>
-            {/* <Circle center={[location.latitude, location.longitude]} radius={100} color="purple" fillColor="purple" fillOpacity={0.5} /> */}
           </Marker>
         ))}
         <CenterMap selected={selected} zoom={zoom} />
       </MapContainer>
 
       {/* Search Bar Toggle Button */}
-      {!isSearchVisible && (
+      {!isSearchVisible && setter && (
         <button
           style={{
             position: "absolute",
@@ -172,7 +151,7 @@ export default function ShowMap({
             padding: "1rem",
             borderRadius: "8px",
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-            zIndex: 10, // Ensure it appears above the map
+            zIndex: 1000, // Ensure it appears above the map
           }}
           onClick={() => setIsSearchVisible(!isSearchVisible)}
         >
@@ -180,7 +159,7 @@ export default function ShowMap({
         </button>
       )}
       {/* Custom Search Bar Overlay */}
-      {isSearchVisible && (
+      {isSearchVisible && setter && (
         <div
           style={{
             position: "absolute",
@@ -192,7 +171,7 @@ export default function ShowMap({
             backgroundColor: "white",
             borderRadius: "8px",
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-            zIndex: 10, // Ensure it appears above the map
+            zIndex: 1000, // Ensure it appears above the map
             maxHeight: "90%",
           }}
         >
@@ -205,7 +184,7 @@ export default function ShowMap({
               backgroundColor: "white",
               padding: "0.5rem",
               borderRadius: "8px",
-              zIndex: 10, // Ensure it appears above the map
+              zIndex: 1000, // Ensure it appears above the map
             }}
           >
             <button
@@ -244,8 +223,9 @@ export default function ShowMap({
                 <li
                   key={location.id}
                   onClick={() => {
-                    setSelected(location);
                     setter(location.name);
+                    selectedLocation = location.name
+                    setSelected(location)
                     setSearchTerm(""); // Clear search when selecting a location
                     setIsSearchVisible(false); // Hide search bar on selection
                   }}

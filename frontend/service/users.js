@@ -124,6 +124,15 @@ async function getUserLocation(uid) {
   return { data: Users, error };
 }
 
+export async function setUserLocation(uid, location) {
+  let { data: Users, error } = await supabase
+    .from("Users")
+    .update({ location: `${location}` })
+    .eq("id", uid)
+    .select();
+  return { data: Users, error };
+}
+
 async function getUserDescription(uid) {
   let { data: Users, error } = await supabase
     .from("Users")

@@ -7,18 +7,13 @@ import UserRating from "../components/UserRating";
 import UpdateSwapModal from "../components/UpdateSwapModal";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
 import ItemPreview from "../components/ItemPreview";
-import locations from "./locations";
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
 import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
-import {
-  getUserIdByUsername,
-  getSwapDetailsBetweenUsers,
-} from "../../service/swaps";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
-import { getUserId } from "../../service/users";
+import { getUserId, getUser } from "../../service/users";
 import {
   supabase,
   getChats,
@@ -28,11 +23,11 @@ import {
   toggleViewed,
 } from "../../service/chat";
 import VisitShopModal from "../components/VisitShopModal";
+import ProfileImage from "../components/ProfileImage";
 sortData(data);
 
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
-  const [otherUser, setOtherUser] = useState<Object | null>(null);
   const [chats, setChats] = useState<Array<{
     id: string;
     created_at: string;
@@ -57,8 +52,17 @@ const ChatPage: React.FC = () => {
     sender_id: string;
   }> | null>(null);
   const [otherUserData, setOtherUserData] = useState<{
+    id: string;
     name: string;
     chat_id: string;
+    location: string;
+    description: string;
+    dob: string;
+    image: string;
+    rating: string;
+    num_of_ratings: string;
+    swap_count: string;
+    blocked: string;
   } | null>(null);
   const [swapId, setSwapId] = useState<string | null>(null);
   const [meetUpInfo, setMeetUpInfo] = useState<{
@@ -103,6 +107,8 @@ const ChatPage: React.FC = () => {
 
   useEffect(() => {
     otherUserDataRef.current = otherUserData;
+    // update shop
+    // console.log("Other user data: ", otherUserData, otherUserDataRef)
   }, [otherUserData]);
 
   const sortChats = (
@@ -196,7 +202,6 @@ const ChatPage: React.FC = () => {
         setActiveChat(0);
       }
     }
-    
   };
 
   useEffect(() => {
@@ -249,6 +254,37 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
+    console.log("Other use data: ", otherUserData);
+  }, [otherUserData]);
+
+  async function updateOtherUserData() {
+    let other_user_id;
+    console.log("alfjnwasfklujbwsolfjkdb", currUserId, requesterId);
+    if (currUserId === requesterId) {
+      other_user_id = accepterId;
+    } else {
+      other_user_id = requesterId; // here
+    }
+    if (other_user_id !== null) {
+      const other_user_data = await getUser(other_user_id);
+      console.log("Other user data: ", other_user_data);
+
+      if (
+        chats != null &&
+        activeChat != null &&
+        other_user_data.Users !== null
+      ) {
+        console.log("Updating other use");
+        setOtherUserData(other_user_data.Users[0]);
+      }
+    }
+  }
+
+  useEffect(() => {
+    updateOtherUserData();
+  }, [requesterId, accepterId]);
+
+  useEffect(() => {
     if (chats != null && activeChat != null) {
       // update list of messages
       const chat_id = chats[activeChat].id;
@@ -260,13 +296,7 @@ const ChatPage: React.FC = () => {
       updateSwapId(chat_id);
 
       // update otherUserData
-      setOtherUserData((prevObj) => ({
-        // ...prevObj,
-        name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
-      }));
-
-
+      // updateOtherUserData();
     }
   }, [activeChat]);
 
@@ -281,10 +311,11 @@ const ChatPage: React.FC = () => {
       fetchChatUsers(chat_id);
 
       // Update otherUserData
-      setOtherUserData({
-        name: chats[activeChat].username,
-        chat_id: chats[activeChat].id,
-      });
+      updateOtherUserData();
+      // setOtherUserData({
+      //   name: chats[activeChat].username,
+      //   chat_id: chats[activeChat].id,
+      // });
     }
   }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
 
@@ -305,7 +336,13 @@ const ChatPage: React.FC = () => {
     console.log("Updating:", location, date, time);
     updateMeetUp(swapId, location, date, time);
     // send message to chat notifying users that meetup has been updated
-    const text = "Meetup agreement updated to: " + time + " on the " + date + " at " + location
+    const text =
+      "Meetup agreement updated to: " +
+      time +
+      " on the " +
+      date +
+      " at " +
+      location;
     if (currUserId !== null && swapId !== null) {
       sendMessage(currUserId, swapId, text);
     }
@@ -575,29 +612,48 @@ const ChatPage: React.FC = () => {
         {activeChat !== null && (
           <div className="flex flex-col flex-grow py-4 pt-0 border-r overflow-y-auto h-full pr-3">
             <div className="w-full bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 border">
-              <div className="flex flex-row items-center justify-evenly w-full mb-4">
-                <div className="w-16 h-16 bg-yellow-500 rounded-full"></div>
-                <div className="flex flex-col items-start align-middle">
-                  <div className="font-bold overflow-auto text-center">
-                    {data[activeChat].name}'s Swap Shop
+              {otherUserData !== null ? (
+                <div className="flex flex-row items-center justify-evenly w-full mb-4">
+                  <ProfileImage userId={otherUserData.id}></ProfileImage>
+                  <div className="flex flex-col items-start align-middle">
+                    <div>
+                      <div className="font-bold overflow-auto text-center">
+                        {otherUserData.name}'s Swap Shop
+                      </div>
+                      {otherUserData !== null ? (
+                        <UserRating
+                          size="text-sm"
+                          rating={Number(otherUserData.rating)}
+                          num={Number(otherUserData.num_of_ratings)}
+                        ></UserRating>
+                      ) : (
+                        <UserRating size="text-sm" num={0}></UserRating>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {data[activeChat].username}
-                  </div>
-                  <UserRating
-                    rating={Number(data[activeChat].rating)}
-                    num={8}
-                  />
                 </div>
-              </div>
-              <GenericButton text="Visit Shop" inverse={true} width="90%" click={openModal}/>
+              ) : (
+                <div className="font-bold overflow-auto text-center">
+                  Loading...
+                </div>
+              )}
+
+              <GenericButton
+                text="Visit Shop"
+                inverse={true}
+                width="90%"
+                click={openModal}
+              />
             </div>
             {isOpen && (
-              <VisitShopModal closeModal={closeModal}/>
+              <VisitShopModal
+                otherUser={otherUserData}
+                closeModal={closeModal}
+              />
             )}
 
             <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
-              <div className="font-bold text-2xl">Meetup Info</div>
+              <div className="font-bold text-2xl mb-3">Meetup Info</div>
               {meetUpInfo !== null ? (
                 <LocationSelector
                   click={(location: string, date: string, time: string) => {

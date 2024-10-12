@@ -22,10 +22,12 @@ const MessagePreview = ({
 
   return (
     <div
-      className={`flex items-center p-5 ${isSelected ? "bg-gray-100" : null}`}
+      className={`flex items-center justify-around p-5 ${
+        isSelected ? "bg-gray-100" : null
+      }`}
     >
-      <ProfileImage userId={userId}/>
-      <div className="flex-grow flex flex-col">
+      <ProfileImage userId={userId} />
+      <div className="mr-3 ml-3 flex-grow flex flex-col">
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold text-black">{name}</div>
         </div>
