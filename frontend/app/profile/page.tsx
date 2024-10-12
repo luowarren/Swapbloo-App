@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchUserData, fetchUserItems } from "../../service/users";
+import { fetchUserData, fetchUserItems, setUserLocation } from "../../service/users";
 import { getUserId } from "@/service/auth";
 import { getUser } from "../../service/users";
 import { getListingsByUsers } from "@/service/items";
@@ -22,6 +22,7 @@ import ListingCard from "../listings/listing-card";
 // Define types for UserData and ItemData
 interface UserData {
   id: string;
+  description: string;
   username: string;
   name: string;
   bio: string;
@@ -47,6 +48,7 @@ const Login: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"listings">("listings"); // State to manage active tab
   const router = useRouter(); // Move useRouter outside useEffect
   const [uid, setUserId] = useState<UserData | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   useEffect(() => {
     const loadUserData = async () => {
       // Fetch user data
@@ -63,6 +65,7 @@ const Login: React.FC = () => {
         if (userBlob?.Users && userBlob.Users.length > 0) {
           const user = userBlob.Users[0];
           setUser(user);
+          setSelectedLocation(user.location);
 
           // Fetch user's items
           const userItemsBlob = await getListingsByUsers([user.id]);
@@ -89,6 +92,13 @@ const Login: React.FC = () => {
 
     loadUserData();
   }, [router]); // Include `router` in the dependency array
+
+  useEffect(() => {
+    const changeLocation = async () => {
+      await setUserLocation(user?.id, selectedLocation)
+    }
+    changeLocation()
+  }, [selectedLocation])
 
   if (loading) {
     return <p>Loading...</p>;
@@ -126,21 +136,19 @@ const Login: React.FC = () => {
       <div className="space-x-8 mt-5 mx-4">Description</div>
       <div className="space-x-8 mt-5 mx-4">{user.description}</div>
       <div className="py-6 px-6 ">
-        <ShowMap
-          setter={() => {}}
-          selectedLocation={{
-            name: "Westfield Chermside",
-            latitude: -27.383085,
-            longitude: 153.030924,
-          }}
-        ></ShowMap>
+        {selectedLocation && (
+          <ShowMap
+            setter={setSelectedLocation}
+            selectedLocation={selectedLocation}
+          ></ShowMap>
+        )}
       </div>
       <div className="flex space-x-8 mt-5 mx-4">Listings</div>
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
               {items.length > 0 ? (
                 items.map((item, index) => (
                   <ListingCard key={index} data={item} />
