@@ -201,11 +201,11 @@ const ChatPage: React.FC = () => {
       }
 
       const chatId = searchParams.get('chatId'); // Get the chat ID from the URL
-      console.log(chatId, "sigm6888", sortedChats)
+      // console.log(chatId, "sigm6888", sortedChats)
       
-      if (chatId) {
+      if (chatId && sortedChats !== null) {
         const chatIndex = sortedChats.findIndex((chat) => Number(chat.id) === Number(chatId));
-        console.log(chatIndex, "sigm6888")
+        // console.log(chatIndex, "sigm6888")
         if (chatIndex !== -1) {
           switchChat(chatIndex);
         }

@@ -36,35 +36,10 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
     }
   };
 
-  // async function coords(loc) {
-  //   const coords = await getCoordinates(loc);
-  //   // console.log("coords", coords)
-  //   if (coords.data) {
-  //     // console.log("setting, ", coords.data[0])
-  //     setLocationCoords(coords.data[0])
-  //   }
-  // }
-
-  // async function fetchCurrLoc() {
-  //   const currLocation = await getSwapLocation(swap_id);
-  //   console.log("found current location:", currLocation);
-  //   if (currLocation.data !== null) {
-  //     coords(currLocation.data[0].location)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   // console.log("Location empty")
-  //   fetchCurrLoc();
-  // }, []);
-
   useEffect(() => {
-    // console.log("Location meeupinfo", meetUpInfo)
-    // coords(meetUpInfo.location);
     setLocationName(meetUpInfo.location)
     setSelectedDate(meetUpInfo.date);
     setSelectedTime(meetUpInfo.time);
-    // fetchCurrLoc();
   }, [meetUpInfo])
 
   return (
@@ -78,11 +53,6 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
         ></ShowMap>
       ) : (
         <div>Loading map...</div>
-        // <ShowMap setter={setSelectedLocation} width="20rem" height="18rem" selectedLocation={{
-        //   name: "UQ Union",
-        //   latitude: -27.496203,
-        //   longitude: 153.017277
-        // }}></ShowMap>
       )}
       <form onSubmit={handleSubmit}>
         <div style={{ margin: "0.5em", marginTop: "1em" }}>
