@@ -4,6 +4,7 @@ import ItemImages from "../components/ItemImages";
 import UserRating from "../components/UserRating";
 import { Heart, MoreHorizontal, Share } from "lucide-react";
 import { getUser } from "@/service/users";
+import { getUserId } from "@/service/auth";
 import { useRouter } from "next/navigation";
 import ProfileImage from "../components/ProfileImage";
 import VisitShopModal from "../components/VisitShopModal";
