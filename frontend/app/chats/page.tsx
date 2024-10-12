@@ -58,7 +58,6 @@ const ChatPage: React.FC = () => {
   }> | null>(null);
   const [otherUserData, setOtherUserData] = useState<{
     name: string;
-    chat_id: string;
     location: string;
     description: string;
     dob: string;
@@ -140,8 +139,8 @@ const ChatPage: React.FC = () => {
           new Date(a.latestMessage.created_at).getTime()
         );
       });
-      console.log("Sorted chats");
-      console.log(sortedChats);
+      // console.log("Sorted chats");
+      // console.log(sortedChats);
       return sortedChats;
     }
     return null;
@@ -156,14 +155,14 @@ const ChatPage: React.FC = () => {
         (payload) => {
           console.log("Change received!", payload);
           handleInitialDataFetches();
-          console.log("Allan checks: ", otherUserDataRef, payload, activeChat);
+          // console.log("Allan checks: ", otherUserDataRef, payload, activeChat);
 
           // update messages
           if (
             otherUserDataRef.current != null &&
-            payload.new.chat_id == otherUserDataRef.current.chat_id
+            payload.new.chat_id == swapId
           ) {
-            console.log("setting messages");
+            // console.log("setting messages");
             setMessages((prevMessages) => {
               if (prevMessages != null) {
                 const updatedMessages = [
@@ -220,14 +219,14 @@ const ChatPage: React.FC = () => {
 
   async function getMeetUpData(swap_id: string) {
     const meetUpData = await getMeetUp(swap_id);
-    console.log("Fetching meet up data");
+    // console.log("Fetching meet up data");
     if (meetUpData && meetUpData.length > 0) {
       const new_meet_up_data = {
         location: meetUpData[0].location,
         date: meetUpData[0].date,
         time: meetUpData[0].time,
       };
-      console.log(new_meet_up_data);
+      // console.log(new_meet_up_data);
       setMeetUpInfo(new_meet_up_data);
     } else {
       console.log("failed to update meet up data poop");
@@ -235,12 +234,12 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log("Current swap id " + swapId);
+    // console.log("Current swap id " + swapId);
     // update meet up data
     if (swapId !== null) {
       getMeetUpData(swapId);
     } else {
-      console.log("couldnt get swap data! cnt");
+      // console.log("couldnt get swap data! cnt");
       setMeetUpInfo(null);
     }
   }, [swapId]);
@@ -248,8 +247,8 @@ const ChatPage: React.FC = () => {
   function updateSwapId(chat_id: string) {
     const curr_swap_id = chat_id;
     if (curr_swap_id !== null) {
-      console.log("Got swap id:");
-      console.log(curr_swap_id);
+      // console.log("Got swap id:");
+      // console.log(curr_swap_id);
       setSwapId(curr_swap_id);
     } else {
       console.log("epic fail, couldn't find swap id");
@@ -264,7 +263,6 @@ const ChatPage: React.FC = () => {
 
   async function updateOtherUserData() {
     let other_user_id;
-    console.log("alfjnwasfklujbwsolfjkdb", currUserId, requesterId)
     if (currUserId === requesterId) {
       other_user_id = accepterId;
     } else {
@@ -272,10 +270,10 @@ const ChatPage: React.FC = () => {
     }
     if (other_user_id !== null) {
       const other_user_data = await getUser(other_user_id);
-      console.log("Other user data: ", other_user_data);
+      // console.log("Other user data: ", other_user_data);
 
       if (chats != null && activeChat != null && other_user_data.Users !== null) {
-        console.log("Updating other use")
+        // console.log("Updating other use")
         setOtherUserData(other_user_data.Users[0]);
       }
     }
@@ -334,7 +332,7 @@ const ChatPage: React.FC = () => {
     time: string
   ) => {
     const type = "notification";
-    console.log("Updating:", location, date, time);
+    // console.log("Updating:", location, date, time);
     updateMeetUp(swapId, location, date, time);
     // send message to chat notifying users that meetup has been updated
     const text = "Meetup agreement updated to: " + time + " on the " + date + " at " + location
@@ -347,8 +345,8 @@ const ChatPage: React.FC = () => {
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
     if (meInput.trim() && activeChat != null) {
-      if (currUserId != null && otherUserDataRef.current != null) {
-        sendMessage(currUserId, otherUserDataRef.current.chat_id, meInput);
+      if (currUserId != null && swapId !== null) {
+        sendMessage(currUserId, swapId, meInput);
         setMeInput("");
         setActiveChat(0);
       }

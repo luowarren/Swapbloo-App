@@ -36,23 +36,42 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
     }
   };
 
+  async function coords(loc) {
+    const coords = await getCoordinates(loc);
+    // console.log("coords", coords)
+    if (coords.data) {
+      // console.log("setting, ", coords.data[0])
+      setLocationCoords(coords.data[0])
+    }
+  }
+
   async function fetchCurrLoc() {
     const currLocation = await getSwapLocation(swap_id);
     // console.log("found current location:", currLocation);
     if (currLocation.data !== null) {
       // console.log(currLocation.data[0].location)
-      const coords = await getCoordinates(currLocation.data[0].location);
-      // console.log("aa", coords)
-      if (coords.data) {
-        // console.log("setting, ", coords.data[0])
-        setLocationCoords(coords.data[0])
-      }
+      coords(currLocation.data[0].location)
+      // const coords = await getCoordinates();
+      // // console.log("aa", coords)
+      // if (coords.data) {
+      //   // console.log("setting, ", coords.data[0])
+      //   setLocationCoords(coords.data[0])
+      // }
     }
   }
 
   useEffect(() => {
+    // console.log("Location empty")
     fetchCurrLoc();
   }, []);
+
+  useEffect(() => {
+    // console.log("Location meeupinfo", meetUpInfo)
+    coords(meetUpInfo.location);
+    setSelectedDate(meetUpInfo.date);
+    setSelectedTime(meetUpInfo.time);
+    fetchCurrLoc();
+  }, [meetUpInfo])
 
   return (
     <div>

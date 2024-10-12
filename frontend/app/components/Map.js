@@ -52,6 +52,10 @@ export default function ShowMap({
     );
   }, []);
 
+  useEffect(() => {
+    setSelected(selectedLocation)
+  },[selectedLocation])
+
   function sameLoc(loc) {
     return areObjectsEqual(loc, selected);
   }
