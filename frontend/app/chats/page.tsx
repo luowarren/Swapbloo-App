@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation"; // Next.js router for redirection
 import ItemPreview from "../components/ItemPreview";
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
-import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
@@ -25,7 +24,6 @@ import {
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
-sortData(data);
 
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
@@ -201,11 +199,11 @@ const ChatPage: React.FC = () => {
       }
 
       const chatId = searchParams.get('chatId'); // Get the chat ID from the URL
-      console.log(chatId, "sigm6888", sortedChats)
+      // console.log(chatId, "sigm6888", sortedChats)
       
-      if (chatId) {
+      if (chatId && sortedChats !== null) {
         const chatIndex = sortedChats.findIndex((chat) => Number(chat.id) === Number(chatId));
-        console.log(chatIndex, "sigm6888")
+        // console.log(chatIndex, "sigm6888")
         if (chatIndex !== -1) {
           switchChat(chatIndex);
         }
@@ -248,6 +246,7 @@ const ChatPage: React.FC = () => {
     // console.log("Current swap id " + swapId);
     // update meet up data
     if (swapId !== null) {
+      // console.log("updating meetup data")
       getMeetUpData(swapId);
     } else {
       // console.log("couldnt get swap data! cnt");
@@ -365,8 +364,11 @@ const ChatPage: React.FC = () => {
   // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
+    // console.log("aaaaaaaaaaaaaaaaaaaa")
     if (meInput.trim() && activeChat != null) {
+      // console.log("bbbbbbbbbbbbbbbbbb")
       if (currUserId != null && swapId !== null) {
+        // console.log("cccccccccccccccccccccccccccc")
         sendMessage(currUserId, swapId, meInput);
         setMeInput("");
         setActiveChat(0);
@@ -398,7 +400,6 @@ const ChatPage: React.FC = () => {
       }
     }
     switchChat(index);
-    data[index]["viewed"] = true;
   };
 
 
@@ -671,7 +672,7 @@ const ChatPage: React.FC = () => {
                 <LocationSelector
                   click={(location: string, date: string, time: string) => {
                     setNotification(
-                      `You updated the meetup details with ${data[activeChat].name}`,
+                      `You updated the meetup details with ${otherUserData?.name}`,
                       location,
                       date,
                       time
