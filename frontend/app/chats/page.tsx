@@ -22,7 +22,7 @@ import {
   getUserIdsFromChat,
   toggleViewed,
 } from "../../service/chat";
-import VisitShopModal from "../components/VisitShopModal";
+import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
 sortData(data);
 
@@ -84,10 +84,6 @@ const ChatPage: React.FC = () => {
   const lastScrollTop = useRef(0); // Track the last scroll position
   const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] =
     useState(false); // State to control modal visibility
-  const [isOpen, setIsOpen] = useState(false);
-
-  const openModal = () => setIsOpen(true);
-  const closeModal = () => setIsOpen(false);
 
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
@@ -638,19 +634,17 @@ const ChatPage: React.FC = () => {
                 </div>
               )}
 
-              <GenericButton
-                text="Visit Shop"
-                inverse={true}
-                width="90%"
-                click={openModal}
-              />
+              {otherUserData && (
+                <ShopModal otherUser={otherUserData}>
+                  <GenericButton
+                    text="Visit Shop"
+                    inverse={true}
+                    width="20vw"
+                    click={openModal}
+                  />
+                </ShopModal>
+              )}
             </div>
-            {isOpen && (
-              <VisitShopModal
-                otherUser={otherUserData}
-                closeModal={closeModal}
-              />
-            )}
 
             <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
               <div className="font-bold text-2xl mb-3">Meetup Info</div>
