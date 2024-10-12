@@ -7,14 +7,14 @@ import ShowMap from "./Map";
 import { getLocations, getSwapLocation, getCoordinates } from "@/service/swaps";
 
 const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
-  const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
+  // const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
   const [selectedDate, setSelectedDate] = useState(meetUpInfo.date);
   const [selectedTime, setSelectedTime] = useState(meetUpInfo.time);
-  const [locationName, setLocationNames] = useState(null);
+  const [locationName, setLocationName] = useState(null);
 
-  const handleLocationChange = (event) => {
-    setSelectedLocation(event.target.value);
-  };
+  // const handleLocationChange = (event) => {
+  //   setSelectedLocation(event.target.value);
+  // };
 
   const handleDateChange = (event) => {
     // console.log("new date" + event.target.value)
@@ -28,31 +28,50 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if ((selectedLocation && selectedDate && selectedTime) == "") {
+    if ((locationName && selectedDate && selectedTime) == "") {
       alert("Something is empty...");
     } else {
       alert("Meet up updated!");
-      click(selectedLocation, selectedDate, selectedTime);
+      click(locationName, selectedDate, selectedTime);
     }
   };
 
-  async function fetchCurrLoc() {
-    const currLocation = await getSwapLocation(swap_id);
-    console.log("found current location:", currLocation);
-    if (currLocation.data !== null) {
-      setLocationNames(currLocation.data[0].location);
-    }
-  }
+  // async function coords(loc) {
+  //   const coords = await getCoordinates(loc);
+  //   // console.log("coords", coords)
+  //   if (coords.data) {
+  //     // console.log("setting, ", coords.data[0])
+  //     setLocationCoords(coords.data[0])
+  //   }
+  // }
+
+  // async function fetchCurrLoc() {
+  //   const currLocation = await getSwapLocation(swap_id);
+  //   console.log("found current location:", currLocation);
+  //   if (currLocation.data !== null) {
+  //     coords(currLocation.data[0].location)
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   // console.log("Location empty")
+  //   fetchCurrLoc();
+  // }, []);
 
   useEffect(() => {
-    fetchCurrLoc();
-  }, [swap_id, meetUpInfo]);
+    // console.log("Location meeupinfo", meetUpInfo)
+    // coords(meetUpInfo.location);
+    setLocationName(meetUpInfo.location)
+    setSelectedDate(meetUpInfo.date);
+    setSelectedTime(meetUpInfo.time);
+    // fetchCurrLoc();
+  }, [meetUpInfo])
 
   return (
     <div>
       {locationName !== null ? (
         <ShowMap
-          setter={setSelectedLocation}
+          setter={setLocationName}
           width="20rem"
           height="37vh"
           selectedLocation={locationName}

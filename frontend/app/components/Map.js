@@ -58,6 +58,13 @@ export default function ShowMap({
     );
   }, []);
 
+  useEffect(() => {
+    setSelected(locations.find(
+      (location) =>
+        location.name.toLowerCase() === selectedLocation.toLowerCase()
+    ))
+  },[selectedLocation])
+
   // Search functionality
   useEffect(() => {
     if (searchTerm) {
