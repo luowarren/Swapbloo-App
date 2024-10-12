@@ -37,9 +37,10 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
   };
 
   useEffect(() => {
+    // console.log("updating meetup info in location", meetUpInfo)
     setLocationName(meetUpInfo.location)
-    setSelectedDate(meetUpInfo.date);
-    setSelectedTime(meetUpInfo.time);
+    setSelectedDate(meetUpInfo.date || "");
+    setSelectedTime(meetUpInfo.time || "");
   }, [meetUpInfo])
 
   return (

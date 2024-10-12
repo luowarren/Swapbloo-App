@@ -248,6 +248,7 @@ const ChatPage: React.FC = () => {
     // console.log("Current swap id " + swapId);
     // update meet up data
     if (swapId !== null) {
+      // console.log("updating meetup data")
       getMeetUpData(swapId);
     } else {
       // console.log("couldnt get swap data! cnt");
@@ -365,8 +366,11 @@ const ChatPage: React.FC = () => {
   // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
+    // console.log("aaaaaaaaaaaaaaaaaaaa")
     if (meInput.trim() && activeChat != null) {
+      // console.log("bbbbbbbbbbbbbbbbbb")
       if (currUserId != null && swapId !== null) {
+        // console.log("cccccccccccccccccccccccccccc")
         sendMessage(currUserId, swapId, meInput);
         setMeInput("");
         setActiveChat(0);
