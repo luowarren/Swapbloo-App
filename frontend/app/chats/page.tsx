@@ -640,6 +640,7 @@ const ChatPage: React.FC = () => {
                     text="Visit Shop"
                     inverse={true}
                     width="20vw"
+                    click={openModal}
                   />
                 </ShopModal>
               )}
