@@ -17,7 +17,7 @@ const ShopModal = ({ otherUser, children }) => {
       setListings(userItems);
     };
     fetchListings();
-  }, []);
+  }, [otherUser]);
   return (
     <Dialog>
       <DialogTrigger>{children}</DialogTrigger>
@@ -39,10 +39,10 @@ const ShopModal = ({ otherUser, children }) => {
           </div>
           <div className="w-full">
             <div>Listings</div>
-            <div className="grid grid-cols-2 xs:grid-cols-2 gap-2 w-full overflow-scroll px-2 mt-4">
+            <div className="flex flex-row w-full overflow-scroll px-2 mt-4 mb-4">
               {listings.length > 0 ? (
                 listings.map((item, index) => (
-                  <ListingCard key={index} data={item} />
+                  <ListingCard key={index} data={item} size={40} font={14}/>
                 ))
               ) : (
                 <p>No items currently listed</p>

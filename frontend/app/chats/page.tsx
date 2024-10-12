@@ -89,6 +89,10 @@ const ChatPage: React.FC = () => {
 
   const searchParams = useSearchParams();
   
+  const truncateMessage = (msg: string, maxLength: number) => {
+    return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
+  };
+
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
 
@@ -637,7 +641,7 @@ const ChatPage: React.FC = () => {
                   <div className="flex flex-col items-start align-middle">
                     <div>
                       <div className="font-bold overflow-auto text-center">
-                        {otherUserData.name}'s Swap Shop
+                        {truncateMessage(`${otherUserData.name}'s Shop`, 20)}
                       </div>
                       {otherUserData !== null ? (
                         <UserRating
@@ -657,7 +661,7 @@ const ChatPage: React.FC = () => {
                 </div>
               )}
 
-              {otherUserData && (
+              {otherUserData !== null && (
                 <ShopModal otherUser={otherUserData}>
                   <GenericButton
                     text="Visit Shop"
