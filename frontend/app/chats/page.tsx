@@ -14,6 +14,7 @@ import { sortData, placeholder } from "./helpers";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
 import { getUserId, getUser } from "../../service/users";
+import { useSearchParams } from 'next/navigation';
 import {
   supabase,
   getChats,
@@ -85,6 +86,8 @@ const ChatPage: React.FC = () => {
   const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] =
     useState(false); // State to control modal visibility
 
+  const searchParams = useSearchParams();
+  
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
 
@@ -197,9 +200,26 @@ const ChatPage: React.FC = () => {
       if (activeChat !== null) {
         setActiveChat(0);
       }
+
+      const chatId = searchParams.get('chatId'); // Get the chat ID from the URL
+      console.log(chatId, "sigm6888", sortedChats)
+      
+      if (chatId) {
+        const chatIndex = sortedChats.findIndex((chat) => Number(chat.id) === Number(chatId));
+        console.log(chatIndex, "sigm6888")
+        if (chatIndex !== -1) {
+          switchChat(chatIndex);
+        }
+      }
     }
   };
 
+  const goToChatWithId = (chatId: string) => {
+    if (!chats) return;
+  
+    
+  };
+  
   useEffect(() => {
     handleInitialDataFetches();
   }, []);
@@ -382,6 +402,8 @@ const ChatPage: React.FC = () => {
     switchChat(index);
     data[index]["viewed"] = true;
   };
+
+
 
   return (
     <div className="relative">
