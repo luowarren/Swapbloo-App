@@ -7,6 +7,7 @@ import { getUser } from "@/service/users";
 import ProfileImage from "../components/ProfileImage";
 import VisitShopModal from "../components/VisitShopModal";
 import ShowMap from "../components/Map";
+import ShopModal from "../components/ShopModal";
 
 const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const handleMakeOffer = () => {};
@@ -82,7 +83,11 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                 }}
               >
                 {!userLoading && (
-                  <ShowMap width="100%" height="100%" selectedLocation={user.location}></ShowMap>
+                  <ShowMap
+                    width="100%"
+                    height="100%"
+                    selectedLocation={user.location}
+                  ></ShowMap>
                 )}
               </div>
               <p className="text-sm text-gray-700 mb-2">{item.location}</p>
@@ -107,9 +112,11 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     </div>
                   </div>
                   <div className="flex space-x-2 text-sm">
-                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
-                      Visit Shop
-                    </button>
+                    <ShopModal otherUser={user}>
+                      <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
+                        Visit Shop
+                      </button>
+                    </ShopModal>
                   </div>
                 </div>
               )}
