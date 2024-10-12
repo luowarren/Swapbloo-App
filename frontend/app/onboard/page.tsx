@@ -208,7 +208,7 @@ const Onboard: React.FC = () => {
               </label>
             </div>
 
-            <ShowMap selectedLocation={locations[0]} setter={setLocation} />
+            <ShowMap setter={setLocation} />
 
             {/* Submit Button */}
             <button

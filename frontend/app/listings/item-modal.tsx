@@ -27,7 +27,11 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
       <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
           <div className="w-1/2 flex-col justify-center relative">
-            <ItemImages buttons={true} className="rounded-md" itemId={item.id} />
+            <ItemImages
+              buttons={true}
+              className="rounded-md"
+              itemId={item.id}
+            />
           </div>
 
           <div className="p-4 w-1/2">
@@ -77,16 +81,9 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                   borderRadius: "100px",
                 }}
               >
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3539.0870022630133!2d153.01028581134258!3d-27.4976695762045!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b91508241eb7c49%3A0x9ae9946d3710eee9!2sThe%20University%20of%20Queensland!5e0!3m2!1sen!2sau!4v1728004940952!5m2!1sen!2sau"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-                
+                {!userLoading && (
+                  <ShowMap width="100%" height="100%" selectedLocation={user.location}></ShowMap>
+                )}
               </div>
               <p className="text-sm text-gray-700 mb-2">{item.location}</p>
 
@@ -100,7 +97,11 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     <div className="flex flex-col pt-4">
                       <p className="text-gray-700 font-semibold">{user.name}</p>
                       <div className="flex items-center text-sm text-gray-700 mb-5">
-                        <UserRating rating={user.rating} num={user.num_of_ratings} reviewButton={false} />
+                        <UserRating
+                          rating={user.rating}
+                          num={user.num_of_ratings}
+                          reviewButton={false}
+                        />
                         {/* <span className="ml-1">(8)</span> */}
                       </div>
                     </div>
