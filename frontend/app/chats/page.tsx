@@ -358,6 +358,7 @@ const ChatPage: React.FC = () => {
       location;
     if (currUserId !== null && swapId !== null) {
       sendMessage(currUserId, swapId, text);
+      handleInitialDataFetches();
     }
   };
 
