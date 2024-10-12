@@ -26,7 +26,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
   const [swapId, setSwapId] = useState<string | null>(null);
   const [isRequester, setIsRequester] = useState<boolean | null>(null);
 
-  console.log('ownerid sigma 69', ownerId)
+  console.log('ownerid sigma 69', ownerId, requesterId)
   const fetchSwapDetails = async () => {
     if (ownerId && requesterId) {
       const userId = await getUserId();
