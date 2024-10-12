@@ -178,6 +178,20 @@ export async function getUserIdsFromChat(chatId) {
   };
 }
 
+export async function getChatBetweenUsers(user1Id, user2Id) {
+  // Check if a chat exists between the users
+  let { data, error } = await supabase
+    .from("Chats")
+    .select("*")
+    .or(`user1_id.eq.${user1Id},user2_id.eq.${user1Id}`)
+    .or(`user1_id.eq.${user2Id},user2_id.eq.${user2Id}`);
+
+  if (error) return { chatId: null, chatError: error };
+
+  return { chatId: data[0].id, chatError: null };
+  
+}
+
 
 (async () => {
     try {

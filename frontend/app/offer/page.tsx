@@ -7,6 +7,7 @@ import { createSwapRequest } from '../../service/swaps';
 import { ItemData } from '../item/page';
 import { getUserId } from '../../service/auth';
 import { useRouter } from 'next/navigation';
+import { getChatBetweenUsers } from '@/service/chat';
 import ItemImages from "../components/ItemImages";
 
 const MakeOffer = () => {
@@ -20,7 +21,8 @@ const MakeOffer = () => {
   const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]); // Store selected items for the offer
   const [userId, setUserId] = useState<string | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false); // For popup visibility
-
+  const [chatId, setChatId] = useState<string | null>(null); // Store chatId
+  
   // Fetch the user ID
   useEffect(() => {
     async function fetchUser() {
@@ -86,9 +88,29 @@ const MakeOffer = () => {
     }
   };
 
+  const fetchChatId = async (ownerId: string, userId: string) => {
+    try {
+      const { chatId, chatError } = await getChatBetweenUsers(ownerId, userId); // Fetch the chat
+      if (chatId) {
+        setChatId(chatId); // Store the chatId in state
+      } else {
+        console.error("No chat found between the users", chatError);
+      }
+    } catch (error) {
+      console.error("Error fetching chat:", error);
+    } 
+  };
+
+  useEffect(() => {
+    if (ownerId && userId) {
+      fetchChatId(ownerId, userId); // Fetch chatId when ownerId and userId are available
+    }
+  }, [ownerId, userId]); // Re-run if ownerId or userId changes
+  
+  console.log(chatId, "chatting like alphas together 222222222")
   const handlePopupClose = () => {
     setIsPopupVisible(false);
-    router.push('/listings'); // Redirect after closing the popup
+    router.push(`/chats?chatId=${chatId}`); // Redirect to the chat page with the chat ID
   };
 
   return (
