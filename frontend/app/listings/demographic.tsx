@@ -1,4 +1,5 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
 import { DEMOGRAPHICS } from "@/service/constants";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -6,9 +7,11 @@ import { useState } from "react";
 const Demographic = ({
   demos,
   setDemos,
+  light = false,
 }: {
   demos: string[];
   setDemos: (demos: string[]) => void;
+  light?: boolean;
 }) => {
   const [col, setCol] = useState(true);
 
@@ -26,16 +29,33 @@ const Demographic = ({
   return (
     <div>
       <div
-        className="flex flex-row items-center justify-between hover:bg-slate-100 transition cursor-pointer my-2 -mx-1 p-1 rounded-sm text-slate-600"
+        className={cn(
+          "flex flex-row items-center justify-between hover:bg-gray-100 transition cursor-pointer my-2 -mx-1 p-1 rounded-sm text-gray-600",
+          light && "hover:bg-indigo-500"
+        )}
         onClick={() => {
           setCol((prev) => !prev);
         }}
       >
-        <span className="font-bold text-sm my-1">Demographic</span>
+        <span
+          className={cn("font-bold text-sm my-1 italic", light && "text-white")}
+        >
+          Demographic
+        </span>
         {col ? (
-          <ChevronDown className="h-5 w-4 stroke-[2.5px]" />
+          <ChevronDown
+            className={cn(
+              "font-bold text-sm my-1 italic",
+              light && "text-white"
+            )}
+          />
         ) : (
-          <ChevronRight className="h-5 w-4 stroke-[2.5px]" />
+          <ChevronRight
+            className={cn(
+              "font-bold text-sm my-1 italic",
+              light && "text-white"
+            )}
+          />
         )}
       </div>
 
@@ -47,9 +67,9 @@ const Demographic = ({
 
               return (
                 <ToggleGroupItem
-                  className={`border border-slate-200 text-slate-500 ${
-                    isActive ? "bg-blue-500 text-white" : ""
-                  }`}
+                  className={cn(
+                    "border bg-white border-gray-200 text-gray-500"
+                  )}
                   value={demo}
                   key={demo}
                   onClick={() => handleToggle(demo)}

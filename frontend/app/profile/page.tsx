@@ -1,6 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchUserData, fetchUserItems, setUserLocation } from "../../service/users";
+import {
+  fetchUserData,
+  fetchUserItems,
+  setUserLocation,
+} from "../../service/users";
 import { getUserId } from "@/service/auth";
 import { getUser } from "../../service/users";
 import { getListingsByUsers } from "@/service/items";
@@ -87,6 +91,7 @@ const Login: React.FC = () => {
           console.warn("No user data found");
         }
         setLoading(false);
+        console.log("ADEKIEN", selectedLocation);
       }
     };
 
@@ -95,10 +100,10 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     const changeLocation = async () => {
-      await setUserLocation(user?.id, selectedLocation)
-    }
-    changeLocation()
-  }, [selectedLocation])
+      await setUserLocation(user?.id, selectedLocation);
+    };
+    changeLocation();
+  }, [selectedLocation]);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -140,7 +145,7 @@ const Login: React.FC = () => {
           <ShowMap
             setter={setSelectedLocation}
             selectedLocation={selectedLocation}
-          ></ShowMap>
+          />
         )}
       </div>
       <div className="flex space-x-8 mt-5 mx-4">Listings</div>

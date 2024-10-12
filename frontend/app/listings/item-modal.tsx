@@ -82,7 +82,12 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                 }}
               >
                 {!userLoading && (
-                  <ShowMap width="100%" height="100%" selectedLocation={user.location}></ShowMap>
+                  <ShowMap
+                    width="100%"
+                    height="100%"
+                    selectedLocation={user.location}
+                    setter={undefined}
+                  />
                 )}
               </div>
               <p className="text-sm text-gray-700 mb-2">{item.location}</p>

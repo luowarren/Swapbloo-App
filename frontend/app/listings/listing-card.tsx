@@ -8,18 +8,18 @@ const ListingCard = ({ data }: { data: any }) => {
   return (
     <div>
       <ItemModal item={data}>
-        <div className="flex flex-col p-2 hover:bg-slate-200 transition rounded-sm cursor-pointer h-fit w-full">
+        <div className="flex flex-col p-2 hover:bg-gray-50 hover:scale-105 transition rounded-sm cursor-pointer h-fit w-full">
           <div className="rounded-sm w-56 h-56 overflow-hidden">
             <div className="scale-125">
               <ItemImages itemId={data.id} className="" />
             </div>
           </div>
           <div className="flex flex-col text-start mt-1">
-            <span className="text-slate-700 font-bold">{data.title}</span>
-            <span className="text-slate-500 text-xs">
+            <span className="text-gray-700 font-bold">{data.title}</span>
+            <span className="text-gray-500 text-xs">
               {data.size} - {data.brand}
             </span>
-            <span className="text-slate-500 text-xs">{data.category}</span>
+            <span className="text-gray-500 text-xs">{data.category}</span>
           </div>
         </div>
       </ItemModal>
