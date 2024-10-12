@@ -24,6 +24,7 @@ import {
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
+import { Send } from "lucide-react";
 sortData(data);
 
 const ChatPage: React.FC = () => {
@@ -404,7 +405,7 @@ const ChatPage: React.FC = () => {
                     date={msg.latestMessage.created_at}
                     viewed={msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
-                    userId={otherUserDataRef.id}
+                    userId={currUserId == msg.user1_id ? msg.user2_id : msg.user1_id}
                   />
                 </div>
               ))}
@@ -599,7 +600,7 @@ const ChatPage: React.FC = () => {
                 type="submit"
                 className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
               >
-                Send
+                <Send/>
               </button>
             </form>
           </div>
