@@ -636,12 +636,12 @@ const ChatPage: React.FC = () => {
           <div className="flex flex-col flex-grow py-4 pt-0 border-r overflow-y-auto h-full pr-3">
             <div className="w-full bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 border">
               {otherUserData !== null ? (
-                <div className="flex flex-row items-center justify-evenly w-full mb-4">
+                <div className="flex flex-row items-start w-full ml-6 mb-4">
                   <ProfileImage userId={otherUserData.id}></ProfileImage>
-                  <div className="flex flex-col items-start align-middle">
+                  <div className="flex flex-col ml-5 items-start align-middle">
                     <div>
-                      <div className="font-bold overflow-auto text-center">
-                        {truncateMessage(`${otherUserData.name}'s Shop`, 20)}
+                      <div className="font-bold overflow-auto">
+                        {truncateMessage(`${otherUserData.name}`, 20)}
                       </div>
                       {otherUserData !== null ? (
                         <UserRating

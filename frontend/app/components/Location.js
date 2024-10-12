@@ -46,7 +46,7 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   useEffect(() => {
     fetchCurrLoc();
-  }, []);
+  }, [swap_id, meetUpInfo]);
 
   return (
     <div>

@@ -6,6 +6,8 @@ export const SIZES = [
   "L",
   "XL",
   "XXL",
+  "0",
+  "2",
   "4",
   "6",
   "8",
