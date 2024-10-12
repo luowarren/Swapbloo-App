@@ -51,14 +51,47 @@ export async function createSwapRequest(
   ownerId, // this is me!
   requesterId
 ) {
-  // First, add to swaps table with a pending status
-  console.log(
-    "creating swap requests: ",
-    myItems,
-    requestingItems,
-    ownerId,
-    requesterId
-  );
+  // First, check if a swap already exists between these users
+  console.log("Checking for existing swap between:", ownerId, requesterId);
+  const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(ownerId, requesterId);
+    
+  // If a swap already exists, modify the swap instead of creating a new one
+  if (swapExists && status != "Accepted") {
+    console.log("Existing swap found. Modifying swap:",swapId);
+
+    // Modify the existing swap by adding new items
+    //const swapId = existingSwap[0].id;
+        
+    // Merge existing items with new items
+    const updatedMyItems = [
+      ...new Set([...user1Items.map(Number), ...myItems.map(Number)]),
+    ];
+    
+    const updatedRequestingItems = [
+      ...new Set([...user2Items.map(Number), ...requestingItems.map(Number)]),
+    ];
+    
+    console.log('sigmarest of them all', updatedMyItems, updatedRequestingItems)
+    // Call modifySwapRequest to update the swap
+    const { data, error } = await modifySwapRequest(
+      swapId,
+      updatedMyItems,
+      updatedRequestingItems,
+      ownerId,
+      requesterId
+    );
+
+    if (error) {
+      console.error("Error modifying swap:", error.message);
+      throw error;
+    }
+
+    return { data, error };
+  }
+
+  // If no existing swap is found, create a new one
+  console.log("No existing swap found. Creating a new swap.");
+
   const { data, error } = await supabase
     .from("Swaps")
     .insert([
@@ -76,18 +109,18 @@ export async function createSwapRequest(
     throw error;
   }
 
-  const swapId = data[0].id;
+  const createSwapId = data[0].id;
 
   // Insert rows for the owner's items
   const ownerItems = myItems.map((itemId) => ({
-    swap_id: swapId,
+    swap_id: createSwapId,
     item_id: itemId,
     owner_id: ownerId,
   }));
 
   // Insert rows for the requester's items
   const requesterItems = requestingItems.map((itemId) => ({
-    swap_id: swapId,
+    swap_id: createSwapId,
     item_id: itemId,
     owner_id: requesterId,
   }));
