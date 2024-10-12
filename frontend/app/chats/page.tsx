@@ -257,7 +257,10 @@ const ChatPage: React.FC = () => {
   }
 
   useEffect(() => {
-    if (chats != null && activeChat != null) {
+    if (chats != null && chats.length > 0 && activeChat != null) {
+      
+      console.log("active chatty",chats)
+      
       // update list of messages
       const chat_id = chats[activeChat].id;
       getAllMessages(chat_id);
@@ -277,8 +280,8 @@ const ChatPage: React.FC = () => {
   }, [activeChat]);
 
   useEffect(() => {
-    if (chats != null && activeChat != null) {
-      const chat_id = chats[activeChat].id;
+    if (chats != null && chats.length > 0 && activeChat != null) {
+     const chat_id = chats[activeChat].id;
 
       // Fetch messages for the current chat
       getAllMessages(chat_id);

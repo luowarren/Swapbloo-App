@@ -146,16 +146,12 @@ const NavBar: React.FC = () => {
                             Items
                         </p>
                     </Link>
-                    <Link href="/marketplace">
+                    <Link href="/listings">
                     <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
                             Menswear
                         </p>
                     </Link>
-                    <Link href="/marketplace">
-                    <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
-                            Sigmawear
-                        </p>
-                    </Link>
+                   
                     <Link href="/chats">
                         <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
                             Chat

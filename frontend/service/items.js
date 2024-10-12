@@ -152,18 +152,57 @@ export async function uploadImage(image, fileName) {
   return { data, error };
 }
 
+
 /**
  * Deletes an item from the Items table.
- * Used when user wants to delete a listing. NOT when user has sucessfully made
- * a swap.
+ * Also deletes all swaps that involve this item by finding the swapId from the ItemImages table.
  *
  * @param {string} itemId - the itemId of the Item being deleted
- * @returns error | null
+ * @returns {Object} - { error }
  */
 export async function deleteItemListing(itemId) {
-  let { error } = await supabase.from("Items").delete().eq("itemId", itemId);
-  return { error };
+  // Step 1: Find related swap IDs from ItemImages table
+  const { data: SwapItemsData, error: SwapItemsError } = await supabase
+    .from("SwapItems")
+    .select("swap_id")
+    .eq("item_id", itemId);
+
+  if (SwapItemsError) {
+    console.error("Error fetching swap IDs from swap:", SwapItemsError);
+    return { error: SwapItemsError };
+  }
+
+  // Extract the swapIds from the itemImagesData
+  const swapIds = SwapItemsData.map(item => item.swap_id);
+
+  // Step 2: Delete all related swaps using the swap IDs
+  if (swapIds.length > 0) {
+    console.log(swapIds)
+    const { error: swapError } = await supabase
+      .from("Swaps")
+      .delete()
+      .in("id", swapIds);
+
+    if (swapError) {
+      console.error("Error deleting related swaps:", swapError);
+      return { error: swapError };
+    }
+  }
+
+  // Step 3: Delete the item from the Items table
+  const { error: itemError } = await supabase
+    .from("Items")
+    .delete()
+    .eq("id", itemId);
+
+  if (itemError) {
+    console.error("Error deleting item:", itemError);
+    return { error: itemError };
+  }
+
+  return { error: null };
 }
+
 
 /**
  * Updates an Item in the Items table to have swapped = true, indicating that

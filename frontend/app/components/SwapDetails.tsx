@@ -1,27 +1,17 @@
 import React, { useState, useEffect } from "react";
-import ItemPreview from "../components/ItemPreview"; // Ensure this component works to display the images
+import ItemPreview from "../components/ItemPreview";
 import GenericButton from "../components/GenericButton";
-import { ArrowRightLeft } from "lucide-react"; // Arrow component you are using
-import UpdateSwapModal from "../components/UpdateSwapModal"; // Import your modal for updating the swap
+import { ArrowRightLeft } from "lucide-react";
+import UpdateSwapModal from "../components/UpdateSwapModal";
 import ItemImages from "./ItemImages";
 import { getSwapDetailsBetweenUsers, updateSwapStatus } from "@/service/swaps";
 import { getUserId } from "@/service/auth";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 
 interface SwapDetailsProps {
     ownerId: string | null;
     requesterId: string | null;
 }
-  
-function onSwapUpdate() {
-  return (
-    <DialogContent>
-      <div> Successfull swap update</div>
-    </DialogContent>
-  )
-}
-
 
 const SwapDetails: React.FC<SwapDetailsProps> = ({
   ownerId,
@@ -34,75 +24,88 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [swapExists, setSwapExists] = useState<boolean>(true); // State to track if the swap exists
   const [swapId, setSwapId] = useState<string | null>(null);
-  const [isUpdateSwapModalVisible, setIsUpdateSwapModalVisible] = useState(false); // Modal state here
- 
-  useEffect(() => {
-    setSwapExists(false)
-    setAccepted(false)
-    // Ensure that ownerId and requesterId are available before running this
+  const [isRequester, setIsRequester] = useState<boolean | null>(null);
+
+  console.log('ownerid sigma 69', ownerId)
+  const fetchSwapDetails = async () => {
     if (ownerId && requesterId) {
-      console.log("ownerId:", ownerId, "requesterId:", requesterId);
+      const userId = await getUserId();
+      setCurrentUserId(userId);
 
-      // Fetch and set the current user ID and swap details on component mount
-      const fetchUserIdAndSwapDetails = async () => {
-        const userId = await getUserId();
-        setCurrentUserId(userId);
+      if (userId) {
+        const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(ownerId, requesterId);
+        console.log('sigma 69', user1Items, ownerId)
+        if (swapExists) {
+          const realReqId = swap.requester_id;
 
-        if (userId) {
-          // Fetch the swap details between the two users
-          const { swapExists, user1Items, user2Items, swapId, status } = await getSwapDetailsBetweenUsers(requesterId, ownerId);
+          // Check if current user is the requester
+          setIsRequester(userId === realReqId);
           
-          if (swapExists) {
-            setSwapExists(true)
-            setSwapId(swapId);
-            if (status == "Accepted") {
-              setAccepted(true)
-            }
-
-            
-            // Determine if the logged-in user is the requester or accepter
-            if (userId === requesterId) {
-              // If the logged-in user is the requester
-              setMyItems(user2Items || []); // Your items
-              setRequestingItems(user1Items || []); // The other user's items
-            } else if (userId === ownerId) {
-              // If the logged-in user is the owner/accepter
-              setMyItems(user1Items || []); // Your items
-              setRequestingItems(user2Items || []); // The other user's items
-            }
-          } else {
-            setSwapExists(false); // Set swapExists to false if no swap exists
+          setSwapExists(true);
+          setSwapId(swapId);
+          if (status === "Accepted") {
+            setAccepted(true);
           }
+
+          setMyItems(user1Items || []); // Requester's items (myItems)
+          setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
+          // Determine if the logged-in user is the requester or accepter
+          // if (userId === realReqId) {
+          //   setMyItems(user1Items || []); // Requester's items (myItems)
+          //   setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
+          // } else if (userId === ownerId) {
+          //   setMyItems(user1Items || []); // Accepter's items (myItems)
+          //   setRequestingItems(user2Items || []); // Requester's items (requestingItems)
+          // }
+        } else {
+          setSwapExists(false);
         }
-      };
-
-      fetchUserIdAndSwapDetails();
+      }
     }
-  }, [ownerId, requesterId]); // Run when `ownerId` or `requesterId` changes
+  };
 
+  useEffect(() => {
+    fetchSwapDetails();
+  }, [ownerId, requesterId]); // Re-run when `ownerId` or `requesterId` changes
+
+  // New useEffect hook to log isRequester after it's updated
+  useEffect(() => {
+    console.log("isRequester updated to:", isRequester);
+  }, [isRequester]);
+
+  // Callback function for updating the swap details after a successful update
+  const handleSwapUpdate = async () => {
+    await fetchSwapDetails(); // Re-fetch the swap details to get updated information
+    setModalOpen(false); // Close the modal after the update
+  };
 
   async function acceptSwap(swapId: number) {
-    updateSwapStatus(swapId, "Accepted");
-    onSwapUpdate();
+    await updateSwapStatus(swapId, "Accepted");
     setAccepted(true);
+    // Trigger notification or post-accept logic
+    console.log("Offer accepted");
   }
 
-  console.log("simgrig55555555555555555", swapExists, ownerId, requesterId)
-  
-  // useEffect(() => {
-
-  // }, [myItems, requestingItems]);
-
-  // Don't render the component if no swap exists or if ownerId/requesterId is null
+  // If no swap exists, return null
   if (!swapExists || !ownerId || !requesterId) {
     return null;
   }
+
+   // Don't render anything until we know if the current user is the requester
+   if (isRequester === null || !swapExists) {
+    return null; // Waiting for data, don't render yet
+  }
+
+  console.log("i am ", isRequester, "ly the requester")
+
 
   return ( 
    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">
       <div className="font-bold text-2xl mb-4">Swap Details</div>
       {accepted ? (
           <div className="font-bold text-xl mb-4">Offer Accepted!</div>
+        ) : isRequester ? (
+          <div className="font-bold text-xl mb-4">Waiting for the other person to accept</div>
         ) : (
           <div></div>
         )
@@ -130,7 +133,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
         >
           {myItems.length > 0 ? (
             myItems.map((itemId, index) => (
-              <ItemImages itemId={itemId} className="" /> // Display each item image for your items
+              <ItemImages key={index} itemId={itemId} className="" /> // Display each item image for your items
             ))
           ) : (
             <p>No items to display</p>
@@ -150,7 +153,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
         >
           {requestingItems.length > 0 ? (
             requestingItems.map((itemId, index) => (
-              <ItemImages itemId={itemId} className="" /> // Display each item image for the requested items
+              <ItemImages key={index} itemId={itemId} className="" /> // Display each item image for the requested items
             ))
           ) : (
             <p>No items to display</p>
@@ -166,60 +169,42 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
           width: "50%",
         }}
       >
-        {accepted ? (
-          <GenericButton text="Update Offer" noClick={true} />
-        ) : (
-          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-            <DialogTrigger asChild>
-            {/* <GenericButton
-            text="Update Offer"
-            // click={() => setIsUpdateSwapModalVisible(true)}
-            /> */}
-            <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">Update Offer</div>
-            </DialogTrigger>
-            <DialogContent className="min-w-[80%] min-h-[80%]" >
-            <div>  </div>
-              <UpdateSwapModal
-                  isVisible={true} // Modal visibility from parent state
-                  onClose={() => setModalOpen(false)} // Close modal when done
-                  swapId={swapId}
-                  myItems={myItems} // Your items
-                  requestingItems={requestingItems} // Their items
-                  ownerId={ownerId}
-                  requesterId={requesterId}
-                  onUpdate={() => setModalOpen(false)} // Handle post-update logic here
-                />
-               
-            </DialogContent>
-          </Dialog>
+        {!accepted && (
           
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogTrigger asChild>
+          <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
+            Update Offer
+          </div>
+        </DialogTrigger>
+        <DialogContent className="min-w-[80%] min-h-[80%]">
+          <UpdateSwapModal
+            isVisible={true} // Modal visibility from parent state
+            onClose={() => setModalOpen(false)} // Close modal when done
+            swapId={swapId}
+            myItems={myItems} // Your items
+            requestingItems={requestingItems} // Their items
+            ownerId={ownerId}
+            requesterId={requesterId}
+            onUpdate={handleSwapUpdate} // Handle post-update logic here
+          />
+        </DialogContent>
+      </Dialog>
         )}
 
-        {/* Update Swap Modal */}
-        {/* <UpdateSwapModal
-          isVisible={isUpdateSwapModalVisible} // Modal visibility from parent state
-          onClose={() => setIsUpdateSwapModalVisible(false)} // Close modal when done
-          swapId={swapId}
-          myItems={myItems} // Your items
-          requestingItems={requestingItems} // Their items
-          ownerId={ownerId}
-          requesterId={requesterId}
-          onUpdate={() => console.log("Swap updated!")} // Handle post-update logic here
-        /> */}
-
-        {accepted ? (
-          <GenericButton text="Accepted Offer" noClick={true} />
-        ) : (
+        {/* Only show Accept Offer button if the current user is not the requester and the offer isn't already accepted */}
+        {!isRequester && !accepted && (
           <GenericButton
             text="Accept Offer"
             click={async () => {
               await acceptSwap(swapId);
               setAccepted(true);
-              // Trigger notification or post-accept logic
-              console.log("Offer accepted");
             }}
           />
         )}
+
+        {/* Display the Accepted Offer button if the offer has been accepted */}
+        {accepted && <GenericButton text="Accepted Offer" noClick={true} />}
       </div>
     </div>
   );

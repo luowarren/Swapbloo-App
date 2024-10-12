@@ -7,6 +7,7 @@ import { createSwapRequest } from '../../service/swaps';
 import { ItemData } from '../item/page';
 import { getUserId } from '../../service/auth';
 import { useRouter } from 'next/navigation';
+import ItemImages from "../components/ItemImages";
 
 const MakeOffer = () => {
   const searchParams = useSearchParams();
@@ -16,31 +17,27 @@ const MakeOffer = () => {
   const ownerId = searchParams.get('ownerId');
 
   const [userItems, setUserItems] = useState<Array<ItemData>>([]); // To store the user's own listed items
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedItemIds, setSelectedItemIds] = useState<number[]>([]); // Store selected items for the offer
   const [userId, setUserId] = useState<string | null>(null);
-  const [message, setMessage] = useState<string>("");
   const [isPopupVisible, setIsPopupVisible] = useState(false); // For popup visibility
-  
-  // First useEffect: Fetch the user ID
+
+  // Fetch the user ID
   useEffect(() => {
     async function fetchUser() {
-      const id = await getUserId(); // Fetch the user's ID
-      
+      const id = await getUserId();
       if (id != null) {
         setUserId(id); // Set userId state once it is fetched
       }
     }
-
     fetchUser();
   }, []);
 
-  // Second useEffect: Fetch user's listed items once userId is available
+  // Fetch user's listed items once userId is available
   useEffect(() => {
     if (!userId) return; // Only fetch items when userId is available
 
     async function fetchUserItems() {
-      const { data, error } = await getListingsByUsers([userId]); // Fetch the user's listed items
-      
+      const { data, error } = await getListingsByUsers([userId]);
       if (error || data == null) {
         console.error("Error fetching user items:", error);
       } else {
@@ -49,31 +46,41 @@ const MakeOffer = () => {
     }
 
     fetchUserItems();
-  }, [userId]); // Include userId as a dependency
+  }, [userId]);
+
+  // Handle adding an item to the offer
+  const handleAddItem = (itemId: number) => {
+    if (!selectedItemIds.includes(itemId)) {
+      setSelectedItemIds([...selectedItemIds, itemId]); // Add item to selected list
+    }
+  };
+
+  // Handle removing an item from the offer
+  const handleRemoveItem = (itemId: number) => {
+    setSelectedItemIds(selectedItemIds.filter(id => id !== itemId)); // Remove item from selected list
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!selectedItemId) {
-      alert("Please select an item to offer.");
+
+    if (selectedItemIds.length === 0) {
+      alert("Please select at least one item to offer.");
       return;
     }
 
     try {
-      // Use the userId as requestingUserId
+      // Submit the offer
       const requestingUserId = userId;
-      
       if (!requestingUserId) {
         alert("Unable to retrieve your user information.");
         return;
       }
 
-      // Submit the offer to the backend with item details
-      const result = await createSwapRequest([selectedItemId], [itemId], ownerId, requestingUserId);
+      // Create the swap request
+      const result = await createSwapRequest(selectedItemIds, [itemId], requestingUserId, ownerId);
 
       // If successful, show the popup
       setIsPopupVisible(true);
-
     } catch (error) {
       console.error("Error submitting offer:", error);
     }
@@ -81,39 +88,59 @@ const MakeOffer = () => {
 
   const handlePopupClose = () => {
     setIsPopupVisible(false);
-    // Redirect to the marketplace after closing the popup
-    router.push('/marketplace');
+    router.push('/listings'); // Redirect after closing the popup
   };
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">
       <h1 className="text-2xl font-bold mb-4">Make an Offer</h1>
       <form className="w-1/2 bg-gray-100 p-4 rounded-lg shadow" onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Select an Item to Offer</label>
-          <select
-            value={selectedItemId || ""}
-            onChange={(e) => setSelectedItemId(e.target.value)}
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option value="">-- Select an Item --</option>
-            {userItems.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title} - {item.size} ({item.condition})
-              </option>
-            ))}
-          </select>
+        {/* Your Items Section */}
+        <div className="mb-6">
+          <h3 className="font-bold text-lg mb-2">Your Items</h3>
+          <div className="flex flex-wrap gap-4">
+            {selectedItemIds.length > 0 ? (
+              selectedItemIds.map((itemId, index) => (
+                <div key={index} className="relative w-32 h-40">
+                  <ItemImages itemId={itemId} className="w-full h-full" />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(itemId)}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>No items selected for offer.</p>
+            )}
+          </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Message</label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            rows={3}
-            placeholder="Add a message to your offer..."
-          />
+        {/* Add More of Your Items Section */}
+        <div className="mb-6">
+          <h3 className="font-bold text-lg mb-2">Add More of Your Items</h3>
+          <div className="flex flex-wrap gap-4">
+            {userItems.length > 0 ? (
+              userItems
+                .filter(item => !selectedItemIds.includes(item.id))
+                .map((item) => (
+                  <div key={item.id} className="relative w-32 h-40">
+                    <ItemImages itemId={item.id} className="w-full h-full" />
+                    <button
+                      type="button"
+                      onClick={() => handleAddItem(item.id)}
+                      className="absolute bottom-2 right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      +
+                    </button>
+                  </div>
+                ))
+            ) : (
+              <p>No items available to add.</p>
+            )}
+          </div>
         </div>
 
         <div className="flex justify-center">
