@@ -404,7 +404,7 @@ const ChatPage: React.FC = () => {
                     date={msg.latestMessage.created_at}
                     viewed={msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
-                    userId={otherUserDataRef.id}
+                    userId={currUserId == msg.user2_id ? msg.user1_id : msg.user2_id}
                   />
                 </div>
               ))}
