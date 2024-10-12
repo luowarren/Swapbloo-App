@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchUserData, fetchUserItems } from "../../service/users";
+import { fetchUserData, fetchUserItems, setUserLocation } from "../../service/users";
 import { getUserId } from "@/service/auth";
 import { getUser } from "../../service/users";
 import { getListingsByUsers } from "@/service/items";
@@ -22,6 +22,7 @@ import ListingCard from "../listings/listing-card";
 // Define types for UserData and ItemData
 interface UserData {
   id: string;
+  description: string;
   username: string;
   name: string;
   bio: string;
@@ -44,11 +45,10 @@ const Login: React.FC = () => {
   const [outgoingSwaps, setOutgoingSwaps] = useState<ItemData[]>([]); // State to store requested swaps
   const [incomingSwaps, setIncomingSwaps] = useState<ItemData[]>([]); // State to store incoming swap requests
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<
-    "listings"
-  >("listings"); // State to manage active tab
+  const [activeTab, setActiveTab] = useState<"listings">("listings"); // State to manage active tab
   const router = useRouter(); // Move useRouter outside useEffect
   const [uid, setUserId] = useState<UserData | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   useEffect(() => {
     const loadUserData = async () => {
       // Fetch user data
@@ -65,6 +65,7 @@ const Login: React.FC = () => {
         if (userBlob?.Users && userBlob.Users.length > 0) {
           const user = userBlob.Users[0];
           setUser(user);
+          setSelectedLocation(user.location);
 
           // Fetch user's items
           const userItemsBlob = await getListingsByUsers([user.id]);
@@ -92,6 +93,13 @@ const Login: React.FC = () => {
     loadUserData();
   }, [router]); // Include `router` in the dependency array
 
+  useEffect(() => {
+    const changeLocation = async () => {
+      await setUserLocation(user?.id, selectedLocation)
+    }
+    changeLocation()
+  }, [selectedLocation])
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -109,51 +117,46 @@ const Login: React.FC = () => {
     <div className="max-w-4xl mx-auto bg-white">
       <div className="w-1/2 bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 ">
         <div className="flex flex-row items-center justify-evenly w-full mb-4">
-          <ProfileImage userId={user.id}/>
+          <ProfileImage userId={user.id} />
           <div className="flex flex-col items-start align-middle">
             <div className="font-bold overflow-auto text-center">
               {user.name}'s Swap Shop
             </div>
-            <div className="text-sm text-gray-500">
-              {user.username}
-            </div>
+            <div className="text-sm text-gray-500">{user.username}</div>
             <UserRating
               rating={Number(user.rating)}
               num={Number(user.num_of_ratings)}
             />
           </div>
         </div>
-        <div className="py-3 px-3 ">
-         <ShowMap ></ShowMap>
-        </div>
       </div>
       <hr className="border-gray-600 mx-4" />
 
       {/* Tab Buttons */}
-      <div className="flex space-x-8 mt-5 mx-4">
-        <button
-          className={`font-semibold px-2 pb-2 ${activeTab === "listings" ? "underline" : ""
-            }`}
-          onClick={() => handleTabSwitch("listings")}
-        >
-          Listings
-        </button>
+      <div className="space-x-8 mt-5 mx-4">Description</div>
+      <div className="space-x-8 mt-5 mx-4">{user.description}</div>
+      <div className="py-6 px-6 ">
+        {selectedLocation && (
+          <ShowMap
+            setter={setSelectedLocation}
+            selectedLocation={selectedLocation}
+          ></ShowMap>
+        )}
       </div>
-      
-
+      <div className="flex space-x-8 mt-5 mx-4">Listings</div>
       {/* Tab Content */}
       <div className="flex space-x-4 p-4">
         {activeTab === "listings" && (
           <div className="flex flex-row">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
-            
-            {items.length > 0 ? (
-              items.map((item, index) => (
-                <ListingCard key={index} data={item} />
-              ))
-            ) : (
-              <p>No items currently listed</p>
-            )}</div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
+              {items.length > 0 ? (
+                items.map((item, index) => (
+                  <ListingCard key={index} data={item} />
+                ))
+              ) : (
+                <p>No items currently listed</p>
+              )}
+            </div>
           </div>
         )}
       </div>

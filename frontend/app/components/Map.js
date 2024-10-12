@@ -4,10 +4,8 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import GenericButton from "./GenericButton";
 import { Minus, Search } from "lucide-react";
-import { getLocations, getSwapLocation } from "@/service/swaps";
-
-const l = await getLocations()
-// const preferredLocation = await getSwapLocation()
+import { getLocations, getSwapLocation, getCoordinates } from "@/service/swaps";
+import { locations } from "./static/locations";
 
 // Custom hook to center the map
 function CenterMap({ selected, zoom }) {
@@ -15,6 +13,7 @@ function CenterMap({ selected, zoom }) {
 
   useEffect(() => {
     if (selected) {
+      console.log(selected)
       map.closePopup();
       map.setView([selected.latitude, selected.longitude], zoom);
     }
@@ -25,23 +24,28 @@ function CenterMap({ selected, zoom }) {
 
 // Main component
 export default function ShowMap({
-  setter= () => {},
+  setter,
   width = "25rem",
   height = "15rem",
   zoom = 11,
   iconSize = 35,
+  selectedLocation = "UQ Union",
 }) {
-  var locations = l.data
-  // console.log("hiii", locations)
-
+  selectedLocation == null
+    ? (selectedLocation = "UQ Union")
+    : (selectedLocation = selectedLocation);
+  
   const [userLocation, setUserLocation] = useState(null);
-  const [selected, setSelected] = useState(locations[0]);
+  const [selected, setSelected] = useState(
+    locations.find(
+      (location) =>
+        location.name.toLowerCase() === selectedLocation.toLowerCase()
+    )
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredLocations, setFilteredLocations] = useState(locations);
   const [isSearchVisible, setIsSearchVisible] = useState(false); // State for search bar visibility
   const mapRef = useRef(); // Ref to store map instance
-
-  // Sort locations and initialize
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -109,35 +113,35 @@ export default function ShowMap({
         )}
         {locations.map((location) => (
           <Marker
-            key={location.id}
+            key={location.name}
             position={[location.latitude, location.longitude]}
-            icon={location == selected ? selectedIcon : locationIcon}
+            icon={location.name == selected.name ? selectedIcon : locationIcon}
           >
             <Popup>
               <div className="flex flex-col justify-center items-center h-full">
                 {" "}
-                {/* Ensure h-full or a specific height */}
                 <span className="mb-2">{location.name}</span>
+                {setter ?
                 <GenericButton
-                  text={location === selected ? "Selected" : "Select"}
-                  noClick={location === selected}
+                  text={location.name == selected.name ? "Selected" : "Select"}
+                  noClick={location.name == selected.name}
                   click={() => {
                     locations.forEach((l) => (l.pinned = false));
                     location.pinned = true;
-                    setSelected(location);
                     setter(location.name);
+                    selectedLocation = location.name
+                    setSelected(location)
                   }}
-                />
+                /> : null}
               </div>
             </Popup>
-            {/* <Circle center={[location.latitude, location.longitude]} radius={100} color="purple" fillColor="purple" fillOpacity={0.5} /> */}
           </Marker>
         ))}
         <CenterMap selected={selected} zoom={zoom} />
       </MapContainer>
 
       {/* Search Bar Toggle Button */}
-      {!isSearchVisible && (
+      {!isSearchVisible && setter && (
         <button
           style={{
             position: "absolute",
@@ -155,7 +159,7 @@ export default function ShowMap({
         </button>
       )}
       {/* Custom Search Bar Overlay */}
-      {isSearchVisible && (
+      {isSearchVisible && setter && (
         <div
           style={{
             position: "absolute",
@@ -198,18 +202,30 @@ export default function ShowMap({
               placeholder="Search by location"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: "200px", padding: "8px", borderWidth: "1px", borderRadius: "8px" }}
+              style={{
+                width: "200px",
+                padding: "8px",
+                borderWidth: "1px",
+                borderRadius: "8px",
+              }}
             />
           </div>
           {/* Search results */}
           {searchTerm && (
-            <ul style={{ listStyleType: "none", paddingBottom: "8px", overflow: "scroll"}}>
+            <ul
+              style={{
+                listStyleType: "none",
+                paddingBottom: "8px",
+                overflow: "scroll",
+              }}
+            >
               {filteredLocations.map((location) => (
                 <li
                   key={location.id}
                   onClick={() => {
-                    setSelected(location);
-                    setter(location.name)
+                    setter(location.name);
+                    selectedLocation = location.name
+                    setSelected(location)
                     setSearchTerm(""); // Clear search when selecting a location
                     setIsSearchVisible(false); // Hide search bar on selection
                   }}
