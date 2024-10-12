@@ -21,8 +21,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   isVisible,
   onClose,
   swapId,
-  myItems, // Other user's items
-  requestingItems, // Your items
+  myItems, // My items 
+  requestingItems, // their
   ownerId,
   requesterId,
   onUpdate,
@@ -33,7 +33,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Store the current user's ID
   const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal visibility state
-  console.log("I am sigmarig")
+  console.log("I am sigmarig", ownerId)
+  console.log(myItems)
   // Fetch the current user's ID and fetch their listings
   useEffect(() => {
     const fetchUserItems = async () => {
@@ -59,7 +60,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
 
   // Function to handle removing an item from the swap (and add it back to available items)
   const handleRemoveMyItem = (itemId: number) => {
-    setUpdatedRequestingItems((prevItems) => prevItems.filter((item) => item !== itemId));
+    setUpdatedMyItems((prevItems) => prevItems.filter((item) => item !== itemId));
 
     // Add the item back to the available userItems list
     const removedItem = userItems.find((item) => item.id === itemId);
@@ -73,8 +74,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
 
   // Function to handle adding an item to the swap (and remove it from available items)
   const handleAddMyItem = (itemId: number) => {
-    if (!updatedRequestingItems.includes(itemId)) {
-      setUpdatedRequestingItems((prevItems) => [...prevItems, itemId]);
+    if (!updatedMyItems.includes(itemId)) {
+      setUpdatedMyItems((prevItems) => [...prevItems, itemId]);
 
       // Remove the item from the available userItems list
       setUserItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
@@ -89,10 +90,11 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
       return;
     }
 
+    
     const { data, error } = await modifySwapRequest(
       swapId,
-      updatedRequestingItems, // Your updated offered items
       updatedMyItems, // The other user's items
+      updatedRequestingItems, // Your updated offered items
       ownerId,
       requesterId
     );
@@ -115,8 +117,11 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   return (
     
       <form 
-        className="w-full" 
+      
         onSubmit={handleSubmit}
+        style={{   // Set max height to 80% of the parent container
+          overflowY: 'scroll',    // Enable vertical scrolling when content overflows
+        }}
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Update Your Swap</h2>
   
@@ -124,8 +129,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
         <div className="mb-6">
           <h3 className="font-bold text-lg mb-2">Their Items</h3>
           <div className="flex flex-wrap gap-4">
-            {updatedMyItems && updatedMyItems.length > 0 ? (
-              updatedMyItems.map((item, index) => (
+            {updatedRequestingItems && updatedRequestingItems.length > 0 ? (
+              updatedRequestingItems.map((item, index) => (
                 <div key={index} className="relative w-32 h-40">
                   <ItemImages itemId={item} className="w-full h-full" />
                 </div>
@@ -140,8 +145,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
         <div className="mb-6">
           <h3 className="font-bold text-lg mb-2">Your Items</h3>
           <div className="flex flex-wrap gap-4">
-            {updatedRequestingItems && updatedRequestingItems.length > 0 ? (
-              updatedRequestingItems.map((item, index) => (
+            {updatedMyItems && updatedMyItems.length > 0 ? (
+              updatedMyItems.map((item, index) => (
                 <div key={index} className="relative w-32 h-40">
                   <ItemImages itemId={item} className="w-full h-full" />
                   <button
@@ -166,7 +171,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
             {userItems && userItems.length > 0 ? (
               (() => {
                 const filteredItems = userItems.filter(
-                  (item) => !updatedRequestingItems.includes(item.id)
+                  (item) => !updatedMyItems.includes(item.id)
                 );
                 return filteredItems.length > 0 ? (
                   filteredItems.map((item) => (

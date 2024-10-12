@@ -9,8 +9,8 @@ const MessagePreview = ({
   date,
   viewed,
   isSelected,
-  userId,
   maxLength = 20,
+  userId,
 }) => {
   const truncateMessage = (msg) => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
@@ -19,6 +19,8 @@ const MessagePreview = ({
   if (lastMessage == "") {
     lastMessage = "Start Chatting!";
   }
+
+  console.log("the alpha 3333", userId, "88");
 
   return (
     <div

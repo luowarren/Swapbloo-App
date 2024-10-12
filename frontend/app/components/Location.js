@@ -10,7 +10,7 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
   const [selectedLocation, setSelectedLocation] = useState(meetUpInfo.location);
   const [selectedDate, setSelectedDate] = useState(meetUpInfo.date);
   const [selectedTime, setSelectedTime] = useState(meetUpInfo.time);
-  const [locationCoords, setLocationCoords] = useState(null);
+  const [locationName, setLocationNames] = useState(null);
 
   const handleLocationChange = (event) => {
     setSelectedLocation(event.target.value);
@@ -47,16 +47,9 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   async function fetchCurrLoc() {
     const currLocation = await getSwapLocation(swap_id);
-    // console.log("found current location:", currLocation);
+    console.log("found current location:", currLocation);
     if (currLocation.data !== null) {
-      // console.log(currLocation.data[0].location)
       coords(currLocation.data[0].location)
-      // const coords = await getCoordinates();
-      // // console.log("aa", coords)
-      // if (coords.data) {
-      //   // console.log("setting, ", coords.data[0])
-      //   setLocationCoords(coords.data[0])
-      // }
     }
   }
 
@@ -75,12 +68,12 @@ const LocationSelector = ({ click, meetUpInfo, swap_id }) => {
 
   return (
     <div>
-      {locationCoords !== null ? (
+      {locationName !== null ? (
         <ShowMap
           setter={setSelectedLocation}
           width="20rem"
-          height="18rem"
-          selectedLocation={locationCoords}
+          height="37vh"
+          selectedLocation={locationName}
         ></ShowMap>
       ) : (
         <div>Loading map...</div>
