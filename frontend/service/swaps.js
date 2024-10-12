@@ -48,7 +48,7 @@ export async function createSwapItem(swapInfo) {
 export async function createSwapRequest(
   myItems,
   requestingItems,
-  ownerId,
+  ownerId, // this is me!
   requesterId
 ) {
   // First, add to swaps table with a pending status
@@ -63,8 +63,8 @@ export async function createSwapRequest(
     .from("Swaps")
     .insert([
       {
-        requester_id: requesterId,
-        accepter_id: ownerId,
+        requester_id: ownerId,
+        accepter_id: requesterId,
         status: "Pending",
       },
     ])
@@ -128,8 +128,30 @@ export async function modifySwapRequest(
   let { data, error } = await supabase
     .from("Swaps")
     .select("*")
-    .eq("id", `${swapId}`);
+    .eq("id", `${swapId}`)
+    .single();
   if (error) return { data, error };
+
+  // Check if requester_id is the current user (yourself)
+ 
+  const THE_REQUESTER = data.requester_id;
+  const accepter_id = data.accepter_id;
+  console.log(ownerId, '69 sigma data', data)
+  
+  console.log(THE_REQUESTER, 'the rewquester 69 sigma data', accepter_id)
+  if (THE_REQUESTER !== ownerId) {
+    // Swap the requester and accepter if you are not the current requester
+    const { error: updateError } = await supabase
+      .from("Swaps")
+      .update({
+        requester_id: ownerId, // Make the accepter the requester
+        accepter_id: THE_REQUESTER,  // Make yourself the accepter
+      })
+      .eq("id", swapId);
+
+    if (updateError) return { data: null, error: updateError };
+  }
+
   // delete all items that are currently associated with this swap
   const deleteStatus = await supabase
     .from("SwapItems")
@@ -171,7 +193,7 @@ export async function modifySwapRequest(
 /**
  * Finds the swap between two users if it exists, and returns the items involved for each user.
  *
- * @param {string} userId1 - The ID of the first user.
+ * @param {string} userId1 - The ID of the first user. i am user 1
  * @param {string} userId2 - The ID of the second user.
  * @returns {Promise<{swapExists: boolean, user1Items: string[], user2Items: string[]}>}
  */
@@ -193,6 +215,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
       user2Items: [],
       swapId: null,
       status: null,
+      swap: swap
     };
   }
 
@@ -213,14 +236,17 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
       user2Items: [],
       swapId: swapId,
       status: swap.status,
+      swap
     };
   }
 
+  console.log("sigma 69", swapItems)
   // Step 3: Separate the items for each user
   const user1Items = swapItems
     .filter((item) => item.owner_id === userId1)
     .map((item) => item.item_id);
-
+ 
+  console.log("sigma 69 js", user1Items, userId1);
   const user2Items = swapItems
     .filter((item) => item.owner_id === userId2)
     .map((item) => item.item_id);
@@ -232,6 +258,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     user2Items,
     swapId,
     status: swap.status,
+    swap
   };
 }
 

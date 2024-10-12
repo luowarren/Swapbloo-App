@@ -4,25 +4,64 @@ import ItemImages from "../components/ItemImages";
 import UserRating from "../components/UserRating";
 import { Heart, MoreHorizontal, Share } from "lucide-react";
 import { getUser } from "@/service/users";
+import { getUserId } from "@/service/auth";
+import { useRouter } from "next/navigation";
 import ProfileImage from "../components/ProfileImage";
 import VisitShopModal from "../components/VisitShopModal";
 import ShowMap from "../components/Map";
+import ShopModal from "../components/ShopModal";
+import { deleteItemListing } from "@/service/items";
 
 const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
-  const handleMakeOffer = () => {};
+  const router = useRouter();
   const [userLoading, setUserLoading] = useState(true);
   const [user, setUser] = useState<any>(undefined);
+  const [isMyItem, setIsMyItem] = useState(false);
+  const [selfUser, setSelfUser] = useState<string>("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // State for controlling the success modal
+
+  const handleMakeOffer = () => {
+    router.push(`/offer?itemId=${item.id}&ownerId=${item.owner_id}`);
+  };
 
   useEffect(() => {
-    getUser(item.owner_id).then((user) => {
-      console.log(user);
+    const fetchUserData = async () => {
+      const fetchedUser = await getUser(item.owner_id);
+      setUser(fetchedUser.Users?.[0]);
       setUserLoading(false);
-      setUser(user.Users?.[0]);
-    });
-  }, []);
+    };
+
+    const fetchUserId = async () => {
+      const userId = await getUserId();
+      setSelfUser(userId); // Set the user ID state
+
+      // Avoid re-rendering by moving this logic into the effect.
+      if (userId === item.owner_id) {
+        setIsMyItem(true);
+      }
+    };
+
+    fetchUserData();
+    fetchUserId();
+  }, [item.owner_id]); // Only run once when item.owner_id changes
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    router.push("/marketplace"); // Redirect to the marketplace after closing the modal
+  };
+
+  const handleDelete = async () => {
+    const { error } = await deleteItemListing(item.id);
+    if (!error) {
+      setShowSuccessModal(true); // Show success modal on successful deletion
+    }
+    setModalOpen(false);
+    // TODO neeed to
+  };
 
   return (
-    <Dialog>
+    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger className="w-full">{children}</DialogTrigger>
       <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
@@ -40,24 +79,23 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
               {item.size} - {item.condition} - {item.brand}
             </p>
             <div className="flex space-x-2">
-              <button
-                onClick={handleMakeOffer}
-                className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
-              >
-                Make Offer
-              </button>
-
-              <button className="text-indigo-800 bg-gray-100 p-2 rounded-sm">
-                <Heart />
-              </button>
-
-              <button className="text-indigo-800 bg-gray-100 p-2 rounded-sm">
-                <Share />
-              </button>
-
-              <button className="text-indigo-800 bg-gray-100 p-2 rounded-sm">
-                <MoreHorizontal />
-              </button>
+              {isMyItem ? (
+                <div>
+                  <button
+                    onClick={handleDelete}
+                    className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                  >
+                    Delete Item
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleMakeOffer}
+                  className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                >
+                  Make Offer
+                </button>
+              )}
             </div>
 
             <hr className="border-gray-300 mt-2"></hr>
@@ -112,9 +150,11 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     </div>
                   </div>
                   <div className="flex space-x-2 text-sm">
-                    <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
-                      Visit Shop
-                    </button>
+                    <ShopModal otherUser={user}>
+                      <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
+                        Visit Shop
+                      </button>
+                    </ShopModal>
                   </div>
                 </div>
               )}
@@ -122,6 +162,24 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
           </div>
         </div>
       </DialogContent>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">
+              Item Deleted Successfully!
+            </h2>
+            <p>Your item has been deleted.</p>
+            <button
+              onClick={handleCloseModal}
+              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </Dialog>
   );
 };
