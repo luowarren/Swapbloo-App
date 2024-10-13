@@ -21,7 +21,7 @@ const Login: React.FC = () => {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/marketplace");
+      router.push("/listings");
     }
   };
 
