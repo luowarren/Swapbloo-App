@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation"; // Next.js router for redirection
 import ItemPreview from "../components/ItemPreview";
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
-import { data } from "./data.js";
 import { sortData, placeholder } from "./helpers";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
@@ -367,6 +366,7 @@ const ChatPage: React.FC = () => {
       location;
     if (currUserId !== null && swapId !== null) {
       sendMessage(currUserId, swapId, text);
+      handleInitialDataFetches();
     }
   };
 
@@ -409,7 +409,6 @@ const ChatPage: React.FC = () => {
       }
     }
     switchChat(index);
-    data[index]["viewed"] = true;
   };
 
 
@@ -682,7 +681,7 @@ const ChatPage: React.FC = () => {
                 <LocationSelector
                   click={(location: string, date: string, time: string) => {
                     setNotification(
-                      `You updated the meetup details with ${data[activeChat].name}`,
+                      `You updated the meetup details with ${otherUserData?.name}`,
                       location,
                       date,
                       time
