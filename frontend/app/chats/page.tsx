@@ -25,8 +25,6 @@ import {
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
 import { Send } from "lucide-react";
-sortData(data);
-
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
