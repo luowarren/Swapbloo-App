@@ -92,7 +92,6 @@ const ChatPage: React.FC = () => {
 
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
-    console.log(users, "888888")
     if (users) {
       if (currUserId === users.requesterId) {
         setRequesterId(users.accepterId); // Other user's ID
@@ -102,7 +101,7 @@ const ChatPage: React.FC = () => {
         setAccepterId(users.accepterId); // Your ID
       }
     } else {
-      console.log("No users found for the given chat ID");
+      
     }
   };
 
@@ -137,8 +136,7 @@ const ChatPage: React.FC = () => {
           new Date(a.latestMessage.created_at).getTime()
         );
       });
-      console.log("Sorted chats");
-      console.log(sortedChats);
+      
       return sortedChats;
     }
     return null;
@@ -204,11 +202,9 @@ const ChatPage: React.FC = () => {
       }
 
       const chatId = searchParams.get('chatId'); // Get the chat ID from the URL
-      // console.log(chatId, "sigm6888", sortedChats)
       
       if (chatId && sortedChats !== null) {
         const chatIndex = sortedChats.findIndex((chat) => Number(chat.id) === Number(chatId));
-        // console.log(chatIndex, "sigm6888")
         if (chatIndex !== -1) {
           switchChat(chatIndex);
         }
@@ -254,7 +250,6 @@ const ChatPage: React.FC = () => {
       // console.log("updating meetup data")
       getMeetUpData(swapId);
     } else {
-      console.log("couldnt get swap data! cnt");
       setMeetUpInfo(null);
     }
   }, [swapId]);
@@ -266,15 +261,10 @@ const ChatPage: React.FC = () => {
       console.log(curr_swap_id);
       setSwapId(curr_swap_id);
     } else {
-      console.log("epic fail, couldn't find swap id");
       setSwapId(null);
       setMeetUpInfo(null);
     }
   }
-
-  useEffect(() => {
-    console.log("Other use data: ", otherUserData);
-  }, [otherUserData]);
 
   async function updateOtherUserData() {
     let other_user_id;
