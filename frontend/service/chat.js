@@ -177,8 +177,50 @@ export async function getUserIdsFromChat(chatId) {
     accepterId: chat.user2_id,
   };
 }
+export async function getOrCreateChatBetweenUsers(user1Id, user2Id) {
+  try {
+    // Step 1: Check if a chat already exists between the two users
+    let { data, error } = await supabase
+      .from("Chats")
+      .select("*")
+      .or(
+        `and(user1_id.eq.${user1Id},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user1_id.eq.${user1Id})`
+      )
+      .single(); // Ensure only one chat is fetched
+
+    if (error && error.code !== "PGRST116") {
+      // If an error occurs other than "No rows found", return the error
+      return { chatId: null, chatError: error };
+    }
+
+    if (data) {
+      console.log(data, "8888888 console.log sigma")
+      // Chat exists, return the existing chat ID
+      return { chatId: data.id, chatError: null };
+    }
+
+    // Step 2: If no chat exists, create a new one
+    const { data: newChat, error: createError } = await supabase
+      .from("Chats")
+      .insert([{ user1_id: user1Id, user2_id: user2Id }])
+      .single(); // Insert a new chat and return the row
+
+      
+
+      console.log(newChat, "8888888 console.log sigma")
+    if (createError) {
+      // If chat creation fails, return the error
+      return { chatId: null, chatError: createError };
+    }
+  
+        return getChatBetweenUsers(user1Id, user2Id);
+    } catch (error) {
+      return { chatId: null, chatError: error };
+    }
+}
 
 export async function getChatBetweenUsers(user1Id, user2Id) {
+  console.log("getting get 88888888888888888888888888")
   // Check if a chat exists between the users
   let { data, error } = await supabase
     .from("Chats")

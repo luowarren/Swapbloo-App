@@ -87,7 +87,7 @@ const ChatPage: React.FC = () => {
   
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
-
+    console.log(users, "888888")
     if (users) {
       if (currUserId === users.requesterId) {
         setRequesterId(users.accepterId); // Other user's ID

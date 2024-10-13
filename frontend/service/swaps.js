@@ -87,8 +87,26 @@ export async function createSwapRequest(
     }
 
     return { data, error };
-  }
+  } else if (swapExists && status == "Accepted") {
+    const updatedMyItems = [
+      ...new Set([...myItems.map(Number)]),
+    ];
+    
+    const updatedRequestingItems = [
+      ...new Set([...requestingItems.map(Number)]),
+    ];
+    
+    console.log('sigmarest of them all', updatedMyItems, updatedRequestingItems)
+    // Call modifySwapRequest to update the swap
+    const { data, error } = await modifySwapRequest(
+      swapId,
+      updatedMyItems,
+      updatedRequestingItems,
+      ownerId,
+      requesterId
+    );
 
+  } 
   // If no existing swap is found, create a new one
   console.log("No existing swap found. Creating a new swap.");
 
@@ -179,10 +197,18 @@ export async function modifySwapRequest(
       .update({
         requester_id: ownerId, // Make the accepter the requester
         accepter_id: THE_REQUESTER,  // Make yourself the accepter
+        status: "Pending"
       })
       .eq("id", swapId);
 
     if (updateError) return { data: null, error: updateError };
+  } else {
+    const { error: updateError } = await supabase
+      .from("Swaps")
+      .update({
+        status: "Pending"
+      })
+      .eq("id", swapId);
   }
 
   // delete all items that are currently associated with this swap
@@ -228,19 +254,26 @@ export async function modifySwapRequest(
  *
  * @param {string} userId1 - The ID of the first user. i am user 1
  * @param {string} userId2 - The ID of the second user.
- * @returns {Promise<{swapExists: boolean, user1Items: string[], user2Items: string[]}>}
+ * @returns {Promise<{swapExists: boolean, user1Items: string[], user2Items: string[],  swapId: number, status: string, swap: Object}>}
  */
 export async function getSwapDetailsBetweenUsers(userId1, userId2) {
   // Step 1: Check if there's a swap between these two users
-  const { data: swap, error } = await supabase
+  const { data: swap1, error1 } = await supabase
     .from("Swaps")
     .select("*")
-    .or(`requester_id.eq.${userId1},accepter_id.eq.${userId1}`)
-    .or(`requester_id.eq.${userId2},accepter_id.eq.${userId2}`)
+    .match({ requester_id: userId2, accepter_id: userId1 })
+    .limit(1)
     .single(); // Ensures there's only one swap
-  console.log(swap, "44444444", error);
-
-  if (error || !swap) {
+  console.log("88888 swap1", swap1)
+  const { data: swap2, error2 } = await supabase
+    .from("Swaps")
+    .select("*")
+    .match({ requester_id: userId1, accepter_id: userId2 })
+    .limit(1)
+    .single(); // Ensures there's only one swap
+  console.log("88888 swap2", swap2)
+  
+  if (error1 || error2 || (!swap1 && !swap2)) {
     // No swap found between the users
     return {
       swapExists: false,
@@ -248,13 +281,16 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
       user2Items: [],
       swapId: null,
       status: null,
-      swap: swap
+      swap: null
     };
   }
 
-  
+  const swap = swap1 ? swap1 : swap2;
+  console.log(swap, "44444444", error2);
+  console.log("88888 swapy", swap)
   // Swap found
   const swapId = swap.id;
+  const swapStatus = swap.status;
 
   // Step 2: Get items associated with this swap for both users
   const { data: swapItems, error: itemsError } = await supabase
@@ -273,26 +309,62 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     };
   }
 
-  console.log("sigma 69", swapItems)
-  // Step 3: Separate the items for each user
-  const user1Items = swapItems
-    .filter((item) => item.owner_id === userId1)
-    .map((item) => item.item_id);
- 
-  console.log("sigma 69 js", user1Items, userId1);
-  const user2Items = swapItems
-    .filter((item) => item.owner_id === userId2)
-    .map((item) => item.item_id);
+// Step 2.5: Extract item IDs from swap items
+const itemIds = swapItems.map((item) => item.item_id);
+console.log(itemIds, "8888 swap item ids", swapId, "users", userId1, userId2)
+// Query the Items table to check their swapped status
+const { data: itemsData, error: itemsCheckError } = await supabase
+  .from("Items")
+  .select("id, owner_id, swapped")
+  .in("id", itemIds);
 
-  // Return the swap details
+if (itemsCheckError) {
+  console.error("Error checking item statuses:", itemsCheckError.message);
+  throw itemsCheckError;
+}
+
+
+// TODO there is a bug here, cause i only show if not swapped, byt if accepted then still want to show swapped. 
+let user1ItemsNotSwapped, user2ItemsNotSwapped;
+if (swapStatus == "Accepted") {
+    
+  // Step 3: Filter items by user and check for 'swapped = false' status
+  user1ItemsNotSwapped = itemsData.filter(
+    (item) => item.owner_id === userId1
+  );
+  user2ItemsNotSwapped = itemsData.filter(
+    (item) => item.owner_id === userId2 
+  );
+
+} else {
+  // Step 3: Filter items by user and check for 'swapped = false' status
+  user1ItemsNotSwapped = itemsData.filter(
+    (item) => item.owner_id === userId1 && !item.swapped
+  );
+  user2ItemsNotSwapped = itemsData.filter(
+    (item) => item.owner_id === userId2 && !item.swapped
+  );
+}
+console.log("8888888",user1ItemsNotSwapped, itemsData)
+
+// Ensure both users have at least one non-swapped item
+if (user1ItemsNotSwapped.length < 1 || user2ItemsNotSwapped.length < 1) {
+  console.warn("Both users must have at least one non-swapped item.");
   return {
-    swapExists: true,
-    user1Items,
-    user2Items,
-    swapId,
-    status: swap.status,
-    swap
+    error: "Both users need at least one item that is not swapped.",
+    swapExists: false,
   };
+}
+
+// Proceed if both users have the required items
+return {
+  swapExists: true,
+  user1Items: user1ItemsNotSwapped.map((item) => item.id),
+  user2Items: user2ItemsNotSwapped.map((item) => item.id),
+  swapId: swapId,
+  status: swap.status,
+  swap,
+};
 }
 
 /**
@@ -421,29 +493,40 @@ export async function getSwapById(swapId) {
 
   return { data: Swap, error };
 }
-
 /**
- * Updates an Item in the Items table to have swapped = true, indicating that
- * the item has been successfully swapped.
+ * Updates the status of a swap in the Swaps table and marks the related items as swapped.
  *
- * @param {number} swapId - the id of the Item being swapped
- * @param {string} status - the updated status of the swap
- * @returns Item is a list containing the Item we just swapped.
+ * @param {number} swapId - The ID of the swap being updated.
+ * @param {string} status - The updated status of the swap.
+ * @param {number[]} itemIds - The IDs of the items to be marked as swapped.
+ * @returns {Promise<{data: any, error: any}>} - The updated swap and items data or an error.
  */
-export async function updateSwapStatus(swapId, status) {
-  const { data: Item, error } = await supabase
+export async function updateSwapStatus(swapId, status, itemIds) {
+  const { data: swapData, error: swapError } = await supabase
     .from("Swaps")
     .update({ status })
     .eq("id", swapId)
     .select();
 
-  if (error) {
-    console.error("Error updating swap status:", error.message);
-    throw error;
+  if (swapError) {
+    console.error("Error updating swap status:", swapError.message);
+    throw swapError;
   }
 
-  return { data: Item, error };
+  const { data: itemsData, error: itemsError } = await supabase
+    .from("Items")
+    .update({ swapped: true })
+    .in("id", itemIds)
+    .select();
+
+  if (itemsError) {
+    console.error("Error updating item statuses:", itemsError.message);
+    throw itemsError;
+  }
+
+  return { swapData, itemsData };
 }
+
 
 /**
  * Deletes a swap record from the 'Swaps' table.

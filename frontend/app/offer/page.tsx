@@ -7,7 +7,7 @@ import { createSwapRequest } from '../../service/swaps';
 import { ItemData } from '../item/page';
 import { getUserId } from '../../service/auth';
 import { useRouter } from 'next/navigation';
-import { getChatBetweenUsers } from '@/service/chat';
+import { getChatBetweenUsers, getOrCreateChatBetweenUsers } from '@/service/chat';
 import ItemImages from "../components/ItemImages";
 
 const MakeOffer = () => {
@@ -39,7 +39,8 @@ const MakeOffer = () => {
     if (!userId) return; // Only fetch items when userId is available
 
     async function fetchUserItems() {
-      const { data, error } = await getListingsByUsers([userId]);
+      const { data, error } = await getListingsByUsers([userId], false);
+      console.log(data, "88888")
       if (error || data == null) {
         console.error("Error fetching user items:", error);
       } else {
@@ -90,14 +91,15 @@ const MakeOffer = () => {
 
   const fetchChatId = async (ownerId: string, userId: string) => {
     try {
-      const { chatId, chatError } = await getChatBetweenUsers(ownerId, userId); // Fetch the chat
+      console.log(ownerId, userId, "9999")
+      const { chatId, chatError } = await getOrCreateChatBetweenUsers(ownerId, userId); // Fetch the chat
       if (chatId) {
         setChatId(chatId); // Store the chatId in state
       } else {
-        console.error("No chat found between the users", chatError);
+        console.error("No chat found between the users9999", chatError);
       }
     } catch (error) {
-      console.error("Error fetching chat:", error);
+      console.error("Error fetching chat:9999", error);
     } 
   };
 
@@ -110,6 +112,7 @@ const MakeOffer = () => {
   console.log(chatId, "chatting like alphas together 222222222")
   const handlePopupClose = () => {
     setIsPopupVisible(false);
+    fetchChatId(ownerId, userId);
     router.push(`/chats?chatId=${chatId}`); // Redirect to the chat page with the chat ID
   };
 

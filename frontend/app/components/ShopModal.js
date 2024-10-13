@@ -12,7 +12,7 @@ const ShopModal = ({ otherUser, children }) => {
 
   useEffect(() => {
     const fetchListings = async () => {
-      const userItemsBlob = await getListingsByUsers([otherUser.id]);
+      const userItemsBlob = await getListingsByUsers([otherUser.id], true);
       const userItems = userItemsBlob?.data ?? [];
       setListings(userItems);
     };

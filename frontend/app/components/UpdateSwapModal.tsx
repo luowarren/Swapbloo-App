@@ -43,7 +43,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
 
       // Fetch the user's listings if the userId is found
       if (userId) {
-        const listings = await getListingsByUsers([userId]);
+        const listings = await getListingsByUsers([userId], false);
         setUserItems(listings?.data ?? []);
       }
     };
