@@ -89,10 +89,10 @@ const MakeOffer = () => {
     }
   };
 
-  const fetchChatId = async (ownerId: string, userId: string) => {
+  const fetchChatId = async (ownerId: string, userId: string, swap_id: number) => {
     try {
       console.log(ownerId, userId, "9999")
-      const { chatId, chatError } = await getOrCreateChatBetweenUsers(ownerId, userId); // Fetch the chat
+      const { chatId, chatError } = await getOrCreateChatBetweenUsers(ownerId, userId, swap_id); // Fetch the chat
       if (chatId) {
         setChatId(chatId); // Store the chatId in state
       } else {

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { getUserProfilePhoto, getUserName } from './users.js'
 import { getMostRecentMessage, censorMessage } from './messages.js'
 import { createClient } from '@supabase/supabase-js';
+import { getSwapDetailsBetweenUsers } from "./swaps.js";
 
 // Load environment variables from .env file
 dotenv.config({ path: "../.env" });
@@ -187,27 +188,25 @@ export async function getOrCreateChatBetweenUsers(user1Id, user2Id) {
         `and(user1_id.eq.${user1Id},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user1_id.eq.${user1Id})`
       )
       .single(); // Ensure only one chat is fetched
-
     if (error && error.code !== "PGRST116") {
       // If an error occurs other than "No rows found", return the error
       return { chatId: null, chatError: error };
     }
 
+    const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(user1Id, user2Id);
+        
     if (data) {
-      console.log(data, "8888888 console.log sigma")
       // Chat exists, return the existing chat ID
       return { chatId: data.id, chatError: null };
     }
 
+    
     // Step 2: If no chat exists, create a new one
     const { data: newChat, error: createError } = await supabase
       .from("Chats")
-      .insert([{ user1_id: user1Id, user2_id: user2Id }])
+      .insert([{ user1_id: user1Id, user2_id: user2Id, id: swapId }])
       .single(); // Insert a new chat and return the row
 
-      
-
-      console.log(newChat, "8888888 console.log sigma")
     if (createError) {
       // If chat creation fails, return the error
       return { chatId: null, chatError: createError };
@@ -220,7 +219,6 @@ export async function getOrCreateChatBetweenUsers(user1Id, user2Id) {
 }
 
 export async function getChatBetweenUsers(user1Id, user2Id) {
-  console.log("getting get 88888888888888888888888888")
   // Check if a chat exists between the users
   let { data, error } = await supabase
     .from("Chats")
@@ -229,7 +227,7 @@ export async function getChatBetweenUsers(user1Id, user2Id) {
     .or(`user1_id.eq.${user2Id},user2_id.eq.${user2Id}`);
 
   if (error) return { chatId: null, chatError: error };
-
+    
   return { chatId: data[0].id, chatError: null };
   
 }
