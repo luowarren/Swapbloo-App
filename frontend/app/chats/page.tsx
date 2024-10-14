@@ -165,31 +165,16 @@ const ChatPage: React.FC = () => {
             swapIdRef.current !== null &&
             payload.new.chat_id == swapIdRef.current
           ) {
-            // console.log("setting messages");
             setMessages((prevMessages) => {
-              if (prevMessages != null) {
-                const updatedMessages = [
-                  ...prevMessages,
-                  {
-                    type: "text",
-                    content: payload.new.content,
-                    chat_id: payload.new.chat_id,
-                    created_at: payload.new.created_at,
-                    sender_id: payload.new.sender_id,
-                  },
-                ];
-
-                return updatedMessages;
-              } else {
-                return [{
-                    type: "text",
-                    content: payload.new.content,
-                    chat_id: payload.new.chat_id,
-                    created_at: payload.new.created_at,
-                    sender_id: payload.new.sender_id,
-                  },
-                ]
-              }
+              let updatedMessages = prevMessages !== null ? [...prevMessages] : [];
+              updatedMessages.push({
+                type: "text",
+                content: payload.new.content,
+                chat_id: payload.new.chat_id,
+                created_at: payload.new.created_at,
+                sender_id: payload.new.sender_id,
+              });
+              return updatedMessages;
             });
           } else {
             console.log("not right chat");
