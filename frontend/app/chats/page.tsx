@@ -76,7 +76,7 @@ const ChatPage: React.FC = () => {
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [accepted, setAccepted] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLDivElement>(null); // Create a ref for the messageBox
-  const otherUserDataRef = useRef(otherUserData);
+  const swapIdRef = useRef(swapId);
   const [requesterId, setRequesterId] = useState<string | null>(null);
   const [accepterId, setAccepterId] = useState<string | null>(null);
   const [isSwapDetailsVisible, setIsSwapDetailsVisible] = useState(true); // Manage SwapDetails visibility
@@ -88,6 +88,16 @@ const ChatPage: React.FC = () => {
   
   const truncateMessage = (msg: string, maxLength: number) => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
+  };
+
+  const sortMessagesByTime = (messagesArray: Array<{
+    type: string,
+    chat_id: string,
+    content: string,
+    created_at: string,
+    sender_id: string
+  }>) => {
+    return messagesArray.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   };
 
   const fetchChatUsers = async (chatId: string) => {
@@ -104,12 +114,6 @@ const ChatPage: React.FC = () => {
       
     }
   };
-
-  useEffect(() => {
-    otherUserDataRef.current = otherUserData;
-    // update shop
-    // console.log("Other user data: ", otherUserData, otherUserDataRef)
-  }, [otherUserData]);
 
   const sortChats = (
     c: Array<{
@@ -143,6 +147,10 @@ const ChatPage: React.FC = () => {
   };
 
   useEffect(() => {
+    swapIdRef.current = swapId;
+  }, [swapId]);
+
+  useEffect(() => {
     const channel = supabase
       .channel("chat-room")
       .on(
@@ -151,14 +159,13 @@ const ChatPage: React.FC = () => {
         (payload) => {
           console.log("Change received!", payload);
           handleInitialDataFetches();
-          console.log("Allan checks: ", otherUserDataRef, payload, activeChat);
 
           // update messages
           if (
-            otherUserDataRef.current != null &&
-            payload.new.chat_id == otherUserDataRef.current.chat_id
+            swapIdRef.current !== null &&
+            payload.new.chat_id == swapIdRef.current
           ) {
-            console.log("setting messages");
+            // console.log("setting messages");
             setMessages((prevMessages) => {
               if (prevMessages != null) {
                 const updatedMessages = [
@@ -174,7 +181,14 @@ const ChatPage: React.FC = () => {
 
                 return updatedMessages;
               } else {
-                return null;
+                return [{
+                    type: "text",
+                    content: payload.new.content,
+                    chat_id: payload.new.chat_id,
+                    created_at: payload.new.created_at,
+                    sender_id: payload.new.sender_id,
+                  },
+                ]
               }
             });
           } else {
@@ -189,13 +203,20 @@ const ChatPage: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (messages !== null) {
+      const sortedMessages = sortMessagesByTime(messages);
+      console.log("sorted messages", sortedMessages);
+      setMessages(sortedMessages);
+    }
+  }, [messages]);
+
   const handleInitialDataFetches = async (c_id: string | null = null) => {
     const uid = await getUserId();
     setCurrUserId(uid);
-    let sortedChats;
     if (uid != null) {
-      const c = await getChats(uid);
-      sortedChats = sortChats(c);
+      const allChats = await getChats(uid);
+      const sortedChats = sortChats(allChats);
       setChats(sortedChats);
       if (activeChat !== null) {
         setActiveChat(0);
@@ -223,8 +244,8 @@ const ChatPage: React.FC = () => {
   }, []);
 
   const getAllMessages = async (chat_id: string) => {
-    const c = await getChat(chat_id);
-    setMessages(c);
+    const texts = await getChat(chat_id);
+    setMessages(texts);
   };
 
   async function getMeetUpData(swap_id: string) {
@@ -253,18 +274,6 @@ const ChatPage: React.FC = () => {
       setMeetUpInfo(null);
     }
   }, [swapId]);
-
-  function updateSwapId(chat_id: string) {
-    const curr_swap_id = chat_id;
-    if (curr_swap_id !== null) {
-      console.log("Got swap id:");
-      console.log(curr_swap_id);
-      setSwapId(curr_swap_id);
-    } else {
-      setSwapId(null);
-      setMeetUpInfo(null);
-    }
-  }
 
   async function updateOtherUserData() {
     let other_user_id;
@@ -302,31 +311,13 @@ const ChatPage: React.FC = () => {
       fetchChatUsers(chat_id);
 
       // update current swap id
-      updateSwapId(chat_id);
+      console.log("setting swap id", chat_id)
+      setSwapId(chat_id);
 
       // update otherUserData
       // updateOtherUserData();
     }
   }, [activeChat]);
-
-  useEffect(() => {
-    if (chats != null && chats.length > 0 && activeChat != null) {
-     const chat_id = chats[activeChat].id;
-
-      // Fetch messages for the current chat
-      getAllMessages(chat_id);
-
-      // Fetch and set the UUID (requesterId) for the other user
-      fetchChatUsers(chat_id);
-
-      // Update otherUserData
-      updateOtherUserData();
-      // setOtherUserData({
-      //   name: chats[activeChat].username,
-      //   chat_id: chats[activeChat].id,
-      // });
-    }
-  }, [activeChat, chats]); // Ensure this runs whenever activeChat changes
 
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
@@ -475,7 +466,7 @@ const ChatPage: React.FC = () => {
               <div>
                 {/* Add padding to prevent overlap */}
                 <div className="flex flex-col space-y-2">
-                  {messages?.map((msg, index) => {
+                  {messages !== null && messages.map((msg, index) => {
                     switch (msg.type) {
                       case "text":
                         return (
