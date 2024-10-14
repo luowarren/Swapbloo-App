@@ -287,22 +287,22 @@ export async function listFilenamesFromBucket() {
  * @returns {Blob|Error} - The image data as a Blob or an error if the operation fails.
  */
 export async function getImageFromId(imageId, bucket) {
-  console.log("image id and bucket:", bucket, imageId);
+  // console.log("image id and bucket:", bucket, imageId);
   if (imageId != null) {
     const { data, error } = await supabase.storage.from(bucket).download(imageId);
-    console.log("getting data from buckets", data);
-    console.log("getting data from buckets2", data);
+    // console.log("getting data from buckets", data);
+    // console.log("getting data from buckets2", data);
 
     if (error) {
       console.log("simga error", error)
       return error;
     } 
-    console.log("getting data from buckets3", data)
+    // console.log("getting data from buckets3", data)
     
     return data;
   }
 
-  console.log("getting data from buckets", data);
+  // console.log("getting data from buckets", data);
 
 }
 
