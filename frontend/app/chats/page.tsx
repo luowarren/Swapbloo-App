@@ -157,7 +157,7 @@ const ChatPage: React.FC = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "Messages" },
         (payload) => {
-          console.log("Change received!", payload);
+          console.log("Change received!", payload, activeChat);
           handleInitialDataFetches();
 
           // update messages
@@ -196,7 +196,7 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
-  const handleInitialDataFetches = async (c_id: string | null = null) => {
+  const handleInitialDataFetches = async () => {
     const uid = await getUserId();
     setCurrUserId(uid);
     if (uid != null) {
@@ -334,17 +334,13 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  // Handle sending messages from "Me"
   const handleSend = (e: FormEvent) => {
     e.preventDefault();
-    // console.log("aaaaaaaaaaaaaaaaaaaa")
     if (meInput.trim() && activeChat != null) {
-      // console.log("bbbbbbbbbbbbbbbbbb")
       if (currUserId != null && swapId !== null) {
-        // console.log("cccccccccccccccccccccccccccc")
         sendMessage(currUserId, swapId, meInput);
         setMeInput("");
-        setActiveChat(0);
+        handleInitialDataFetches();
       }
     }
   };
