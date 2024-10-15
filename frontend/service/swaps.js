@@ -493,6 +493,72 @@ export async function getSwapById(swapId) {
 
   return { data: Swap, error };
 }
+
+export async function incrementSwapCount(userId) {
+  // Retrieve the current swapCount for the user
+  const { data: userData, error: userError } = await supabase
+    .from("Users")
+    .select("swap_count")
+    .eq("id", userId)
+    .single();
+
+  if (userError) {
+    console.error("Error retrieving user data:", userError);
+    return { error: userError };
+  }
+
+  const newSwapCount = (userData?.swapCount || 0) + 1;
+
+  // Update the swapCount with the incremented value
+  const { data: updateData, error: updateError } = await supabase
+    .from("Users")
+    .update({ swap_count: newSwapCount })
+    .eq("id", userId)
+    .select();
+
+  if (updateError) {
+    console.error("Error updating swap count:", updateError);
+    return { error: updateError };
+  }
+
+  return { data: updateData };
+}
+
+async function withdrawOffer(swapId) {
+  try {
+    await deleteChat(swapId); // Delete the chat associated with the swap
+    await updateSwapStatus(swapId, "Withdrawn", []);
+    setWithdrawn(true); // Update state to reflect withdrawal
+    console.log("Offer withdrawn");
+  } catch (error) {
+    console.error("Error withdrawing offer:", error);
+  }
+}
+
+/**
+ * Deletes a chat by the swap ID (or chat ID if you prefer).
+ * @param {number} swapId - The swap ID associated with the chat.
+ * @returns {Promise<void>}
+ */
+export async function deleteChat(swapId) {
+  try {
+    // Assuming the Chats table has a `swap_id` column to identify related chats
+    const { error } = await supabase
+      .from("Chats")
+      .delete()
+      .eq("id", swapId); // You can also use chat_id if applicable
+
+    if (error) {
+      throw new Error(`Failed to delete chat: ${error.message}`);
+    }
+
+    console.log(`Chat associated with swap ID ${swapId} deleted successfully.`);
+  } catch (error) {
+    console.error("Error deleting chat:", error);
+    throw error; // Re-throw error to handle it in the caller
+  }
+}
+
 /**
  * Updates the status of a swap in the Swaps table and marks the related items as swapped.
  *

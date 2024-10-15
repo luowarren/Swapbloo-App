@@ -100,6 +100,7 @@ const Login: React.FC = () => {
           <div className="flex flex-col items-start align-middle">
             <div className="font-bold text-center">{user.name}'s Swap Shop</div>
             <div className="text-sm text-gray-500">{user.username}</div>
+            <div className="text-sm text-gray-500">Number of total swaps: {user.swap_count}</div>
             <UserRating rating={Number(user.rating)} num={Number(user.num_of_ratings)} />
           </div>
         </div>
