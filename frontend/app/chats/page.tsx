@@ -452,7 +452,12 @@ const ChatPage: React.FC = () => {
                     switch (msg.type) {
                       case "text":
                         return (
-                          <SwapAccept msg={msg} index={index}></SwapAccept>
+                          <MessageBubble
+                            key={index}
+                            sender={msg.sender_id}
+                            text={msg.content}
+                            uid={currUserId}
+                          />
                         );
                       // case "accept":
                       //   console.log(accepted);
