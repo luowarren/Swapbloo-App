@@ -91,6 +91,17 @@ const ChatPage: React.FC = () => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
   };
 
+  // check if user logged in!
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!data?.user) {
+        router.push("/login"); // Redirect to /login if no user is found
+      }
+    };
+    checkUser();
+  }, [router]);
+
   const sortMessagesByTime = (messagesArray: Array<{
     type: string,
     chat_id: string,
