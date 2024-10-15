@@ -25,6 +25,7 @@ import {
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
 import { Send } from "lucide-react";
+import SwapAccept from "../components/SwapAccept";
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
@@ -451,108 +452,13 @@ const ChatPage: React.FC = () => {
                     switch (msg.type) {
                       case "text":
                         return (
-                          <MessageBubble
-                            key={index}
-                            sender={msg.sender_id}
-                            text={msg.content}
-                            uid={currUserId}
-                          />
+                          <SwapAccept msg={msg} index={index}></SwapAccept>
                         );
-                      case "accept":
-                        console.log(accepted);
-                        return (
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
-                            <div
-                              key={index}
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                width: "100%",
-                                color: "gray",
-                              }}
-                            >
-                              {msg.content}
-                            </div>
-                            <div
-                              style={{
-                                border: "2px solid black",
-                                borderRadius: "15px",
-                                paddingTop: "20px",
-                                paddingBottom: "10px",
-                                margin: "20px",
-                                marginBottom: "10px",
-                                width: "60%",
-                                textAlign: "center",
-                                color: "#3730A3",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Swap Success!
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-around",
-                                  alignItems: "center",
-                                  width: "100%",
-                                  color: "black",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-around",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    padding: "20px",
-                                  }}
-                                >
-                                  <div>You and Sohee saved:</div>
-                                  <div className="text-yellow-500 text-3xl font-bold">
-                                    220kg
-                                  </div>
-                                  <div>of CO2 easte</div>
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-around",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    padding: "20px",
-                                  }}
-                                >
-                                  <div>You've made:</div>
-                                  <div className="text-yellow-500 text-3xl font-bold">
-                                    21
-                                  </div>
-                                  <div>successful swaps</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              style={{
-                                border: "2px solid black",
-                                borderRadius: "15px",
-                                padding: "5px",
-                                width: "60%",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              <UserRating size="text-2xl"></UserRating>
-                            </div>
-                          </div>
-                        );
+                      // case "accept":
+                      //   console.log(accepted);
+                      //   return (
+                          
+                      //   );
                       default:
                         return (
                           <div
