@@ -29,26 +29,38 @@ const Listings = ({
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any[] | null>(null);
   const [self, setSelf] = useState<string>("");
+  const [blockedUsers, setBlockedUsers] = useState<Array<{blockee: string}> | null>(null);
 
   useEffect(() => {
-    // Define an async function inside useEffect
     const fetchData = async () => {
       try {
         const myId = await getUserId();
         setSelf(myId);
-  
+    
         const listings = await getActiveListings();
-        const blockedUsers = await getAllBlocked(myId);
-        setData(listings.data?.filter((item) => item.owner_id !== myId && !(blockedUsers?.find((u) => u.blockee==item.owner_id))) || []); // and need to check myId not in 
+        const blocked = await getAllBlocked(myId);
+        
+        if (Array.isArray(blocked)) {
+          setBlockedUsers(blocked);
+        } else {
+          console.error("Blocked users data is not in expected format");
+          setBlockedUsers([]);
+        }
+  
+        const filteredData = listings.data?.filter((item) => 
+          item.owner_id !== myId && 
+          !blocked?.some((u) => u.blockee === item.owner_id)
+        ) || [];
+        setData(filteredData);
       } catch (error) {
-        console.error("Error fetching data:", error); // Error handling
+        console.error("Error fetching data:", error);
       } finally {
-        setLoading(false); // Ensure loading state is updated
+        setLoading(false);
       }
     };
   
-    fetchData(); // Call the async function
-  }, []); // Empty dependency array ensures it runs only once
+    fetchData();
+  }, []);  
   
 
   useEffect(() => {
@@ -61,19 +73,26 @@ const Listings = ({
     const demographic =
       filter.demographic.length == 0 ? DEMOGRAPHICS : filter.demographic;
 
-    if (search) {
-      searchAndFilter(search, sizes, category, condition, demographic).then(
-        (data) => {
+      const filterBlockedUsers = (data: any[]) => {
+        if (!blockedUsers) return data; // If blockedUsers is null, return the original data
+    
+        const blockedIds = blockedUsers.map(user => user.blockee);
+        return data.filter(item => !blockedIds.includes(item.owner_id));
+      };
+    
+      if (search) {
+        searchAndFilter(search, sizes, category, condition, demographic).then((data) => {
           setLoading(false);
-          setData(data.data);
-        }
-      );
-    } else {
-      getfilteredItems(sizes, category, condition, demographic).then((data) => {
-        setLoading(false);
-        setData(data.data);
-      });
-    }
+          setData(filterBlockedUsers(data.data || []));
+        });
+      } else {
+        getfilteredItems(sizes, category, condition, demographic)
+          .then((response) => {
+            const filteredData = filterBlockedUsers(response.data || []);
+            setLoading(false);
+            setData(filteredData);
+          });
+      }
   }, [filter]);
 
   if (loading || data == null) {

@@ -3,7 +3,7 @@ import ItemImages from "../components/ItemImages";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import ItemModal from "./item-modal";
 
-const ListingCard = ({ data, size = 56, font=18 }: { data: any; size: number, font: number }) => {
+const ListingCard = ({ data, size = 56, font=18 }: { data: any; size?: number, font?: number }) => {
   const router = useRouter();
   const truncateMessage = (msg: string) => {
     return msg.length > 19 ? msg.slice(0, 19) + "..." : msg;
