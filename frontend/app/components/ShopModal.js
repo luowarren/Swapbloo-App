@@ -117,7 +117,7 @@ const ShopModal = ({ otherUser, children }) => {
         overflow: "auto", // Change to auto for better scroll behavior
         padding: "0 8px",
         marginBottom: "16px",
-        width: "37rem"
+        width: "37.5rem"
       }}
     >
       {listings.length > 0 ? (

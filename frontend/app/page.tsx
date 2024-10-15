@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
+"use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ImageDisplay from "./components/ImageDisplay";
 import ItemImages from "./components/ItemImages";
 import Link from "next/link";
@@ -14,8 +15,39 @@ import {
   TreePalm,
   Twitter,
 } from "lucide-react";
+import { supabase } from "@/service/supabaseClient";
 
 export default function Home() {
+  const [user, setUser] = useState<any>(null); // State for user
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data) {
+        setUser(data.user);
+      } else if (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+
+    // Subscribe to auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUser(session.user); // Update the user state when logged in
+        } else {
+          setUser(null); // Clear the user state when logged out
+        }
+      }
+    );
+
+    // Cleanup listener on component unmount
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">
       <div>
@@ -27,17 +59,34 @@ export default function Home() {
                 Snap old. Swap new. SwapBloo!
               </p>
               <div className="flex w-full gap-2">
-                <Link href="/login">
-                  <p className="text-m bg-indigo-600 text-white py-2 px-10 rounded-md">
-                    Log in
-                  </p>
-                </Link>
+                {user ? (
+                  <>
+                    <Link href="/listings">
+                      <p className="text-m bg-indigo-600 text-white py-2 px-6 rounded-md">
+                        Browse Items
+                      </p>
+                    </Link>
+                    <Link href="/chats">
+                      <p className="text-m bg-yellow-300 hover:bg-indigo-200 py-2 px-9 rounded-md transition">
+                        View Chats
+                      </p>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <p className="text-m bg-indigo-600 text-white py-2 px-10 rounded-md">
+                        Log in
+                      </p>
+                    </Link>
 
-                <Link href="/signup">
-                  <p className="text-m bg-yellow-300 hover:bg-indigo-200 py-2 px-9 rounded-md transition">
-                    Sign up
-                  </p>
-                </Link>
+                    <Link href="/signup">
+                      <p className="text-m bg-yellow-300 hover:bg-indigo-200 py-2 px-9 rounded-md transition">
+                        Sign up
+                      </p>
+                    </Link>
+                  </>
+                )}
               </div>
               <div className="flex justify-start gap-4 mt-6 text-indigo-950">
                 <div className="flex items-center gap-1">
