@@ -63,37 +63,42 @@ const Listings = ({
   }, []);  
 
   useEffect(() => {
-    setLoading(true);
-    setFilteringComplete(false); // Reset filtering state
-
-    const sizes = filter.size.length === 0 ? SIZES : filter.size;
-    const category = filter.category.length === 0 ? CATEGORIES : filter.category;
-    const condition = filter.condition.length === 0 ? CONDITIONS : filter.condition;
-    const demographic = filter.demographic.length === 0 ? DEMOGRAPHICS : filter.demographic;
-
-    const filterBlockedUsers = (data: any[]) => {
-      if (!blockedUsers) return data; // If blockedUsers is null, return the original data
-    
-      const blockedIds = blockedUsers.map(user => user.blockee);
-      return data.filter(item => !blockedIds.includes(item.owner_id));
-    };
-    
     const applyFilters = async () => {
-      let filteredData;
-      if (search) {
-        filteredData = await searchAndFilter(search, sizes, category, condition, demographic);
-      } else {
-        filteredData = await getfilteredItems(sizes, category, condition, demographic);
+      setLoading(true);
+      setFilteringComplete(false); // Reset filtering state
+
+      const sizes = filter.size.length === 0 ? SIZES : filter.size;
+      const category = filter.category.length === 0 ? CATEGORIES : filter.category;
+      const condition = filter.condition.length === 0 ? CONDITIONS : filter.condition;
+      const demographic = filter.demographic.length === 0 ? DEMOGRAPHICS : filter.demographic;
+
+      if (!blockedUsers) return; // Wait until blockedUsers is fetched
+
+      const filterBlockedUsers = (data: any[]) => {
+        const blockedIds = blockedUsers.map(user => user.blockee);
+        return data.filter(item => !blockedIds.includes(item.owner_id));
+      };
+
+      try {
+        let filteredData;
+        if (search) {
+          filteredData = await searchAndFilter(search, sizes, category, condition, demographic);
+        } else {
+          filteredData = await getfilteredItems(sizes, category, condition, demographic);
+        }
+
+        const finalData = filterBlockedUsers(filteredData.data || []);
+        setData(finalData);
+      } catch (error) {
+        console.error("Error applying filters:", error);
+      } finally {
+        setLoading(false);
+        setFilteringComplete(true); // Set filtering complete
       }
-      
-      const finalData = filterBlockedUsers(filteredData.data || []);
-      setData(finalData);
-      setFilteringComplete(true); // Set filtering complete
-      setLoading(false);
     };
 
     applyFilters();
-  }, [filter]);
+  }, [filter, blockedUsers]); // Depend on blockedUsers as well
 
   if (loading || data == null || !filteringComplete) {
     return (
