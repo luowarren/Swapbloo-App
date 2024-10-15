@@ -207,7 +207,7 @@ const NavBar: React.FC = () => {
             </p>
           </Link>
 
-          <Link href="/resources">
+          <Link href="/resources/">
             <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
               Resources
             </p>
