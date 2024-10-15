@@ -4,7 +4,6 @@ import { getActiveListings } from "@/service/items";
 import {
   getfilteredItems,
   searchAndFilter,
-  searchFilter,
 } from "@/service/listings";
 import { Shirt } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,7 +16,7 @@ import {
   SIZES,
 } from "@/service/constants";
 import { getUserId } from "@/service/users";
-import {getAllBlocked} from "../../service/block";
+import { getAllBlocked } from "../../service/block";
 
 const Listings = ({
   filter,
@@ -29,7 +28,8 @@ const Listings = ({
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any[] | null>(null);
   const [self, setSelf] = useState<string>("");
-  const [blockedUsers, setBlockedUsers] = useState<Array<{blockee: string}> | null>(null);
+  const [blockedUsers, setBlockedUsers] = useState<Array<{ blockee: string }> | null>(null);
+  const [filteringComplete, setFilteringComplete] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,41 +61,41 @@ const Listings = ({
   
     fetchData();
   }, []);  
-  
 
   useEffect(() => {
     setLoading(true);
+    setFilteringComplete(false); // Reset filtering state
 
-    const sizes = filter.size.length == 0 ? SIZES : filter.size;
-    const category = filter.category.length == 0 ? CATEGORIES : filter.category;
-    const condition =
-      filter.condition.length == 0 ? CONDITIONS : filter.condition;
-    const demographic =
-      filter.demographic.length == 0 ? DEMOGRAPHICS : filter.demographic;
+    const sizes = filter.size.length === 0 ? SIZES : filter.size;
+    const category = filter.category.length === 0 ? CATEGORIES : filter.category;
+    const condition = filter.condition.length === 0 ? CONDITIONS : filter.condition;
+    const demographic = filter.demographic.length === 0 ? DEMOGRAPHICS : filter.demographic;
 
-      const filterBlockedUsers = (data: any[]) => {
-        if (!blockedUsers) return data; // If blockedUsers is null, return the original data
+    const filterBlockedUsers = (data: any[]) => {
+      if (!blockedUsers) return data; // If blockedUsers is null, return the original data
     
-        const blockedIds = blockedUsers.map(user => user.blockee);
-        return data.filter(item => !blockedIds.includes(item.owner_id));
-      };
+      const blockedIds = blockedUsers.map(user => user.blockee);
+      return data.filter(item => !blockedIds.includes(item.owner_id));
+    };
     
+    const applyFilters = async () => {
+      let filteredData;
       if (search) {
-        searchAndFilter(search, sizes, category, condition, demographic).then((data) => {
-          setLoading(false);
-          setData(filterBlockedUsers(data.data || []));
-        });
+        filteredData = await searchAndFilter(search, sizes, category, condition, demographic);
       } else {
-        getfilteredItems(sizes, category, condition, demographic)
-          .then((response) => {
-            const filteredData = filterBlockedUsers(response.data || []);
-            setLoading(false);
-            setData(filteredData);
-          });
+        filteredData = await getfilteredItems(sizes, category, condition, demographic);
       }
+      
+      const finalData = filterBlockedUsers(filteredData.data || []);
+      setData(finalData);
+      setFilteringComplete(true); // Set filtering complete
+      setLoading(false);
+    };
+
+    applyFilters();
   }, [filter]);
 
-  if (loading || data == null) {
+  if (loading || data == null || !filteringComplete) {
     return (
       <div className="flex h-[85vh] w-full justify-center items-center">
         <div className="animate-spin">
@@ -107,9 +107,9 @@ const Listings = ({
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 h-[85vh] w-full overflow-scroll px-2 mt-4">
-      {data.map((item: any, index) => {
-        return <ListingCard key={index} data={item} />;
-      })}
+      {data.map((item: any, index) => (
+        <ListingCard key={index} data={item} />
+      ))}
     </div>
   );
 };
