@@ -105,6 +105,13 @@ export async function sendMessage(uid, chat_id, message) {
       console.log("Error sending message", error.message);
       throw error;
     } else{
+      // update viewed status
+      const viewed = await getViewedStatus(chat_id);
+      // console.log("message sent, so should update", viewed)
+      if (viewed) {
+        // console.log("message sent so update viewed")
+        await toggleViewed(chat_id);
+      }
       return data;
     }
 }

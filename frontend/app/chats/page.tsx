@@ -363,10 +363,12 @@ const ChatPage: React.FC = () => {
   };
 
   // Toggle selection of a lastMessage preview
-  const toggleMessageSelection = (index: number) => {
+  const toggleMessageSelection = async (index: number) => {
     if (chats != null) {
-      if (chats[index].viewed == false) {
+      if (chats[index] && chats[index].viewed == false && chats[index].latestMessage.sender_id !== currUserId) {
         // set to viewed!!!!
+        console.log("toggling viewed!!")
+        await toggleViewed(chats[index].id);
       }
     }
     switchChat(index);
@@ -393,7 +395,7 @@ const ChatPage: React.FC = () => {
                     name={msg.username}
                     lastMessage={msg.latestMessage.content}
                     date={msg.latestMessage.created_at}
-                    viewed={msg.viewed}
+                    viewed={msg.latestMessage.sender_id == currUserId ? true : msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
                     userId={currUserId == msg.user2_id ? msg.user1_id : msg.user2_id}
                   />
