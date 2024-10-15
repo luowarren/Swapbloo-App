@@ -4,7 +4,7 @@ import GenericButton from "../components/GenericButton";
 import { ArrowRightLeft } from "lucide-react";
 import UpdateSwapModal from "../components/UpdateSwapModal";
 import ItemImages from "./ItemImages";
-import { getSwapDetailsBetweenUsers, updateSwapStatus } from "@/service/swaps";
+import { getSwapDetailsBetweenUsers, incrementSwapCount, updateSwapStatus, deleteChat } from "@/service/swaps";
 import { getUserId } from "@/service/auth";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
@@ -19,14 +19,15 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
-  const [myItems, setMyItems] = useState<string[]>([]); // Your items
-  const [requestingItems, setRequestingItems] = useState<string[]>([]); // Other user's items
+  const [rejected, setRejected] = useState(false);
+  const [withdrawn, setWithdrawn] = useState(false); // Track withdrawal state
+  const [myItems, setMyItems] = useState<string[]>([]);
+  const [requestingItems, setRequestingItems] = useState<string[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [swapExists, setSwapExists] = useState<boolean>(true); // State to track if the swap exists
+  const [swapExists, setSwapExists] = useState<boolean>(true);
   const [swapId, setSwapId] = useState<number | null>(null);
   const [isRequester, setIsRequester] = useState<boolean | null>(null);
 
-  console.log('ownerid sigma 698888', ownerId, requesterId)
   const fetchSwapDetails = async () => {
     if (ownerId && requesterId) {
       const userId = await getUserId();
@@ -34,29 +35,19 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
       if (userId) {
         const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(ownerId, requesterId);
-        console.log('sigma 698888', user1Items, ownerId)
         if (swapExists) {
           const realReqId = swap.requester_id;
 
-          // Check if current user is the requester
           setIsRequester(userId === realReqId);
-          
           setSwapExists(true);
           setSwapId(swapId);
-          if (status === "Accepted") {
-            setAccepted(true);
-          }
 
-          setMyItems(user1Items || []); // Requester's items (myItems)
-          setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
-          // Determine if the logged-in user is the requester or accepter
-          // if (userId === realReqId) {
-          //   setMyItems(user1Items || []); // Requester's items (myItems)
-          //   setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
-          // } else if (userId === ownerId) {
-          //   setMyItems(user1Items || []); // Accepter's items (myItems)
-          //   setRequestingItems(user2Items || []); // Requester's items (requestingItems)
-          // }
+          if (status === "Accepted") setAccepted(true);
+          else if (status === "Rejected") setRejected(true);
+          else if (status === "Withdrawn") setWithdrawn(true);
+
+          setMyItems(user1Items || []);
+          setRequestingItems(user2Items || []);
         } else {
           setSwapExists(false);
         }
@@ -66,50 +57,63 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
   useEffect(() => {
     fetchSwapDetails();
-  }, [ownerId, requesterId]); // Re-run when `ownerId` or `requesterId` changes
+  }, [ownerId, requesterId]);
 
-  // New useEffect hook to log isRequester after it's updated
-  useEffect(() => {
-    console.log("isRequester updated to:", isRequester);
-  }, [isRequester]);
-
-  // Callback function for updating the swap details after a successful update
   const handleSwapUpdate = async () => {
-    await fetchSwapDetails(); // Re-fetch the swap details to get updated information
-    setModalOpen(false); // Close the modal after the update
+    await fetchSwapDetails();
+    setModalOpen(false);
   };
 
   async function acceptSwap(swapId: number, itemIds: number[]) {
     await updateSwapStatus(swapId, "Accepted", itemIds);
-    setAccepted(true);
-    console.log("Offer accepted");
-  }
-  
+    await incrementSwapCount(requesterId);
+    await incrementSwapCount(ownerId);
 
-  // If no swap exists, return null
+    setAccepted(true);
+  }
+
+  async function rejectSwap(swapId: number) {
+    try {
+      await deleteChat(swapId);
+      await updateSwapStatus(swapId, "Rejected", []);
+      setRejected(true);
+    } catch (error) {
+      console.error("Error rejecting swap:", error);
+    }
+  }
+
+  async function withdrawOffer(swapId: number) {
+    try {
+      await deleteChat(swapId);
+      await updateSwapStatus(swapId, "Withdrawn", []);
+      setWithdrawn(true);
+    } catch (error) {
+      console.error("Error withdrawing offer:", error);
+    }
+  }
+
   if (!swapExists || !ownerId || !requesterId || myItems.length < 1 || requestingItems.length < 1) {
     return null;
   }
 
-   // Don't render anything until we know if the current user is the requester
-   if (isRequester === null || !swapExists) {
-    return null; // Waiting for data, don't render yet
+  if (isRequester === null || !swapExists) {
+    return null;
   }
 
-  console.log("i am ", isRequester, "ly the requester")
-
-
-  return ( 
-   <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">
+  return (
+    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">
       <div className="font-bold text-2xl mb-4">Swap Details</div>
       {accepted ? (
-          <div className="font-bold text-xl mb-4">Offer Accepted!</div>
-        ) : isRequester ? (
-          <div className="font-bold text-xl mb-4">Waiting for the other person to accept</div>
-        ) : (
-          <div></div>
-        )
-      }
+        <div className="font-bold text-xl mb-4">Offer Accepted!</div>
+      ) : rejected ? (
+        <div className="font-bold text-xl mb-4">Offer Rejected</div>
+      ) : withdrawn ? (
+        <div className="font-bold text-xl mb-4">Offer Withdrawn</div>
+      ) : isRequester ? (
+        <div className="font-bold text-xl mb-4">Waiting for the other person to accept or reject</div>
+      ) : (
+        <div></div>
+      )}
       <div
         style={{
           display: "flex",
@@ -131,14 +135,9 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
             flexWrap: "wrap",
           }}
         >
-          {myItems.length > 0 ? (
-            myItems.map((itemId, index) => (
-              <ItemImages key={index} itemId={itemId} className="" /> // Display each item image for your items
-            ))
-          ) : (
-            <p>No items to display</p>
-          )}
-          
+          {myItems.map((itemId, index) => (
+            <ItemImages key={index} itemId={itemId} className="" />
+          ))}
         </div>
         <ArrowRightLeft />
         <div
@@ -151,13 +150,9 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
             flexWrap: "wrap",
           }}
         >
-          {requestingItems.length > 0 ? (
-            requestingItems.map((itemId, index) => (
-              <ItemImages key={index} itemId={itemId} className="" /> // Display each item image for the requested items
-            ))
-          ) : (
-            <p>No items to display</p>
-          )}
+          {requestingItems.map((itemId, index) => (
+            <ItemImages key={index} itemId={itemId} className="" />
+          ))}
         </div>
       </div>
 
@@ -169,41 +164,46 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
           width: "50%",
         }}
       >
-        {!accepted && (
-          
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogTrigger asChild>
-          <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
-            Update Offer
-          </div>
-        </DialogTrigger>
-        <DialogContent className="min-w-[80%] min-h-[80%]">
-          <UpdateSwapModal
-            isVisible={true} // Modal visibility from parent state
-            onClose={() => setModalOpen(false)} // Close modal when done
-            swapId={swapId}
-            myItems={myItems} // Your items
-            requestingItems={requestingItems} // Their items
-            ownerId={ownerId}
-            requesterId={requesterId}
-            onUpdate={handleSwapUpdate} // Handle post-update logic here
-          />
-        </DialogContent>
-      </Dialog>
+        {!accepted && !rejected && !withdrawn && (
+          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+            <DialogTrigger asChild>
+              <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
+                Update Offer
+              </div>
+            </DialogTrigger>
+            <DialogContent className="min-w-[80%] min-h-[80%]">
+              <UpdateSwapModal
+                isVisible={true}
+                onClose={() => setModalOpen(false)}
+                swapId={swapId}
+                myItems={myItems}
+                requestingItems={requestingItems}
+                ownerId={ownerId}
+                requesterId={requesterId}
+                onUpdate={handleSwapUpdate}
+              />
+            </DialogContent>
+          </Dialog>
         )}
 
-        {/* Only show Accept Offer button if the current user is not the requester and the offer isn't already accepted */}
-        {!isRequester && !accepted && (
+        {!isRequester && !accepted && !rejected && !withdrawn && (
           <GenericButton
             text="Accept Offer"
             click={async () => {
               await acceptSwap(swapId, [...myItems, ...requestingItems]);
-              setAccepted(true);
             }}
           />
         )}
 
-        {/* Display the Accepted Offer button if the offer has been accepted */}
+        {isRequester && !accepted && !rejected && !withdrawn && (
+          <GenericButton
+            text="Withdraw Offer"
+            click={async () => {
+              await withdrawOffer(swapId);
+            }}
+          />
+        )}
+
         {accepted && <GenericButton text="Accepted Offer" noClick={true} />}
       </div>
     </div>

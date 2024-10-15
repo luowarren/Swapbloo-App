@@ -1,18 +1,4 @@
-import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js"; // Correct named import
-// import twilio from "twilio";
-
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" });
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL and key are required.");
-}
+import { supabase } from "./supabaseClient.js";
 
 async function loginUser(email, password) {
   let { data, error } = await supabase.auth.signInWithPassword({

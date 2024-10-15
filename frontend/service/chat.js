@@ -4,20 +4,7 @@ import { getUserProfilePhoto, getUserName } from "./users.js";
 import { getMostRecentMessage, censorMessage } from "./messages.js";
 import { createClient } from "@supabase/supabase-js";
 import { getSwapDetailsBetweenUsers } from "./swaps.js";
-
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" });
-
-// const { createClient, SupabaseClient } = pkg;
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL and key are required.");
-}
+import { supabase } from "./supabaseClient.js";
 
 /**
  * Get a list of active chats for the current user
@@ -101,12 +88,19 @@ export async function sendMessage(uid, chat_id, message) {
     },
   ]);
 
-  if (error) {
-    console.log("Error sending message", error.message);
-    throw error;
-  } else {
-    return data;
-  }
+    if (error) {
+      console.log("Error sending message", error.message);
+      throw error;
+    } else{
+      // update viewed status
+      const viewed = await getViewedStatus(chat_id);
+      // console.log("message sent, so should update", viewed)
+      if (viewed) {
+        // console.log("message sent so update viewed")
+        await toggleViewed(chat_id);
+      }
+      return data;
+    }
 }
 
 /**
@@ -245,23 +239,3 @@ export async function getChatBetweenUsers(user1Id, user2Id) {
 
   return { chatId: data[0].id, chatError: null };
 }
-
-(async () => {
-  try {
-    // const uid = "b484dc52-08ca-4518-8253-0a7cd6bec4e9"
-    const uid = "797fbccf-0b76-4a60-8406-a3ecd0408e69";
-    const chat_id = "16";
-    // const chats = await getChats(uid);
-    // const messsages = await getChat(uid, chat_id);
-    // console.log(messages);
-    // const s = await sendMessage(uid, chat_id, "test fuck");
-
-    // const d = await deleteChat('15');
-    // console.log(d);
-
-    // const v = await getViewedStatus(chat_id);
-    await toggleViewed(chat_id);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-})();

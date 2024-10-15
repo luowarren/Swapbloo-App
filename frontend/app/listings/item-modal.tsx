@@ -10,6 +10,7 @@ import ProfileImage from "../components/ProfileImage";
 import VisitShopModal from "../components/VisitShopModal";
 import ShowMap from "../components/Map";
 import ShopModal from "../components/ShopModal";
+import { deleteItemListing } from "@/service/items";
 
 const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const router = useRouter();
@@ -47,7 +48,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);
-    router.push('/marketplace'); // Redirect to the marketplace after closing the modal
+    router.push('/listings'); // Redirect to the marketplace after closing the modal
   };
 
   const handleDelete = async () => {
@@ -149,7 +150,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     </div>
                   </div>
                   <div className="flex space-x-2 text-sm">
-                    <ShopModal otherUser={user}>
+                    <ShopModal otherUser={user} origin="listings">
                       <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
                         Visit Shop
                       </button>
