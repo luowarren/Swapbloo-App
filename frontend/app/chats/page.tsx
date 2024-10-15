@@ -395,7 +395,7 @@ const ChatPage: React.FC = () => {
                     name={msg.username}
                     lastMessage={msg.latestMessage.content}
                     date={msg.latestMessage.created_at}
-                    viewed={msg.latestMessage.sender_id == currUserId ? true : msg.viewed}
+                    viewed={msg.latestMessage.sender_id === currUserId ? true : msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
                     userId={currUserId == msg.user2_id ? msg.user1_id : msg.user2_id}
                   />
