@@ -29,16 +29,25 @@ export async function addNewBlockRecord(blockerId, blockeeId) {
         return data;
     }
 }
-
+// .or(`user1_id.eq.${uid},user2_id.eq.${uid}`)
 export async function getAllBlocked(blockerId) {
-    const {data, error} = await supabase
+    const {data: blockee, error: blockeeErr} = await supabase
         .from("Blocked")
         .select("blockee")
         .eq("blocker", blockerId);
-    if (error) {
-        console.log("Error getting blocked users for uid: ", blockerId, error);
+        // .or(`blocker.eq.${blockerId},blockee.eq.${blockerId}`);
+    const {data: blocked, error: blockedErr} = await supabase
+        .from("Blocked")
+        .select("blocker")
+        .eq("blockee", blockerId);
+    if (blockeeErr || blockedErr) {
+        console.log("Error getting blocked users for uid: ", blockerId, blockeeErr, blockedErr);
     } else {
-        console.log("successfully got blocked users!", data);
-        return data;
+        const renameBlockee = blocked.map(b => ({
+            blockee: b.blocker
+        }))
+        const combinedArray = [...blockee, ...renameBlockee];
+        console.log("successfully got blocked users!", combinedArray);
+        return combinedArray;
     }
 }
