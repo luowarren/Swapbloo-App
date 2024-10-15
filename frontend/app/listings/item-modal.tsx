@@ -150,7 +150,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     </div>
                   </div>
                   <div className="flex space-x-2 text-sm">
-                    <ShopModal otherUser={user}>
+                    <ShopModal otherUser={user} origin="listings">
                       <button className="border bg-white border-indigo-800 text-indigo-800 font-semibold py-1 px-2 rounded-sm mr-2 hover:bg-indigo-50">
                         Visit Shop
                       </button>
