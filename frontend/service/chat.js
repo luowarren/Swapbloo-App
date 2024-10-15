@@ -1,7 +1,11 @@
+import dotenv from "dotenv";
+// import pkg from "@supabase/supabase-js";
 import { getUserProfilePhoto, getUserName } from './users.js'
 import { getMostRecentMessage, censorMessage } from './messages.js'
+import { createClient } from '@supabase/supabase-js';
 import { getSwapDetailsBetweenUsers } from "./swaps.js";
 import { supabase } from "./supabaseClient.js";
+
 /**
  * Get a list of active chats for the current user
  *

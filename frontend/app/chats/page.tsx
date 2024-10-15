@@ -14,8 +14,8 @@ import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
 import { getUserId, getUser } from "../../service/users";
 import { useSearchParams } from 'next/navigation';
+import { supabase } from "../../service/supabaseClient";
 import {
-  supabase,
   getChats,
   getChat,
   sendMessage,
