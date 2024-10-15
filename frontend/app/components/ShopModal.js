@@ -8,9 +8,11 @@ import { getListingsByUsers } from "@/service/items";
 import GenericButton from "./GenericButton";
 import {addNewBlockRecord, getAllBlocked} from "../../service/block"
 import { getUserId } from "../../service/users";
+import { useRouter } from "next/navigation"; // Next.js router for redirection
 
-const ShopModal = ({ otherUser, children }) => {
+const ShopModal = ({ otherUser, children, origin="" }) => {
   const [listings, setListings] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -25,7 +27,7 @@ const ShopModal = ({ otherUser, children }) => {
     const uid = await getUserId();
     const newBlockRecord = await addNewBlockRecord(uid, otherUser.id);
     // redirect user to homepage?
-    
+    router.push("/" + origin);
   }
 
   return (

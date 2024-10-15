@@ -549,7 +549,7 @@ const ChatPage: React.FC = () => {
               )}
 
               {otherUserData !== null && (
-                <ShopModal otherUser={otherUserData}>
+                <ShopModal otherUser={otherUserData} origin="chats">
                   <GenericButton
                     text="Visit Shop"
                     inverse={true}
