@@ -5,6 +5,9 @@ import ShowMap from "./Map";
 import ListingCard from "../listings/listing-card";
 import ProfileImage from "./ProfileImage";
 import { getListingsByUsers } from "@/service/items";
+import GenericButton from "./GenericButton";
+import {addNewBlockRecord, getAllBlocked} from "../../service/block"
+import { getUserId } from "../../service/users";
 
 const ShopModal = ({ otherUser, children }) => {
   const [listings, setListings] = useState([]);
@@ -17,6 +20,13 @@ const ShopModal = ({ otherUser, children }) => {
     };
     fetchListings();
   }, [otherUser]);
+
+  async function handleBlock() {
+    const uid = await getUserId();
+    const newBlockRecord = await addNewBlockRecord(uid, otherUser.id);
+    // redirect user to homepage?
+    
+  }
 
   return (
     <Dialog>
@@ -80,17 +90,24 @@ const ShopModal = ({ otherUser, children }) => {
               </div>
             </div>
           </div>
+          <GenericButton
+            text="Block (irreversible!)"
+            // inverse={true}
+            width="8vw"
+            fontSize="1rem"
+            click={async () => await handleBlock()}
+          />
 
           <div
-  style={{
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    padding: "16px 0", // Add padding to the parent to prevent margin collapsing
-  }}
->
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              padding: "16px 0", // Add padding to the parent to prevent margin collapsing
+            }}
+          >
   <div style={{ flex: 1, marginRight: "16px", marginTop: "16px", marginBottom: "16px" }}>
     <div style={{ fontWeight: "bold" }}>
       {`${otherUser.name}'s Shop`}

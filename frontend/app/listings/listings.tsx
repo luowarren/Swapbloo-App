@@ -17,6 +17,7 @@ import {
   SIZES,
 } from "@/service/constants";
 import { getUserId } from "@/service/users";
+import {getAllBlocked} from "../../service/block";
 
 const Listings = ({
   filter,
@@ -37,7 +38,8 @@ const Listings = ({
         setSelf(myId);
   
         const listings = await getActiveListings();
-        setData(listings.data?.filter((item) => item.owner_id !== myId) || []);
+        const blockedUsers = await getAllBlocked(myId);
+        setData(listings.data?.filter((item) => item.owner_id !== myId && !(blockedUsers?.find((u) => u.blockee==item.owner_id))) || []); // and need to check myId not in 
       } catch (error) {
         console.error("Error fetching data:", error); // Error handling
       } finally {
