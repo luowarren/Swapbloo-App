@@ -33,9 +33,9 @@ const Sidebar = ({
   };
 
   return (
-    <div className="h-[85vh] w-80 border-r border-gray-300 border-y p-5 overflow-y-scroll rounded-r-lg mb-2">
+    <div className="h-screen w-80 border-r border-gray-300 p-5 overflow-y-scroll pb-56">
       <div className="flex flex-col p-4 items-center w-full border-b border-b-gray-300">
-        <span className="font-bold text-xl text-gray-700">
+        <span className="font-bold text-xl text-gray-600 italic">
           {search ? `"${search}"` : "Everything"}
         </span>
       </div>

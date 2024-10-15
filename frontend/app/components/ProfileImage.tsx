@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getUserProfileImageUrl } from "../../service/items"; // Import your existing service function
 import { UserRound } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProfileImageProps {
   userId: string;
@@ -9,6 +10,7 @@ interface ProfileImageProps {
 
 const ProfileImage: React.FC<ProfileImageProps> = ({
   userId,
+
   className = "",
 }) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
@@ -41,14 +43,10 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
   }, [userId]);
 
   if (loading) {
-    return (
-      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
-        <UserRound />
-      </div>
-    );
+    return <Skeleton className={"rounded-full w-12 h-12 " + className} />;
   }
 
-  console.log("5678",profilePicUrl)
+  console.log("5678", profilePicUrl);
 
   return (
     <div>
@@ -59,7 +57,12 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
           className={`w-12 h-12 rounded-full ${className}`}
         />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 ">
+        <div
+          className={
+            "w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 " +
+            className
+          }
+        >
           <UserRound />
         </div>
       )}

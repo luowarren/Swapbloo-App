@@ -9,15 +9,25 @@ import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  CircleUser,
+  HomeIcon,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Search,
+  Sprout,
+  Store,
+} from "lucide-react";
 
 const NavBar: React.FC = () => {
   const pathname = usePathname(); // Get the current path
   const [user, setUser] = useState<any>(null); // State for user
   const [search, setSearch] = useState(""); // State for search input
   const [showTooltip, setShowTooltip] = useState(false); // State for tooltip visibility
-  const [isScrolled, setIsScrolled] = useState(false); // State to track if the user has scrolled
   const navRef = useRef<HTMLDivElement>(null); // Ref for the navbar div
   const router = useRouter();
 
@@ -73,30 +83,14 @@ const NavBar: React.FC = () => {
     router.push("/");
   };
 
-  // Check if the user has scrolled
-  useEffect(() => {
-    const handleScroll = () => {
-      // Check if the user has scrolled down from the top of the page
-      setIsScrolled(window.scrollY > 0);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
     <div
       ref={navRef}
       className={cn(
-        "bg-transparent mx-16 rounded-b-2xl transition-all sticky top-0 z-50",
-        isScrolled && "border-b border-x shadow-sm bg-white"
+        "bg-white transition-all sticky top-0 z-50 border-b border-gray-300"
       )}
     >
-      <div className="container mx-auto flex items-center justify-between py-4 px-6">
+      <div className="container mx-auto flex items-center justify-between py-2 px-6">
         {/* Left side: Logo */}
         <div className="flex items-center">
           <a href="/" className="text-indigo-700 font-medium text-xl">
@@ -106,11 +100,12 @@ const NavBar: React.FC = () => {
 
         {/* Center: Search Bar */}
         <div className="flex-grow mx-8">
-          <div className="relative">
+          <div className="flex justify-center items-center gap-2 w-full px-4 py-2 rounded-full border border-gray-300">
+            <Search className="h-h w-5 text-gray-500" />
             <input
               type="text"
               placeholder="Search"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full outline-none"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleSearch} // Handle Enter key
@@ -119,12 +114,25 @@ const NavBar: React.FC = () => {
         </div>
 
         {/* Right side: Action buttons */}
-        <div className="flex items-center space-x-4 relative">
-          {/* List an item button */}
+        <div className="flex items-center space-x-2 relative">
           {user && (
             <Link href="/listing">
-              <div className="bg-indigo-100 text-indigo-600 font-semibold py-2 px-4 rounded-md">
+              <div className="hover:bg-indigo-50 transition text-indigo-600 font-semibold py-2 px-4 rounded-full">
                 LIST AN ITEM
+              </div>
+            </Link>
+          )}
+
+          <Link href="/listings">
+            <div className="flex justify-center items-center bg-indigo-100 text-indigo-600 font-semibold p-2 rounded-full hover:bg-indigo-200 transition">
+              <HomeIcon />
+            </div>
+          </Link>
+
+          {user && (
+            <Link href="/chats">
+              <div className="flex justify-center items-center bg-indigo-100 text-indigo-600 font-semibold p-2 rounded-full hover:bg-indigo-200 transition">
+                <Mail />
               </div>
             </Link>
           )}
@@ -141,38 +149,46 @@ const NavBar: React.FC = () => {
                     <ProfilePic userId={user.id} />
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="mr-2">
                   <div className="w-48 bg-white z-10">
-                    <Link href="/profile" onClick={() => setShowTooltip(false)}>
-                      <div className="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer transition rounded font-semibold">
-                        View Profile
-                      </div>
-                    </Link>
+                    <div
+                      onClick={() => {
+                        router.push("/chats");
+                      }}
+                      className="flex gap-2 items-center px-2 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer transition rounded font-medium"
+                    >
+                      <Mail className="h-5 w-5" />
+                      Inbox
+                    </div>
+                    <div
+                      onClick={() => {
+                        router.push("/profile");
+                      }}
+                      className="flex gap-2 items-center px-2 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer transition rounded font-medium"
+                    >
+                      <Store className="h-5 w-5" />
+                      My store
+                    </div>
+                    <div
+                      onClick={() => {
+                        router.push("/resources");
+                      }}
+                      className="flex gap-2 items-center px-2 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer transition rounded font-medium"
+                    >
+                      <Sprout className="h-5 w-5" />
+                      Learn eco
+                    </div>
+                    <DropdownMenuSeparator />
                     <div
                       onClick={handleLogout}
-                      className="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer transition rounded font-semibold"
+                      className="flex gap-2 items-center px-2 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer transition rounded font-medium"
                     >
-                      Log Out
+                      <LogOut className="h-5 w-5" />
+                      Log out
                     </div>
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              {/* {showTooltip && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg py-2 z-10">
-                  <Link href="/profile" onClick={() => setShowTooltip(false)}>
-                    <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      View Profile
-                    </div>
-                  </Link>
-                  <div
-                    onClick={handleLogout}
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    Log Out
-                  </div>
-                </div>
-              )} */}
             </div>
           ) : (
             <div className="flex items-center space-x-4">
@@ -189,23 +205,6 @@ const NavBar: React.FC = () => {
               </Link>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Bottom navigation bar */}
-      <div className={cn(isScrolled && "border-t")}>
-        <div className="container mx-auto py-2 px-6 flex justify-center space-x-8">
-          <Link href="/listings/">
-            <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
-              Items
-            </p>
-          </Link>
-          
-          <Link href="/chats">
-            <p className={`font-semibold hover:text-pink-700 text-indigo-900`}>
-              Chat
-            </p>
-          </Link>
         </div>
       </div>
     </div>

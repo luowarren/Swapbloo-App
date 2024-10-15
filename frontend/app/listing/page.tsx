@@ -137,15 +137,6 @@ const ListAnItemPage: React.FC = () => {
     }
   };
 
-  // if (loading)
-  //   return (
-  //     <div className="w-full h-[80vh] bg-white flex items-center justify-center">
-  //       <div className="animate-spin">
-  //         <Shirt className="text-indigo-600" />
-  //       </div>
-  //     </div>
-  //   );
-
   return (
     <>
       {/* LOADER */}
@@ -161,7 +152,12 @@ const ListAnItemPage: React.FC = () => {
       </div>
 
       {/* MAIN PAGE */}
-      <div className={cn("min-h-screen bg-white pt-12", loading && "hidden")}>
+      <div
+        className={cn(
+          "bg-white py-12 h-[100vh] overflow-scroll",
+          loading && "hidden"
+        )}
+      >
         <div
           className="mb-4 text-gray-500 flex gap-1 items-center bg-gray-100 rounded w-fit px-2 py-1 pr-4 hover:bg-gray-200 transition cursor-pointer mx-24"
           onClick={() => {

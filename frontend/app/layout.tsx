@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>{/* Metadata and other head elements go here */}</head>
-      <body className={inter.className}>
+      <body className={inter.className + " max-h-[100vh] overflow-hidden"}>
         {/* NavBar should be inside the body */}
         <NavBar />
         <main>{children}</main>
