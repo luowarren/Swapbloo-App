@@ -1,20 +1,5 @@
-import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js"; // Correct named import
 import { CATEGORIES, CONDITIONS, DEMOGRAPHICS, SIZES } from "./constants.js";
-
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" }); // Optional: specify the path to .env
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL and key are required.");
-}
-
+import { supabase } from "./supabaseClient.js";
 /**
  * Searches for matching listing based on key words. Searches through title,
  * caption

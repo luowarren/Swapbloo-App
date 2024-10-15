@@ -35,7 +35,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
       if (userId) {
         const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(ownerId, requesterId);
-        console.log('sigma 698888', user1Items, ownerId);
         if (swapExists) {
           const realReqId = swap.requester_id;
 
@@ -60,10 +59,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
     fetchSwapDetails();
   }, [ownerId, requesterId]);
 
-  useEffect(() => {
-    console.log("isRequester updated to:", isRequester);
-  }, [isRequester]);
-
   const handleSwapUpdate = async () => {
     await fetchSwapDetails();
     setModalOpen(false);
@@ -75,7 +70,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
     await incrementSwapCount(ownerId);
 
     setAccepted(true);
-    console.log("Offer accepted");
   }
 
   async function rejectSwap(swapId: number) {
@@ -83,7 +77,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
       await deleteChat(swapId);
       await updateSwapStatus(swapId, "Rejected", []);
       setRejected(true);
-      console.log("Swap rejected");
     } catch (error) {
       console.error("Error rejecting swap:", error);
     }
@@ -94,7 +87,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
       await deleteChat(swapId);
       await updateSwapStatus(swapId, "Withdrawn", []);
       setWithdrawn(true);
-      console.log("Offer withdrawn");
     } catch (error) {
       console.error("Error withdrawing offer:", error);
     }
@@ -107,8 +99,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
   if (isRequester === null || !swapExists) {
     return null;
   }
-
-  console.log("i am ", isRequester, "ly the requester");
 
   return (
     <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">

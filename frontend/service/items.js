@@ -1,24 +1,6 @@
-import dotenv from "dotenv"; // Import dotenv
-import { createClient } from "@supabase/supabase-js"; // Import Supabase client
 import { search } from "./listings";
 import { data } from "@/app/chats/data";
-import { getChatBetweenUsers } from "./chat";
-
-dotenv.config(); // Load environment variables from .env file
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-
-// Log the environment variables to check their values
-console.log("Supabase URL:", supabaseUrl);
-console.log("Supabase Key:", supabaseKey);
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL and key are required.");
-}
+import { supabase } from "./supabaseClient";
 
 export async function loginUser(email, password) {
   let { data, error } = await supabase.auth.signInWithPassword({
@@ -314,11 +296,9 @@ export async function getImageFromId(imageId, bucket) {
 export async function getItemImages(imageIds) {
   // Assuming `Item` is an array and contains image paths
   const images = [];
-  console.log("starting");
 
   imageIds.sort((a, b) => a.created_at - b.created_at);
 
-  console.log("list of 677", imageIds)
   for (let item of imageIds) {
     // Get the image path or name from the 'image' column
     const imagePath = item.image;
