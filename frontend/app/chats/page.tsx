@@ -13,7 +13,7 @@ import { sortData, placeholder } from "./helpers";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
 import { getUserId, getUser } from "../../service/users";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 import {
   supabase,
   getChats,
@@ -21,11 +21,13 @@ import {
   sendMessage,
   getUserIdsFromChat,
   toggleViewed,
+  setChatConsented,
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
 import { Send } from "lucide-react";
 import SwapAccept from "../components/SwapAccept";
+import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
@@ -43,6 +45,7 @@ const ChatPage: React.FC = () => {
       sender_id: string;
       content: string;
     };
+    consented: boolean;
   }> | null>(null);
   const [messages, setMessages] = useState<Array<{
     type: string;
@@ -71,7 +74,7 @@ const ChatPage: React.FC = () => {
     time: string;
   } | null>(null);
   const [user, setUser] = useState<any>(null); // State for user
-  const [loading, setLoading] = useState(true); // For handling the loading state
+  const [consented, setConsented] = useState(false); // For handling the loading state
   const router = useRouter();
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -86,33 +89,34 @@ const ChatPage: React.FC = () => {
     useState(false); // State to control modal visibility
 
   const searchParams = useSearchParams();
-  
+
   const truncateMessage = (msg: string, maxLength: number) => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
   };
 
-  const sortMessagesByTime = (messagesArray: Array<{
-    type: string,
-    chat_id: string,
-    content: string,
-    created_at: string,
-    sender_id: string
-  }>) => {
-    return messagesArray.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  const sortMessagesByTime = (
+    messagesArray: Array<{
+      type: string;
+      chat_id: string;
+      content: string;
+      created_at: string;
+      sender_id: string;
+    }>
+  ) => {
+    return messagesArray.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
   };
 
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
     if (users) {
-      if (currUserId === users.requesterId) {
-        setRequesterId(users.accepterId); // Other user's ID
-        setAccepterId(users.requesterId); // Your ID
-      } else {
-        setRequesterId(users.requesterId); // Other user's ID
-        setAccepterId(users.accepterId); // Your ID
-      }
-    } else {
-      
+      const { swapExists, user1Items, user2Items, swapId, status, swap } =
+        await getSwapDetailsBetweenUsers(users?.accepterId, users?.requesterId);
+
+      setRequesterId(swap.requester_id); // Other user's ID
+      setAccepterId(swap.accepter_id); // Your ID
     }
   };
 
@@ -141,7 +145,7 @@ const ChatPage: React.FC = () => {
           new Date(a.latestMessage.created_at).getTime()
         );
       });
-      
+
       return sortedChats;
     }
     return null;
@@ -167,7 +171,8 @@ const ChatPage: React.FC = () => {
             payload.new.chat_id == swapIdRef.current
           ) {
             setMessages((prevMessages) => {
-              let updatedMessages = prevMessages !== null ? [...prevMessages] : [];
+              let updatedMessages =
+                prevMessages !== null ? [...prevMessages] : [];
               updatedMessages.push({
                 type: "text",
                 content: payload.new.content,
@@ -208,10 +213,12 @@ const ChatPage: React.FC = () => {
         setActiveChat(0);
       }
 
-      const chatId = searchParams.get('chatId'); // Get the chat ID from the URL
-      
+      const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
+
       if (chatId && sortedChats !== null) {
-        const chatIndex = sortedChats.findIndex((chat) => Number(chat.id) === Number(chatId));
+        const chatIndex = sortedChats.findIndex(
+          (chat) => Number(chat.id) === Number(chatId)
+        );
         if (chatIndex !== -1) {
           switchChat(chatIndex);
         }
@@ -221,10 +228,8 @@ const ChatPage: React.FC = () => {
 
   const goToChatWithId = (chatId: string) => {
     if (!chats) return;
-  
-    
   };
-  
+
   useEffect(() => {
     handleInitialDataFetches();
   }, []);
@@ -297,11 +302,14 @@ const ChatPage: React.FC = () => {
       fetchChatUsers(chat_id);
 
       // update current swap id
-      console.log("setting swap id", chat_id)
+      console.log("setting swap id", chat_id);
       setSwapId(chat_id);
 
       // update otherUserData
       // updateOtherUserData();
+      console.log("adeline", chats[activeChat].id);
+
+      setConsented(chats[activeChat].consented);
     }
   }, [activeChat]);
 
@@ -372,8 +380,6 @@ const ChatPage: React.FC = () => {
     switchChat(index);
   };
 
-
-
   return (
     <div className="relative">
       {" "}
@@ -395,7 +401,9 @@ const ChatPage: React.FC = () => {
                     date={msg.latestMessage.created_at}
                     viewed={msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
-                    userId={currUserId == msg.user2_id ? msg.user1_id : msg.user2_id}
+                    userId={
+                      currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
+                    }
                   />
                 </div>
               ))}
@@ -436,73 +444,91 @@ const ChatPage: React.FC = () => {
                   style={{
                     display: "flex",
                     justifyContent: "center",
+                    flexDirection: "column",
                     alignItems: "center",
                     width: "100%",
                     color: "gray",
                     marginBottom: "7px",
                   }}
                 >
-                  This is the start of your chat with {otherUserData.name}
+                  <p style={{ paddingBottom: "10px" }}>
+                    This is the start of your chat with {otherUserData.name}
+                  </p>
+                  {!consented &&
+                    chats &&
+                    accepterId == currUserId && (
+                      <GenericButton
+                        text="Consent"
+                        click={() => {
+                          setConsented(true);
+                          setChatConsented(chats[activeChat].id);
+                        }}
+                        fontSize="1.5rem"
+                      ></GenericButton>
+                    )}
                 </div>
               )}
               <div>
                 {/* Add padding to prevent overlap */}
                 <div className="flex flex-col space-y-2">
-                  {messages !== null && messages.map((msg, index) => {
-                    switch (msg.type) {
-                      case "text":
-                        return (
-                          <MessageBubble
-                            key={index}
-                            sender={msg.sender_id}
-                            text={msg.content}
-                            uid={currUserId}
-                          />
-                        );
-                      // case "accept":
-                      //   console.log(accepted);
-                      //   return (
-                          
-                      //   );
-                      default:
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              width: "100%",
-                              color: "gray",
-                            }}
-                          >
-                            {msg.content}
-                          </div>
-                        );
-                    }
-                  })}
+                  {messages !== null &&
+                    messages.map((msg, index) => {
+                      switch (msg.type) {
+                        case "text":
+                          return (
+                            <MessageBubble
+                              key={index}
+                              sender={msg.sender_id}
+                              text={msg.content}
+                              uid={currUserId}
+                            />
+                          );
+                        // case "accept":
+                        //   console.log(accepted);
+                        //   return (
+
+                        //   );
+                        default:
+                          return (
+                            <div
+                              key={index}
+                              style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                width: "100%",
+                                color: "gray",
+                              }}
+                            >
+                              {msg.content}
+                            </div>
+                          );
+                      }
+                    })}
                 </div>
               </div>
             </div>
 
             {/* Form for sending messages as "Me" */}
-            <form onSubmit={handleSend} className="flex mt-4">
-              <input
-                type="text"
-                value={meInput}
-                onChange={(e) => {
-                  setMeInput(e.target.value);
-                }}
-                className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-                placeholder="Type your lastMessage..."
-              />
-              <button
-                type="submit"
-                className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
-              >
-                <Send/>
-              </button>
-            </form>
+            {consented ? (
+              <form onSubmit={handleSend} className="flex mt-4">
+                <input
+                  type="text"
+                  value={meInput}
+                  onChange={(e) => {
+                    setMeInput(e.target.value);
+                  }}
+                  className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
+                  placeholder="Type your lastMessage..."
+                />
+                <button
+                  type="submit"
+                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
+                >
+                  <Send />
+                </button>
+              </form>
+            ) : null}
           </div>
         )}
         {/* Other users info and meetup info */}

@@ -73,7 +73,7 @@ const UserRating = ({
           display: "flex",
           alignItems: "center",
           textAlign: "center",
-          justifyContent: "center",
+          justifyContent: num == -1 ? "center" : "start",
           marginBottom: num === -1 ? "10px" : undefined,
         }}
       >

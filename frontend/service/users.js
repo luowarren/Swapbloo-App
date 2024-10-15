@@ -258,7 +258,7 @@ export async function getRatings(userId) {
 /**
  * calculates a new average based on a rating added
  *
- * @param {string} userId
+ * @param {string} userId - user u are rating
  * @param {number} rating - rating u want to add
  */
 export async function addRating(userId, rating) {
