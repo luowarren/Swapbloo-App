@@ -26,6 +26,8 @@ import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
 import { Send } from "lucide-react";
 import SwapAccept from "../components/SwapAccept";
+import {getAllBlocked} from "../../service/block";
+
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
@@ -208,11 +210,22 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
+  function isBlocked(blocked: any[] | undefined, chat: any) {
+    if (!chat || !blocked) {
+      return false;
+    }
+    if (blocked.find((b) => b.blockee === chat.user1_id || b.blockee === chat.user2_id)) {
+      return true;
+    }
+    return false;
+  }
+
   const handleInitialDataFetches = async () => {
     const uid = await getUserId();
     setCurrUserId(uid);
     if (uid != null) {
-      const allChats = await getChats(uid);
+      const blocked = await getAllBlocked(uid);
+      const allChats = (await getChats(uid)).filter((c) => !isBlocked(blocked, c));
       const sortedChats = sortChats(allChats);
       setChats(sortedChats);
       if (activeChat !== null) {

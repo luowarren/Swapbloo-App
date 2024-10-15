@@ -27,7 +27,8 @@ const ShopModal = ({ otherUser, children, origin="" }) => {
     const uid = await getUserId();
     const newBlockRecord = await addNewBlockRecord(uid, otherUser.id);
     // redirect user to homepage?
-    router.push("/" + origin);
+    window.location.reload();
+    // router.push("/" + origin);
   }
 
   return (
