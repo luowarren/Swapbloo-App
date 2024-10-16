@@ -21,6 +21,7 @@ interface SwapDetailsProps {
 
 const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [succModalOpen, setsuccModalOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [rejected, setRejected] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false); // Track withdrawal state
@@ -45,6 +46,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           setIsRequester(userId === realReqId);
           setSwapExists(true);
           setSwapId(swapId);
+          setAccepted(false)
 
           if (status === "Accepted") setAccepted(true);
           else if (status === "Rejected") setRejected(true);
@@ -81,6 +83,11 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
 
   }
 
+  function closeItUp() {
+    setsuccModalOpen(false);
+    setAccepted(true);
+  }
+
   async function rejectSwap(swapId: number) {
     try {
       await deleteChat(swapId);
@@ -114,6 +121,8 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
   if (isRequester === null || !swapExists) {
     return null;
   }
+
+  console.log("please i have not accepted", accepted)
 
   return (
     <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">
@@ -211,7 +220,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal otherUser={requesterId} modalOpen={!accepted} setModalOpen={setAccepted(true)}>
+          <AcceptOfferModal otherUser={requesterId} modalOpen={succModalOpen} setModalOpen={closeItUp}>
             <GenericButton
               text="Accept Offer"
               click={async () => {
