@@ -1,9 +1,21 @@
 import { useRouter } from "next/navigation";
-import ItemImages from "../components/ItemImages";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import ItemModal from "./item-modal";
+import ItemImages from "../components/ItemImages";
 
-const ListingCard = ({ data }: { data: any }) => {
+const ListingCard = ({
+  data,
+  size = 56,
+  font = 18,
+}: {
+  data: any;
+  size?: number;
+  font?: number;
+}) => {
+  const router = useRouter();
+  const truncateMessage = (msg: string) => {
+    return msg.length > 20 ? msg.slice(0, 20) + "..." : msg;
+  };
   return (
     <div className="w-full h-full">
       <ItemModal item={data}>
@@ -32,7 +44,9 @@ const ListingCard = ({ data }: { data: any }) => {
 
           {/* Text content */}
           <div className="relative flex flex-col text-start mt-2 z-10">
-            <span className="text-gray-700 font-bold">{data.title}</span>
+            <span className="text-gray-700 font-bold">
+              {truncateMessage(data.title)}
+            </span>
             <span className="text-gray-500 text-xs">
               {data.size} - {data.brand}
             </span>

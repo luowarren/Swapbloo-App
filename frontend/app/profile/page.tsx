@@ -2,29 +2,21 @@
 import React, { useEffect, useState } from "react";
 import {
   fetchUserData,
-  fetchUserItems,
+  getUserId,
+  getUser,
   setUserLocation,
-} from "../../service/users";
-import { getUserId } from "@/service/auth";
-import { getUser } from "../../service/users";
+} from "@/service/users";
 import { getListingsByUsers } from "@/service/items";
-import {
-  getRequestedItems,
-  getReceivedRequests,
-  getRequestedSwaps,
-  getReceivedSwaps,
-} from "@/service/swaps"; // Import swap functions
+import { getRequestedSwaps, getReceivedSwaps } from "@/service/swaps";
 import ProfileImage from "../components/ProfileImage";
-import ItemImages from "../components/ItemImages";
 import ShowMap from "../components/Map";
 import GenericButton from "../components/GenericButton";
 import { useRouter } from "next/navigation";
 import UserRating from "../components/UserRating";
-import { locations } from "./locations";
 import ListingCard from "../listings/listing-card";
 import { ChevronLeft, Shirt } from "lucide-react";
+import SwapDetails from "../components/SwapDetails";
 
-// Define types for UserData and ItemData
 interface UserData {
   id: string;
   description: string;
@@ -47,58 +39,55 @@ interface ItemData {
 const Login: React.FC = () => {
   const [user, setUser] = useState<UserData | null>(null);
   const [items, setItems] = useState<ItemData[]>([]);
-  const [outgoingSwaps, setOutgoingSwaps] = useState<ItemData[]>([]); // State to store requested swaps
-  const [incomingSwaps, setIncomingSwaps] = useState<ItemData[]>([]); // State to store incoming swap requests
+  const [outgoingSwaps, setOutgoingSwaps] = useState<string[]>([]);
+  const [incomingSwaps, setIncomingSwaps] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"listings">("listings"); // State to manage active tab
-  const router = useRouter(); // Move useRouter outside useEffect
+  const router = useRouter();
+  const [uid, setUserId] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+
   useEffect(() => {
     const loadUserData = async () => {
-      // Fetch user data
       const userId = await getUserId();
-      if (userId == null) {
-        router.push("/login"); // Redirect if no user
-      } else {
-        // Fetch user details using the userId
-        const userBlob = await getUser(userId);
-
-        // Safely check if userBlob.Users exists and has items
-        if (userBlob?.Users && userBlob.Users.length > 0) {
-          const user = userBlob.Users[0];
-          setUser(user);
-          setSelectedLocation(user.location);
-
-          // Fetch user's items
-          const userItemsBlob = await getListingsByUsers([user.id]);
-          const userItems = userItemsBlob?.data ?? [];
-          setItems(userItems);
-
-          // Fetch requested swaps (outgoing swaps)
-          const outgoingSwapsBlob = await getRequestedSwaps(user.id);
-          console.log("outgoing swaps:", outgoingSwapsBlob);
-          const outgoingSwaps = outgoingSwapsBlob?.data ?? [];
-          setOutgoingSwaps(outgoingSwaps);
-
-          // Fetch incoming swap requests
-          const incomingSwapsBlob = await getReceivedSwaps(user.id);
-          console.log("incoming swaps:", incomingSwapsBlob);
-          const incomingSwaps = incomingSwapsBlob?.data ?? [];
-          setIncomingSwaps(incomingSwaps);
-        } else {
-          console.warn("No user data found");
-        }
-        setLoading(false);
-        console.log("ADEKIEN", selectedLocation);
+      if (!userId) {
+        router.push("/login");
+        return;
       }
+
+      setUserId(userId);
+
+      const userBlob = await getUser(userId);
+      if (userBlob?.Users?.length) {
+        const user = userBlob.Users[0];
+        setUser(user);
+        setSelectedLocation(user.location);
+
+        const userItemsBlob = await getListingsByUsers([user.id], true);
+        setItems(userItemsBlob?.data ?? []);
+
+        const outgoingSwapsBlob = await getRequestedSwaps(user.id);
+        setOutgoingSwaps(
+          outgoingSwapsBlob?.data?.map((swap) => swap.accepter_id) ?? []
+        );
+
+        const incomingSwapsBlob = await getReceivedSwaps(user.id);
+        setIncomingSwaps(
+          incomingSwapsBlob?.data?.map((swap) => swap.requester_id) ?? []
+        );
+      } else {
+        console.warn("No user data found");
+      }
+      setLoading(false);
     };
 
     loadUserData();
-  }, [router]); // Include `router` in the dependency array
+  }, [router]);
 
   useEffect(() => {
     const changeLocation = async () => {
-      await setUserLocation(user?.id, selectedLocation);
+      if (user?.id && selectedLocation) {
+        await setUserLocation(user.id, selectedLocation);
+      }
     };
     changeLocation();
   }, [selectedLocation]);
@@ -116,11 +105,6 @@ const Login: React.FC = () => {
   if (!user) {
     return <p>No user found</p>;
   }
-
-  // Function to switch tabs
-  const handleTabSwitch = (tab: "listings") => {
-    setActiveTab(tab);
-  };
 
   return (
     <div className="mx-auto bg-gray-100 h-[100vh] pb-32 overflow-scroll ">

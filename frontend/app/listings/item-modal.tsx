@@ -7,7 +7,6 @@ import { getUser } from "@/service/users";
 import { getUserId } from "@/service/auth";
 import { useRouter } from "next/navigation";
 import ProfileImage from "../components/ProfileImage";
-import VisitShopModal from "../components/VisitShopModal";
 import ShowMap from "../components/Map";
 import ShopModal from "../components/ShopModal";
 import { deleteItemListing } from "@/service/items";

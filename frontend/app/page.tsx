@@ -63,15 +63,15 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="ml-20 relative w-[40%] items-center justify-center mb-20">
+                <div className="ml-20 relative w-[40%] items-center justify-center mb-20 group">
                   {/* Box behind the image */}
-                  <div className="absolute top-4 left-4 w-[90%] h-full bg-indigo-800 rounded-3xl"></div>
+                  <div className="absolute top-4 left-4 w-[90%] h-full bg-indigo-800 rounded-3xl group-hover:scale-110 group-hover:rotate-6 transition"></div>
 
                   {/* Image on top */}
                   <img
                     src="placeholder.png"
                     alt="Swapping clothes"
-                    className="relative z-1 w-5/6 h-auto rounded-xl border-4 border-indigo-800"
+                    className="relative z-1 w-5/6 h-auto rounded-xl border-4 border-indigo-800 group-hover:scale-110 group-hover:-rotate-6 transition"
                   />
                 </div>
               </main>
@@ -91,7 +91,7 @@ export default function Home() {
               </div>
 
               <div className="flex flex-row gap-2 justify-center items-center text-center w-full">
-                <div className="flex flex-col items-center text-center lg:items-start lg:text-left hover:scale-110 transition">
+                <div className="flex flex-col items-center text-center lg:items-start lg:text-left hover:scale-110 hover:-rotate-6 transition">
                   <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-2">
                     WOMEN
                   </p>
@@ -121,7 +121,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center text-center lg:items-start lg:text-left hover:scale-110 transition">
+                <div className="flex flex-col items-center text-center lg:items-start lg:text-left hover:scale-110 hover:rotate-6 transition">
                   <p className="my-3 text-indigo-900 text-3xl font-extrabold mb-2">
                     MEN
                   </p>

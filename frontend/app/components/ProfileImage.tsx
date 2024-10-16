@@ -46,8 +46,6 @@ const ProfileImage: React.FC<ProfileImageProps> = ({
     return <Skeleton className={"rounded-full w-12 h-12 " + className} />;
   }
 
-  console.log("5678", profilePicUrl);
-
   return (
     <div>
       {profilePicUrl ? (

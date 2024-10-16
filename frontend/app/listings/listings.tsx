@@ -16,6 +16,7 @@ import {
   DEMOGRAPHICS,
   SIZES,
 } from "@/service/constants";
+import { getUserId } from "@/service/users";
 
 const Listings = ({
   filter,
@@ -26,12 +27,27 @@ const Listings = ({
 }) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any[] | null>(null);
+  const [self, setSelf] = useState<string>("");
+
   useEffect(() => {
-    getActiveListings().then((data) => {
-      setLoading(false);
-      setData(data.data);
-    });
-  }, []);
+    // Define an async function inside useEffect
+    const fetchData = async () => {
+      try {
+        const myId = await getUserId();
+        setSelf(myId);
+  
+        const listings = await getActiveListings();
+        setData(listings.data?.filter((item) => item.owner_id !== myId) || []);
+      } catch (error) {
+        console.error("Error fetching data:", error); // Error handling
+      } finally {
+        setLoading(false); // Ensure loading state is updated
+      }
+    };
+  
+    fetchData(); // Call the async function
+  }, []); // Empty dependency array ensures it runs only once
+  
 
   useEffect(() => {
     setLoading(true);

@@ -43,7 +43,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
 
       // Fetch the user's listings if the userId is found
       if (userId) {
-        const listings = await getListingsByUsers([userId]);
+        const listings = await getListingsByUsers([userId], false);
         setUserItems(listings?.data ?? []);
       }
     };
@@ -203,7 +203,14 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   
         {/* Buttons */}
         <div className="flex justify-end space-x-4">
-          <GenericButton text="Cancel" click={onClose} inverse={true} />
+          <GenericButton 
+            text="Cancel" 
+            click={(e) => {
+              e.preventDefault(); // Prevent the form submission
+              onClose(); // Close the modal
+            }} 
+            inverse={true} 
+          />
           <button
             type="submit"
             className="bg-blue-500 text-white rounded-lg px-6 py-2"

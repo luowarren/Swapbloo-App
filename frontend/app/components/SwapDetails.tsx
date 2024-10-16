@@ -23,10 +23,10 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
   const [requestingItems, setRequestingItems] = useState<string[]>([]); // Other user's items
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [swapExists, setSwapExists] = useState<boolean>(true); // State to track if the swap exists
-  const [swapId, setSwapId] = useState<string | null>(null);
+  const [swapId, setSwapId] = useState<number | null>(null);
   const [isRequester, setIsRequester] = useState<boolean | null>(null);
 
-  console.log('ownerid sigma 69', ownerId, requesterId)
+  console.log('ownerid sigma 698888', ownerId, requesterId)
   const fetchSwapDetails = async () => {
     if (ownerId && requesterId) {
       const userId = await getUserId();
@@ -34,7 +34,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
 
       if (userId) {
         const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(ownerId, requesterId);
-        console.log('sigma 69', user1Items, ownerId)
+        console.log('sigma 698888', user1Items, ownerId)
         if (swapExists) {
           const realReqId = swap.requester_id;
 
@@ -79,15 +79,15 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
     setModalOpen(false); // Close the modal after the update
   };
 
-  async function acceptSwap(swapId: number) {
-    await updateSwapStatus(swapId, "Accepted");
+  async function acceptSwap(swapId: number, itemIds: number[]) {
+    await updateSwapStatus(swapId, "Accepted", itemIds);
     setAccepted(true);
-    // Trigger notification or post-accept logic
     console.log("Offer accepted");
   }
+  
 
   // If no swap exists, return null
-  if (!swapExists || !ownerId || !requesterId) {
+  if (!swapExists || !ownerId || !requesterId || myItems.length < 1 || requestingItems.length < 1) {
     return null;
   }
 
@@ -197,7 +197,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({
           <GenericButton
             text="Accept Offer"
             click={async () => {
-              await acceptSwap(swapId);
+              await acceptSwap(swapId, [...myItems, ...requestingItems]);
               setAccepted(true);
             }}
           />

@@ -2,6 +2,7 @@ import dotenv from "dotenv"; // Import dotenv
 import { createClient } from "@supabase/supabase-js"; // Import Supabase client
 import { search } from "./listings";
 import { data } from "@/app/chats/data";
+import { getChatBetweenUsers } from "./chat";
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -62,21 +63,27 @@ async function runTest() {
     }
   })();
 }
-// runTest();
 
-export async function getListingsByUsers(userIds) {
-  let { data: Items, error } = await supabase
-    .from("Items")
-    .select("*")
-    .in("owner_id", userIds)
-    .eq("swapped", "false");
+// runTest();
+export async function getListingsByUsers(userIds, swapped) {
+  console.log("swapped 8888", swapped)
+  let query = supabase.from("Items").select("*").in("owner_id", userIds);
+
+  // Add the 'swapped' condition only if swapped is false
+  if (!swapped) {
+    query = query.eq("swapped", false);
+  }
+
+  const { data: Items, error } = await query;
 
   if (error) {
-    console.error("Error fetching listings by users:", error.message);
-    return { data: null, error: error };
+    console.error("Error fetching listings:", error.message);
+    throw error;
   }
+
   return { data: Items, error };
 }
+
 
 /**
  * Creates an Item type that is inserted into the Items table. Used when user
@@ -280,22 +287,22 @@ export async function listFilenamesFromBucket() {
  * @returns {Blob|Error} - The image data as a Blob or an error if the operation fails.
  */
 export async function getImageFromId(imageId, bucket) {
-  console.log("image id and bucket:", bucket, imageId);
+  // console.log("image id and bucket:", bucket, imageId);
   if (imageId != null) {
     const { data, error } = await supabase.storage.from(bucket).download(imageId);
-    console.log("getting data from buckets", data);
-    console.log("getting data from buckets2", data);
+    // console.log("getting data from buckets", data);
+    // console.log("getting data from buckets2", data);
 
     if (error) {
       console.log("simga error", error)
       return error;
     } 
-    console.log("getting data from buckets3", data)
+    // console.log("getting data from buckets3", data)
     
     return data;
   }
 
-  console.log("getting data from buckets", data);
+  // console.log("getting data from buckets", data);
 
 }
 
