@@ -7,7 +7,6 @@ import { getUser } from "@/service/users";
 import { getUserId } from "@/service/auth";
 import { useRouter } from "next/navigation";
 import ProfileImage from "../components/ProfileImage";
-import VisitShopModal from "../components/VisitShopModal";
 import ShowMap from "../components/Map";
 import ShopModal from "../components/ShopModal";
 import { deleteItemListing } from "@/service/items";
@@ -24,7 +23,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const handleMakeOffer = () => {
     router.push(`/offer?itemId=${item.id}&ownerId=${item.owner_id}`);
   };
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
       const fetchedUser = await getUser(item.owner_id);
@@ -48,7 +47,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
 
   const handleCloseModal = () => {
     setShowSuccessModal(false);
-    router.push('/listings'); // Redirect to the marketplace after closing the modal
+    router.push("/listings"); // Redirect to the marketplace after closing the modal
   };
 
   const handleDelete = async () => {
@@ -56,14 +55,14 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
     if (!error) {
       setShowSuccessModal(true); // Show success modal on successful deletion
     }
-    setModalOpen(false)
-    // TODO neeed to 
+    setModalOpen(false);
+    // TODO neeed to
   };
 
   return (
     <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger className="w-full">{children}</DialogTrigger>
-      <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll" >
+      <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
           <div className="w-1/2 flex-col justify-center relative">
             <ItemImages
@@ -81,22 +80,21 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
             <div className="flex space-x-2">
               {isMyItem ? (
                 <div>
-                 <button
-                      onClick={handleDelete}
-                      className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
-                      >
-                        Delete Item
-                    </button>
+                  <button
+                    onClick={handleDelete}
+                    className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                  >
+                    Delete Item
+                  </button>
                 </div>
               ) : (
                 <button
-                onClick={handleMakeOffer}
-                className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                  onClick={handleMakeOffer}
+                  className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
                 >
                   Make Offer
                 </button>
-              )
-              } 
+              )}
             </div>
 
             <hr className="border-gray-300 mt-2"></hr>
@@ -125,7 +123,8 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
                     width="100%"
                     height="100%"
                     selectedLocation={user.location}
-                  ></ShowMap>
+                    setter={undefined}
+                  />
                 )}
               </div>
               <p className="text-sm text-gray-700 mb-2">{item.location}</p>
@@ -167,7 +166,9 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Item Deleted Successfully!</h2>
+            <h2 className="text-xl font-bold mb-4">
+              Item Deleted Successfully!
+            </h2>
             <p>Your item has been deleted.</p>
             <button
               onClick={handleCloseModal}

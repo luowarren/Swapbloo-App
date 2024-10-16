@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getImages } from "../../service/items"; // Import the getImages function
 import ImageDisplay from "./ImageDisplay"; // Import the ImageDisplay component
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ItemImages = ({
   itemId,
@@ -65,58 +66,60 @@ const ItemImages = ({
     <div className={`relative ${className}`}>
       {imageUrls.length > 0 ? (
         <div className="relative group">
-          {" "}
           {/* Group for hover */}
-          <ImageDisplay
-            imageUrl={imageUrls[currentIndex]}
-            className="w-full max-w-[90%] max-h-[600px] h-auto mx-auto object-contain"
-          />
-          {buttons && ( // Only render buttons if buttons is true
-            <>
-              {currentIndex > 0 && (
-                <button
-                  className={`absolute left-11 top-1/2 transform -translate-y-1/2 text-gray-500 text-2xl font-bold opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-                  onClick={handlePrevImage}
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    backgroundColor: "rgba(255, 255, 255, 0.5)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-                  }}
-                  disabled={currentIndex === 0} // Disable button if no previous image
-                >
-                  <ChevronLeft />
-                </button>
-              )}
+          <div className="relative group">
+            {/* Group for hover */}
+            <ImageDisplay
+              imageUrl={imageUrls[currentIndex]}
+              className="w-full max-w-[90%] max-h-[600px] h-auto mx-auto object-contain"
+            />
+            {buttons && ( // Only render buttons if buttons is true
+              <>
+                {currentIndex > 0 && (
+                  <button
+                    className={`absolute left-11 top-1/2 transform -translate-y-1/2 text-gray-500 text-2xl font-bold opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+                    onClick={handlePrevImage}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      backgroundColor: "rgba(255, 255, 255, 0.5)",
+                      borderRadius: "50%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                    }}
+                    disabled={currentIndex === 0} // Disable button if no previous image
+                  >
+                    <ChevronLeft />
+                  </button>
+                )}
 
-              {currentIndex < imageUrls.length - 1 && (
-                <button
-                  className={`absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-500 text-2xl font-bold opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    backgroundColor: "rgba(255, 255, 255, 0.5)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-                  }}
-                  onClick={handleNextImage}
-                  disabled={currentIndex === imageUrls.length - 1} // Disable button if no next image
-                >
-                  <ChevronRight />
-                </button>
-              )}
-            </>
-          )}
+                {currentIndex < imageUrls.length - 1 && (
+                  <button
+                    className={`absolute right-11 top-1/2 transform -translate-y-1/2 text-gray-500 text-2xl font-bold opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      backgroundColor: "rgba(255, 255, 255, 0.5)",
+                      borderRadius: "50%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                    }}
+                    onClick={handleNextImage}
+                    disabled={currentIndex === imageUrls.length - 1} // Disable button if no next image
+                  >
+                    <ChevronRight />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
         </div>
       ) : (
-        <p>Loading images...</p>
+        <Skeleton className="h-[250px] w-[250px] rounded-lg" />
       )}
     </div>
   );

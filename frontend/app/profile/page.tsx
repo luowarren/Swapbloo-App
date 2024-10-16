@@ -1,15 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchUserData, getUserId, getUser, setUserLocation } from "@/service/users";
+import {
+  fetchUserData,
+  getUserId,
+  getUser,
+  setUserLocation,
+} from "@/service/users";
 import { getListingsByUsers } from "@/service/items";
-import { getRequestedSwaps, getReceivedSwaps } from "@/service/swaps"; 
+import { getRequestedSwaps, getReceivedSwaps } from "@/service/swaps";
 import ProfileImage from "../components/ProfileImage";
-import ItemImages from "../components/ItemImages";
 import ShowMap from "../components/Map";
 import GenericButton from "../components/GenericButton";
 import { useRouter } from "next/navigation";
 import UserRating from "../components/UserRating";
 import ListingCard from "../listings/listing-card";
+import { ChevronLeft, Shirt } from "lucide-react";
 import SwapDetails from "../components/SwapDetails";
 
 interface UserData {
@@ -37,7 +42,6 @@ const Login: React.FC = () => {
   const [outgoingSwaps, setOutgoingSwaps] = useState<string[]>([]);
   const [incomingSwaps, setIncomingSwaps] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"listings" | "incoming" | "outgoing">("listings"); // Tab state
   const router = useRouter();
   const [uid, setUserId] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -62,10 +66,14 @@ const Login: React.FC = () => {
         setItems(userItemsBlob?.data ?? []);
 
         const outgoingSwapsBlob = await getRequestedSwaps(user.id);
-        setOutgoingSwaps(outgoingSwapsBlob?.data?.map((swap) => swap.accepter_id) ?? []);
+        setOutgoingSwaps(
+          outgoingSwapsBlob?.data?.map((swap) => swap.accepter_id) ?? []
+        );
 
         const incomingSwapsBlob = await getReceivedSwaps(user.id);
-        setIncomingSwaps(incomingSwapsBlob?.data?.map((swap) => swap.requester_id) ?? []);
+        setIncomingSwaps(
+          incomingSwapsBlob?.data?.map((swap) => swap.requester_id) ?? []
+        );
       } else {
         console.warn("No user data found");
       }
@@ -84,97 +92,77 @@ const Login: React.FC = () => {
     changeLocation();
   }, [selectedLocation]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!user) return <p>No user found</p>;
-
-  // Function to switch tabs
-  const handleTabSwitch = (tab: "listings" | "incoming" | "outgoing") => {
-    setActiveTab(tab);
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto bg-white">
-      <div className="w-1/2 bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4">
-        <div className="flex flex-row items-center justify-evenly w-full mb-4">
-          <ProfileImage userId={user.id} />
-          <div className="flex flex-col items-start align-middle">
-            <div className="font-bold text-center">{user.name}'s Swap Shop</div>
-            <div className="text-sm text-gray-500">{user.username}</div>
-            <div className="text-sm text-gray-500">Number of total swaps: {user.swap_count}</div>
-            <UserRating rating={Number(user.rating)} num={Number(user.num_of_ratings)} />
-          </div>
+  if (loading) {
+    return (
+      <div className="flex h-[85vh] w-full justify-center items-center">
+        <div className="animate-spin [animation-duration:500ms]">
+          <Shirt className="text-indigo-600" />
         </div>
       </div>
+    );
+  }
 
-      <hr className="border-gray-600 mx-4" />
-      <div className="space-x-8 mt-5 mx-4">Description</div>
-      <div className="space-x-8 mt-5 mx-4">{user.description}</div>
-      <div className="py-6 px-6 ">
-        {selectedLocation && (
-          <ShowMap
-            setter={setSelectedLocation}
-            selectedLocation={selectedLocation}
-          ></ShowMap>
-        )}
+  if (!user) {
+    return <p>No user found</p>;
+  }
+
+  return (
+    <div className="mx-auto bg-gray-100 h-[100vh] pb-32 overflow-scroll ">
+      <div
+        className="mb-4 text-gray-500 flex gap-1 items-center bg-white rounded w-fit px-2 py-1 pr-4 hover:bg-gray-200 transition cursor-pointer mt-10 ml-10 border boder-gray-300"
+        onClick={() => {
+          router.push("/listings");
+        }}
+      >
+        <ChevronLeft className="h-4 w-4 stroke-[2.5px]" />
+        Go back
       </div>
-
-      {/* Tab Buttons */}
-      <div className="flex space-x-4 mt-5 mx-4">
-        <button
-          className={`px-4 py-2 ${activeTab === "listings" ? "bg-gray-300" : ""}`}
-          onClick={() => handleTabSwitch("listings")}
-        >
-          Listings
-        </button>
-        <button
-          className={`px-4 py-2 ${activeTab === "incoming" ? "bg-gray-300" : ""}`}
-          onClick={() => handleTabSwitch("incoming")}
-        >
-          Incoming Swaps
-        </button>
-        <button
-          className={`px-4 py-2 ${activeTab === "outgoing" ? "bg-gray-300" : ""}`}
-          onClick={() => handleTabSwitch("outgoing")}
-        >
-          Outgoing Swaps
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      <div className="p-4">
-        {activeTab === "listings" && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 h-[85vh] overflow-scroll">
-            {items.length > 0 ? (
-              items.map((item, index) => <ListingCard key={index} data={item} />)
-            ) : (
-              <p>No items currently listed</p>
-            )}
+      <div className="m-10 mt-5 flex gap-4">
+        <div className="bg-white p-10 w-[35%] shadow-lg rounded-lg border boder-gray-300">
+          <ProfileImage userId={user.id} className="w-28 h-28" />
+          <div className="flex flex-col items-start align-middle">
+            <div className="font-bold overflow-auto text-center text-3xl mt-4 text-gray-700 italic">
+              {user.name}'s <span className="mr-2 text-indigo-600">Store</span>
+            </div>
+            <div className="text-sm text-gray-500">{user.username}</div>
+            <UserRating
+              rating={Number(user.rating)}
+              num={Number(user.num_of_ratings)}
+            />
+            <div className="mt-2 text-gray-500">{user.description}</div>
+            <div className="flex gap-16">
+              <div>
+                <div className="mt-6 text-gray-500">Active Listings</div>
+                <div className="mt-0 text-gray-700 text-2xl font-bold">7</div>
+              </div>
+              <div>
+                <div className="mt-6 text-gray-500">CO2 saved</div>
+                <div className="mt-0 text-gray-700 text-2xl font-bold">
+                  1600mgs
+                </div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <div className="mt-6 text-gray-500">{selectedLocation}</div>
+              {selectedLocation && (
+                <ShowMap
+                  setter={setSelectedLocation}
+                  selectedLocation={selectedLocation}
+                />
+              )}
+            </div>
           </div>
-        )}
-
-        {activeTab === "incoming" && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 h-[85vh] overflow-scroll">
-            {incomingSwaps.length > 0 ? (
-              incomingSwaps.map((otherUser, index) => (
-                <SwapDetails key={index} ownerId={uid} requesterId={otherUser} />
-              ))
-            ) : (
-              <p>No incoming swaps</p>
-            )}
+        </div>
+        <div className="bg-white p-8 w-full shadow-lg rounded-lg border boder-gray-300">
+          <div className="m-2 text-xl text-gray-600 italic font-bold">
+            Listings
           </div>
-        )}
-
-        {activeTab === "outgoing" && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 h-[85vh] overflow-scroll">
-            {outgoingSwaps.length > 0 ? (
-              outgoingSwaps.map((otherUser, index) => (
-                <SwapDetails key={index} ownerId={uid} requesterId={otherUser} />
-              ))
-            ) : (
-              <p>No outgoing swaps</p>
-            )}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 w-full">
+            {items.map((item: any, index) => {
+              return <ListingCard key={index} data={item} />;
+            })}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
