@@ -178,8 +178,8 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
             isVisible={true}
             onClose={() => setModalOpen(false)}
             swapId={swapId}
-            myItems={myItems}
-            requestingItems={requestingItems}
+            myItems={requestingItems}
+            requestingItems={myItems}
             ownerId={ownerId}
             requesterId={requesterId}
             onUpdate={handleSwapUpdate}

@@ -498,13 +498,18 @@ const ChatPage: React.FC = () => {
                   </p>
                   {!consented && chats && accepterId == currUserId && (
                     <GenericButton
-                      text="Consent"
+                      text="Start Chatting!"
                       click={() => {
                         setConsented(true);
                         setChatConsented(chats[activeChat].id);
                       }}
                       fontSize="1.5rem"
                     ></GenericButton>
+                  )}
+                  {!consented && chats && requesterId == currUserId && (
+                    <p style={{ paddingBottom: "10px" }}>
+                      Wait for {otherUserData.name} to consent before you start chatting
+                    </p>
                   )}
                 </div>
               )}
