@@ -5,8 +5,8 @@ import ItemImages from "../components/ItemImages";
 
 const ListingCard = ({
   data,
-  size = 56,
-  font = 18,
+  size = undefined,
+  font = undefined,
 }: {
   data: any;
   size?: number;
@@ -23,9 +23,12 @@ const ListingCard = ({
           {/* Background square behind the image, same size and position */}
 
           {/* Image div */}
-          <div className="bg-indigo-500 rounded group-hover:scale-105 transition">
+          <div
+            className="bg-indigo-500 rounded group-hover:scale-105 transition"
+            style={{ maxWidth: size }}
+          >
             <div
-              className="relative  overflow-hidden rounded-sm bg-gray-200 transition-transform group-hover:rotate-6 z-10 group-hover:border-4 border-indigo-500"
+              className="relative overflow-hidden rounded-sm bg-gray-200 transition-transform group-hover:rotate-6 z-10 group-hover:border-4 border-indigo-500"
               style={{
                 width: "100%",
                 height: "100%",
@@ -44,7 +47,10 @@ const ListingCard = ({
 
           {/* Text content */}
           <div className="relative flex flex-col text-start mt-2 z-10">
-            <span className="text-gray-700 font-bold">
+            <span
+              className="text-gray-700 font-bold"
+              style={{ fontSize: font }}
+            >
               {truncateMessage(data.title)}
             </span>
             <span className="text-gray-500 text-xs">
