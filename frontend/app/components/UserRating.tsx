@@ -58,7 +58,7 @@ const UserRating = ({
             onClick={() => handleStarClick(i)}
             icon={starIcon}
             className={size}
-            color="#eab308"
+            color="#6366f1"
           />
         </div>
       );

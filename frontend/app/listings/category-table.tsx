@@ -55,9 +55,7 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "category",
     header: "Category",
     cell: ({ row }) => (
-      <div className="capitalize text-slate-600">
-        {row.getValue("category")}
-      </div>
+      <div className="capitalize text-gray-600">{row.getValue("category")}</div>
     ),
   },
 ];
@@ -107,7 +105,7 @@ export function CategoryTable({
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white rounded-lg">
       <div className="flex items-center py-0">
         <Input
           placeholder="Search categories..."

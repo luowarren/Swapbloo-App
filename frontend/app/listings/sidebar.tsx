@@ -33,25 +33,25 @@ const Sidebar = ({
   };
 
   return (
-    <div className="h-[85vh] w-80 border-r border-slate-300 border-y p-5 overflow-y-scroll rounded-r-lg mb-2">
-      <div className="flex flex-col p-4 items-center w-full border-b border-b-slate-300">
-        <span className="font-bold text-xl text-slate-700">
+    <div className="h-screen w-80 border-r border-gray-300 p-5 overflow-y-scroll pb-56">
+      <div className="flex flex-col p-4 items-center w-full border-b border-b-gray-300">
+        <span className="font-bold text-xl text-gray-600 italic">
           {search ? `"${search}"` : "Everything"}
         </span>
       </div>
       <div className="flex flex-col mt-4">
-        <span className="font-bold text-sm my-1 text-slate-500">Filters</span>
+        <span className="font-bold text-sm my-1 text-gray-500">Filters</span>
         <span className="font-bold text-indigo-600 my-1 text-sm">
           Brisbane, Queensland - Within 5km
         </span>
 
         <div
-          className="flex flex-row items-center justify-between hover:bg-slate-100 transition cursor-pointer -m-1 p-1 rounded-sm"
+          className="flex flex-row items-center justify-between hover:bg-gray-100 transition cursor-pointer -m-1 p-1 rounded-sm"
           onClick={() => {
             setSortColl((prev) => !prev);
           }}
         >
-          <span className="font-bold text-sm my-1 text-slate-600">Sort by</span>
+          <span className="font-bold text-sm my-1 text-gray-600">Sort by</span>
           {sortColl ? (
             <ChevronDown className="h-5 w-4 stroke-[2.5px]" />
           ) : (
@@ -59,17 +59,17 @@ const Sidebar = ({
           )}
         </div>
         {sortColl && (
-          <div className="flex flex-col text-sm gap-2 pl-2 mt-2 text-slate-600">
-            <div className="hover:bg-slate-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
+          <div className="flex flex-col text-sm gap-2 pl-2 mt-2 text-gray-600">
+            <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
               Suggested
             </div>
-            <div className="hover:bg-slate-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
+            <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
               Newest
             </div>
-            <div className="hover:bg-slate-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
+            <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
               Oldest
             </div>
-            <div className="hover:bg-slate-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
+            <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
               Nearest
             </div>
           </div>

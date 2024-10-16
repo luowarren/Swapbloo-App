@@ -73,9 +73,9 @@ export const columns: ColumnDef<ConditionsType>[] = [
 
       return (
         <div>
-          <div className="text-slate-600">{condition}</div>
+          <div className="text-gray-600">{condition}</div>
           {isConditionKey(condition) && (
-            <div className="text-slate-400 text-xs">
+            <div className="text-gray-400 text-xs">
               {descriptions[condition]}
             </div>
           )}
@@ -130,7 +130,7 @@ export function ConditionTable({
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white rounded-lg">
       <div className="rounded-md border">
         <Table>
           <TableBody>
