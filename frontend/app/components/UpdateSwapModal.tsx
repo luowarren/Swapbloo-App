@@ -6,6 +6,7 @@ import { getListingsByUsers } from "@/service/items"; // Function to fetch the u
 import { getUserId } from "@/service/auth"; // Function to get the current user ID
 import SuccessModal from "../components/SuccessModal";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 interface UpdateSwapModalProps {
   isVisible: boolean;
@@ -102,16 +103,26 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
       return;
     }
 
+    let psudeoMe, pseduoThem;
+    if (currentUserId != ownerId) {
+      psudeoMe = requesterId;
+      pseduoThem = ownerId;
+    } else {
+      psudeoMe = ownerId;
+      pseduoThem = requesterId;
+    }
+
     const { data, error } = await modifySwapRequest(
       swapId,
       updatedMyItems, // The other user's items
       updatedRequestingItems, // Your updated offered items
-      ownerId,
-      requesterId
+      psudeoMe,
+      pseduoThem
     );
     if (!error) {
       setShowSuccessModal(true); // Show success modal when swap is successful
       onUpdate(); // Call the onUpdate callback for any external updates
+      setModalOpen(false)
     } else {
       console.error(error);
     }
