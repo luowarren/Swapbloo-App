@@ -28,7 +28,7 @@ import ProfileImage from "../components/ProfileImage";
 import { Send } from "lucide-react";
 import SwapAccept from "../components/SwapAccept";
 import { getSwapDetailsBetweenUsers } from "@/service/swaps";
-import {getAllBlocked} from "../../service/block";
+import { getAllBlocked } from "../../service/block";
 
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
@@ -107,14 +107,19 @@ const ChatPage: React.FC = () => {
     checkUser();
   }, [router]);
 
-  const sortMessagesByTime = (messagesArray: Array<{
-    type: string,
-    chat_id: string,
-    content: string,
-    created_at: string,
-    sender_id: string
-  }>) => {
-    return messagesArray.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  const sortMessagesByTime = (
+    messagesArray: Array<{
+      type: string;
+      chat_id: string;
+      content: string;
+      created_at: string;
+      sender_id: string;
+    }>
+  ) => {
+    return messagesArray.sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    );
   };
 
   const fetchChatUsers = async (chatId: string) => {
@@ -123,8 +128,10 @@ const ChatPage: React.FC = () => {
       const { swapExists, user1Items, user2Items, swapId, status, swap } =
         await getSwapDetailsBetweenUsers(users?.accepterId, users?.requesterId);
 
-      setRequesterId(swap.requester_id); // Other user's ID
-      setAccepterId(swap.accepter_id); // Your ID
+      if (swap) {
+        setRequesterId(swap.requester_id); // Other user's ID
+        setAccepterId(swap.accepter_id); // Your ID
+      }
     }
   };
 
@@ -214,7 +221,11 @@ const ChatPage: React.FC = () => {
     if (!chat || !blocked) {
       return false;
     }
-    if (blocked.find((b) => b.blockee === chat.user1_id || b.blockee === chat.user2_id)) {
+    if (
+      blocked.find(
+        (b) => b.blockee === chat.user1_id || b.blockee === chat.user2_id
+      )
+    ) {
       return true;
     }
     return false;
@@ -225,7 +236,9 @@ const ChatPage: React.FC = () => {
     setCurrUserId(uid);
     if (uid != null) {
       const blocked = await getAllBlocked(uid);
-      const allChats = (await getChats(uid)).filter((c) => !isBlocked(blocked, c));
+      const allChats = (await getChats(uid)).filter(
+        (c) => !isBlocked(blocked, c)
+      );
       const sortedChats = sortChats(allChats);
       setChats(sortedChats);
       if (activeChat !== null) {
@@ -392,9 +405,13 @@ const ChatPage: React.FC = () => {
   // Toggle selection of a lastMessage preview
   const toggleMessageSelection = async (index: number) => {
     if (chats != null) {
-      if (chats[index] && chats[index].viewed == false && chats[index].latestMessage.sender_id !== currUserId) {
+      if (
+        chats[index] &&
+        chats[index].viewed == false &&
+        chats[index].latestMessage.sender_id !== currUserId
+      ) {
         // set to viewed!!!!
-        console.log("toggling viewed!!")
+        console.log("toggling viewed!!");
         await toggleViewed(chats[index].id);
       }
     }
@@ -420,7 +437,11 @@ const ChatPage: React.FC = () => {
                     name={msg.username}
                     lastMessage={msg.latestMessage.content}
                     date={msg.latestMessage.created_at}
-                    viewed={msg.latestMessage.sender_id === currUserId ? true : msg.viewed}
+                    viewed={
+                      msg.latestMessage.sender_id === currUserId
+                        ? true
+                        : msg.viewed
+                    }
                     isSelected={activeChat === index} // Pass selection state
                     userId={
                       currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
@@ -475,18 +496,16 @@ const ChatPage: React.FC = () => {
                   <p style={{ paddingBottom: "10px" }}>
                     This is the start of your chat with {otherUserData.name}
                   </p>
-                  {!consented &&
-                    chats &&
-                    accepterId == currUserId && (
-                      <GenericButton
-                        text="Consent"
-                        click={() => {
-                          setConsented(true);
-                          setChatConsented(chats[activeChat].id);
-                        }}
-                        fontSize="1.5rem"
-                      ></GenericButton>
-                    )}
+                  {!consented && chats && accepterId == currUserId && (
+                    <GenericButton
+                      text="Consent"
+                      click={() => {
+                        setConsented(true);
+                        setChatConsented(chats[activeChat].id);
+                      }}
+                      fontSize="1.5rem"
+                    ></GenericButton>
+                  )}
                 </div>
               )}
               <div>

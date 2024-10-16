@@ -2,13 +2,10 @@ import React from 'react';
 import UserRating from './UserRating';
 
 interface MessageProps {
-  msg: {
-    content: string;
-  };
-  index: number;
+  otherUser: any;
 }
 
-const SwapAccept: React.FC<MessageProps> = ({ msg, index }) => {
+const SwapAccept: React.FC<MessageProps> = ({otherUser}) => {
   return (
     <div
       style={{
@@ -19,18 +16,6 @@ const SwapAccept: React.FC<MessageProps> = ({ msg, index }) => {
       }}
     >
       <div
-        key={index}
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-          color: 'gray',
-        }}
-      >
-        {msg.content}
-      </div>
-      <div
         style={{
           border: '2px solid black',
           borderRadius: '15px',
@@ -38,7 +23,7 @@ const SwapAccept: React.FC<MessageProps> = ({ msg, index }) => {
           paddingBottom: '10px',
           margin: '20px',
           marginBottom: '10px',
-          width: '60%',
+          width: '100%',
           textAlign: 'center',
           color: '#3730A3',
           fontWeight: 'bold',
@@ -89,12 +74,12 @@ const SwapAccept: React.FC<MessageProps> = ({ msg, index }) => {
           border: '2px solid black',
           borderRadius: '15px',
           padding: '5px',
-          width: '60%',
+          width: '100%',
           textAlign: 'center',
           fontWeight: 'bold',
         }}
       >
-        <UserRating size="text-2xl" />
+        <UserRating otherUser={otherUser} size="text-2xl" />
         
       </div>
     </div>
