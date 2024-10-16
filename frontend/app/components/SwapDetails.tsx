@@ -84,9 +84,16 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
   }
 
   function closeItUp() {
-    setsuccModalOpen(false);
-    setAccepted(true);
+    setsuccModalOpen(!modalOpen);
+    setAccepted(!accepted);
   }
+
+  
+  useEffect(() => {
+    if (succModalOpen == false) {
+      setAccepted(true);
+    }
+  }, [succModalOpen]);
 
   async function rejectSwap(swapId: number) {
     try {
@@ -220,7 +227,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal otherUser={requesterId} modalOpen={succModalOpen} setModalOpen={closeItUp}>
+          <AcceptOfferModal otherUser={requesterId} modalOpen={succModalOpen} setModalOpen={setsuccModalOpen}>
             <GenericButton
               text="Accept Offer"
               click={async () => {
