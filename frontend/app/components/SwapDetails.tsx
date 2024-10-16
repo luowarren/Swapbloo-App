@@ -138,14 +138,17 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-evenly",
+            justifyContent: "center",
             alignItems: "center",
-            maxWidth: "100px",
+            // maxWidth: "60%",
+            width: "fit",
             flexWrap: "wrap",
           }}
         >
           {myItems.map((itemId, index) => (
-            <ItemImages key={index} itemId={itemId} className="" />
+            <div style={{ width: "100px", margin: "5px 5px", borderRadius: "8px" }}>
+              <ItemImages key={index} itemId={itemId} className="" />
+            </div>
           ))}
         </div>
         <ArrowRightLeft />
@@ -155,12 +158,14 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
             flexDirection: "row",
             justifyContent: "space-evenly",
             alignItems: "center",
-            maxWidth: "100px",
+            // maxWidth: "60%",
             flexWrap: "wrap",
           }}
         >
           {requestingItems.map((itemId, index) => (
-            <ItemImages key={index} itemId={itemId} className="" />
+            <div style={{ width: "100px", margin: "5px 5px", borderRadius: "8px" }}>
+              <ItemImages key={index} itemId={itemId} className="" />
+            </div>
           ))}
         </div>
       </div>
@@ -189,7 +194,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal>
+          <AcceptOfferModal otherUser={requesterId}>
             <GenericButton
               text="Accept Offer"
               click={async () => {
@@ -211,7 +216,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         {accepted && <GenericButton text="Accepted Offer" noClick={true} />}
       </div>
       <AcceptOfferModal otherUser={ownerId}>
-        <GenericButton text="Accept Offer" />
+        <GenericButton text="Leave a rating" />
       </AcceptOfferModal>
     </div>
   );

@@ -503,6 +503,7 @@ const ChatPage: React.FC = () => {
                         setConsented(true);
                         setChatConsented(chats[activeChat].id);
                       }}
+                      inverse={true}
                       fontSize="1.5rem"
                     ></GenericButton>
                   )}
