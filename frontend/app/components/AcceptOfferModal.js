@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import React, { useEffect, useState } from "react";
 import SwapAccept from "./SwapAccept";
 
-const AcceptSwapModal = ({ otherUser, children, origin = "" }) => {
+const AcceptSwapModal = ({ otherUser, onClose, children, origin = "" }) => {
   return (
     <Dialog>
       <DialogTrigger>{children}</DialogTrigger>

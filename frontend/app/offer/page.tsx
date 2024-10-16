@@ -80,10 +80,16 @@ const MakeOffer = () => {
       }
 
       // Create the swap request
-      const result = await createSwapRequest(selectedItemIds, [itemId], requestingUserId, ownerId);
+      let { data: Swap, error} = await createSwapRequest(selectedItemIds, [itemId], requestingUserId, ownerId);
+      console.log("swap requester", Swap)
 
+      Swap = (Swap && Swap.length > 0) ? Swap[0] : Swap;
       // If successful, show the popup
       setIsPopupVisible(true);
+
+      if (ownerId && userId) {
+        fetchChatId(ownerId, userId, Swap.id); // Fetch chatId when ownerId and userId are available
+      }
     } catch (error) {
       console.error("Error submitting offer:", error);
     }
@@ -103,12 +109,6 @@ const MakeOffer = () => {
     } 
   };
 
-  useEffect(() => {
-    if (ownerId && userId) {
-      fetchChatId(ownerId, userId); // Fetch chatId when ownerId and userId are available
-    }
-  }, [ownerId, userId]); // Re-run if ownerId or userId changes
-  
   console.log(chatId, "chatting like alphas together 222222222")
   const handlePopupClose = () => {
     setIsPopupVisible(false);

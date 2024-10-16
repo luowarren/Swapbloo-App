@@ -70,7 +70,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
     await incrementSwapCount(requesterId);
     await incrementSwapCount(ownerId);
 
-    setAccepted(true);
   }
 
   async function rejectSwap(swapId: number) {
@@ -194,7 +193,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal otherUser={requesterId}>
+          <AcceptOfferModal otherUser={requesterId} onClose={() => setAccepted(true)}>
             <GenericButton
               text="Accept Offer"
               click={async () => {
