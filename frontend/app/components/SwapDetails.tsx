@@ -50,8 +50,15 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           else if (status === "Rejected") setRejected(true);
           else if (status === "Withdrawn") setWithdrawn(true);
 
-          setMyItems(user1Items || []);
-          setRequestingItems(user2Items || []);
+
+          if (userId === realReqId && userId == ownerId) {
+             console.log("I am the requester", ownerId,  user1Items, user2Items)
+              setMyItems(user1Items || []); // Requester's items (myItems)
+              setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
+            } else {
+              setMyItems(user2Items || []); // Accepter's items (myItems)
+              setRequestingItems(user1Items || []); // Requester's items (requestingItems)
+            }
         } else {
           setSwapExists(false);
         }
@@ -204,7 +211,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal otherUser={requesterId} onClose={() => setAccepted(true)}>
+          <AcceptOfferModal otherUser={requesterId} modalOpen={!accepted} setModalOpen={setAccepted(true)}>
             <GenericButton
               text="Accept Offer"
               click={async () => {

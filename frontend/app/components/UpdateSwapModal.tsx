@@ -17,6 +17,8 @@ interface UpdateSwapModalProps {
   requesterId: string;
   onUpdate: () => void;
   children: any;
+  setModalOpen: any;
+  modalOpen: boolean;
 }
 
 const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
