@@ -29,6 +29,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   requesterId,
   onUpdate,
   children,
+  modalOpen,
+  setModalOpen
 }) => {
   const [updatedMyItems, setUpdatedMyItems] = useState<number[]>([]); // The other user's items
   const [updatedRequestingItems, setUpdatedRequestingItems] = useState<
@@ -122,7 +124,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <Dialog>
+    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger>
         {/* <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
                 Update Offer

@@ -111,6 +111,16 @@ export async function createSwapRequest(
 
   const createSwapId = data[0].id;
 
+  const { data: MeetUps, meetUpError } = await supabase
+    .from("MeetUps")
+    .insert([
+      {
+        swap_id: createSwapId, location: "UQ Union"
+      },
+    ])
+    .select();
+
+
   // Insert rows for the owner's items
   const ownerItems = myItems.map((itemId) => ({
     swap_id: createSwapId,
@@ -252,7 +262,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     .eq('accepter_id', userId2)
     // Ensures there's only one swa
     console.log(error1, "kys emma2", swap2)
-  if (error1 || error2 || (swap1.length < 1 && swap2.length < 1)) {
+  if (error1 || error2 || ((swap1 != null && swap1.length < 1) && (swap2 != null && swap2.length < 1))) {
     // No swap found between the users
     return {
       swapExists: false,
@@ -324,7 +334,7 @@ if (swapStatus == "Accepted") {
 
 // Ensure both users have at least one non-swapped item
 if (user1ItemsNotSwapped.length < 1 || user2ItemsNotSwapped.length < 1) {
-  console.warn("Both users must have at least one non-swapped item.");
+  console.warn("Both users must have at least one non-swapped item.", itemsData, user1ItemsNotSwapped, user2ItemsNotSwapped);
   return {
     error: "Both users need at least one item that is not swapped.",
     swapExists: false,

@@ -102,6 +102,7 @@ const MakeOffer = () => {
       if (chatId) {
         setChatId(chatId); // Store the chatId in state
       } else {
+        setChatId(swap_id)
         console.error("No chat found between the users9999", chatError);
       }
     } catch (error) {

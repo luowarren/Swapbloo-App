@@ -12,6 +12,7 @@ import {
   deleteChat,
 } from "@/service/swaps";
 import { getUserId } from "@/service/auth";
+import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 
 interface SwapDetailsProps {
   ownerId: string | null;
@@ -19,6 +20,7 @@ interface SwapDetailsProps {
 }
 
 const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
+  const [modalOpen, setModalOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [rejected, setRejected] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false); // Track withdrawal state
@@ -178,18 +180,27 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         }}
       >
         {!accepted && !rejected && !withdrawn && (
-          <UpdateSwapModal
-            isVisible={true}
-            onClose={() => setModalOpen(false)}
-            swapId={swapId}
-            myItems={requestingItems}
-            requestingItems={myItems}
-            ownerId={ownerId}
-            requesterId={requesterId}
-            onUpdate={handleSwapUpdate}
-          >
-            <GenericButton text="Update Offer"></GenericButton>
-          </UpdateSwapModal>
+          <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogTrigger asChild>
+            <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
+              Update Offer
+            </div>
+          </DialogTrigger>
+          <DialogContent className="min-w-[80%] min-h-[80%]">
+            <UpdateSwapModal
+              isVisible={true}
+              onClose={() => setModalOpen(false)}
+              swapId={swapId}
+              myItems={myItems}
+              requestingItems={requestingItems}
+              ownerId={ownerId}
+              requesterId={requesterId}
+              onUpdate={handleSwapUpdate}
+              modalOpen={modalOpen}
+              setModalOpen={setModalOpen}
+            />
+          </DialogContent>
+        </Dialog>
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
