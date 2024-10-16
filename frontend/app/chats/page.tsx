@@ -13,18 +13,23 @@ import { sortData, placeholder } from "./helpers";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
 import { getUserId, getUser } from "../../service/users";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
+import { supabase } from "../../service/supabaseClient";
 import {
-  supabase,
   getChats,
   getChat,
   sendMessage,
   getUserIdsFromChat,
   toggleViewed,
+  setChatConsented,
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
 import { Send } from "lucide-react";
+import SwapAccept from "../components/SwapAccept";
+import { getSwapDetailsBetweenUsers } from "@/service/swaps";
+import {getAllBlocked} from "../../service/block";
+
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
   const [chats, setChats] = useState<Array<{
@@ -42,6 +47,7 @@ const ChatPage: React.FC = () => {
       sender_id: string;
       content: string;
     };
+    consented: boolean;
   }> | null>(null);
   const [messages, setMessages] = useState<Array<{
     type: string;
@@ -70,7 +76,7 @@ const ChatPage: React.FC = () => {
     time: string;
   } | null>(null);
   const [user, setUser] = useState<any>(null); // State for user
-  const [loading, setLoading] = useState(true); // For handling the loading state
+  const [consented, setConsented] = useState(false); // For handling the loading state
   const router = useRouter();
   const [meInput, setMeInput] = useState<string>(""); // Input for sending messages as "Me"
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -85,10 +91,21 @@ const ChatPage: React.FC = () => {
     useState(false); // State to control modal visibility
 
   const searchParams = useSearchParams();
-  
+
   const truncateMessage = (msg: string, maxLength: number) => {
     return msg.length > maxLength ? msg.slice(0, maxLength) + "..." : msg;
   };
+
+  // check if user logged in!
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!data?.user) {
+        router.push("/login"); // Redirect to /login if no user is found
+      }
+    };
+    checkUser();
+  }, [router]);
 
   const sortMessagesByTime = (messagesArray: Array<{
     type: string,
@@ -103,15 +120,11 @@ const ChatPage: React.FC = () => {
   const fetchChatUsers = async (chatId: string) => {
     const users = await getUserIdsFromChat(chatId);
     if (users) {
-      if (currUserId === users.requesterId) {
-        setRequesterId(users.accepterId); // Other user's ID
-        setAccepterId(users.requesterId); // Your ID
-      } else {
-        setRequesterId(users.requesterId); // Other user's ID
-        setAccepterId(users.accepterId); // Your ID
-      }
-    } else {
-      
+      const { swapExists, user1Items, user2Items, swapId, status, swap } =
+        await getSwapDetailsBetweenUsers(users?.accepterId, users?.requesterId);
+
+      setRequesterId(swap.requester_id); // Other user's ID
+      setAccepterId(swap.accepter_id); // Your ID
     }
   };
 
@@ -140,7 +153,7 @@ const ChatPage: React.FC = () => {
           new Date(a.latestMessage.created_at).getTime()
         );
       });
-      
+
       return sortedChats;
     }
     return null;
@@ -166,7 +179,8 @@ const ChatPage: React.FC = () => {
             payload.new.chat_id == swapIdRef.current
           ) {
             setMessages((prevMessages) => {
-              let updatedMessages = prevMessages !== null ? [...prevMessages] : [];
+              let updatedMessages =
+                prevMessages !== null ? [...prevMessages] : [];
               updatedMessages.push({
                 type: "text",
                 content: payload.new.content,
@@ -196,21 +210,34 @@ const ChatPage: React.FC = () => {
     }
   }, [messages]);
 
+  function isBlocked(blocked: any[] | undefined, chat: any) {
+    if (!chat || !blocked) {
+      return false;
+    }
+    if (blocked.find((b) => b.blockee === chat.user1_id || b.blockee === chat.user2_id)) {
+      return true;
+    }
+    return false;
+  }
+
   const handleInitialDataFetches = async () => {
     const uid = await getUserId();
     setCurrUserId(uid);
     if (uid != null) {
-      const allChats = await getChats(uid);
+      const blocked = await getAllBlocked(uid);
+      const allChats = (await getChats(uid)).filter((c) => !isBlocked(blocked, c));
       const sortedChats = sortChats(allChats);
       setChats(sortedChats);
       if (activeChat !== null) {
         setActiveChat(0);
       }
 
-      const chatId = searchParams.get('chatId'); // Get the chat ID from the URL
-      
+      const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
+
       if (chatId && sortedChats !== null) {
-        const chatIndex = sortedChats.findIndex((chat) => Number(chat.id) === Number(chatId));
+        const chatIndex = sortedChats.findIndex(
+          (chat) => Number(chat.id) === Number(chatId)
+        );
         if (chatIndex !== -1) {
           switchChat(chatIndex);
         }
@@ -220,10 +247,8 @@ const ChatPage: React.FC = () => {
 
   const goToChatWithId = (chatId: string) => {
     if (!chats) return;
-  
-    
   };
-  
+
   useEffect(() => {
     handleInitialDataFetches();
   }, []);
@@ -296,11 +321,14 @@ const ChatPage: React.FC = () => {
       fetchChatUsers(chat_id);
 
       // update current swap id
-      console.log("setting swap id", chat_id)
+      console.log("setting swap id", chat_id);
       setSwapId(chat_id);
 
       // update otherUserData
       // updateOtherUserData();
+      console.log("adeline", chats[activeChat].id);
+
+      setConsented(chats[activeChat].consented);
     }
   }, [activeChat]);
 
@@ -362,16 +390,16 @@ const ChatPage: React.FC = () => {
   };
 
   // Toggle selection of a lastMessage preview
-  const toggleMessageSelection = (index: number) => {
+  const toggleMessageSelection = async (index: number) => {
     if (chats != null) {
-      if (chats[index].viewed == false) {
+      if (chats[index] && chats[index].viewed == false && chats[index].latestMessage.sender_id !== currUserId) {
         // set to viewed!!!!
+        console.log("toggling viewed!!")
+        await toggleViewed(chats[index].id);
       }
     }
     switchChat(index);
   };
-
-
 
   return (
     <div className="relative">
@@ -392,9 +420,11 @@ const ChatPage: React.FC = () => {
                     name={msg.username}
                     lastMessage={msg.latestMessage.content}
                     date={msg.latestMessage.created_at}
-                    viewed={msg.viewed}
+                    viewed={msg.latestMessage.sender_id === currUserId ? true : msg.viewed}
                     isSelected={activeChat === index} // Pass selection state
-                    userId={currUserId == msg.user2_id ? msg.user1_id : msg.user2_id}
+                    userId={
+                      currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
+                    }
                   />
                 </div>
               ))}
@@ -435,40 +465,52 @@ const ChatPage: React.FC = () => {
                   style={{
                     display: "flex",
                     justifyContent: "center",
+                    flexDirection: "column",
                     alignItems: "center",
                     width: "100%",
                     color: "gray",
                     marginBottom: "7px",
                   }}
                 >
-                  This is the start of your chat with {otherUserData.name}
+                  <p style={{ paddingBottom: "10px" }}>
+                    This is the start of your chat with {otherUserData.name}
+                  </p>
+                  {!consented &&
+                    chats &&
+                    accepterId == currUserId && (
+                      <GenericButton
+                        text="Consent"
+                        click={() => {
+                          setConsented(true);
+                          setChatConsented(chats[activeChat].id);
+                        }}
+                        fontSize="1.5rem"
+                      ></GenericButton>
+                    )}
                 </div>
               )}
               <div>
                 {/* Add padding to prevent overlap */}
                 <div className="flex flex-col space-y-2">
-                  {messages !== null && messages.map((msg, index) => {
-                    switch (msg.type) {
-                      case "text":
-                        return (
-                          <MessageBubble
-                            key={index}
-                            sender={msg.sender_id}
-                            text={msg.content}
-                            uid={currUserId}
-                          />
-                        );
-                      case "accept":
-                        console.log(accepted);
-                        return (
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "center",
-                              alignItems: "center",
-                            }}
-                          >
+                  {messages !== null &&
+                    messages.map((msg, index) => {
+                      switch (msg.type) {
+                        case "text":
+                          return (
+                            <MessageBubble
+                              key={index}
+                              sender={msg.sender_id}
+                              text={msg.content}
+                              uid={currUserId}
+                            />
+                          );
+                        // case "accept":
+                        //   console.log(accepted);
+                        //   return (
+
+                        //   );
+                        default:
+                          return (
                             <div
                               key={index}
                               style={{
@@ -481,117 +523,33 @@ const ChatPage: React.FC = () => {
                             >
                               {msg.content}
                             </div>
-                            <div
-                              style={{
-                                border: "2px solid black",
-                                borderRadius: "15px",
-                                paddingTop: "20px",
-                                paddingBottom: "10px",
-                                margin: "20px",
-                                marginBottom: "10px",
-                                width: "60%",
-                                textAlign: "center",
-                                color: "#3730A3",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Swap Success!
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-around",
-                                  alignItems: "center",
-                                  width: "100%",
-                                  color: "black",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-around",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    padding: "20px",
-                                  }}
-                                >
-                                  <div>You and Sohee saved:</div>
-                                  <div className="text-yellow-500 text-3xl font-bold">
-                                    220kg
-                                  </div>
-                                  <div>of CO2 easte</div>
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-around",
-                                    alignItems: "center",
-                                    width: "100%",
-                                    padding: "20px",
-                                  }}
-                                >
-                                  <div>You've made:</div>
-                                  <div className="text-yellow-500 text-3xl font-bold">
-                                    21
-                                  </div>
-                                  <div>successful swaps</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              style={{
-                                border: "2px solid black",
-                                borderRadius: "15px",
-                                padding: "5px",
-                                width: "60%",
-                                textAlign: "center",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              <UserRating size="text-2xl"></UserRating>
-                            </div>
-                          </div>
-                        );
-                      default:
-                        return (
-                          <div
-                            key={index}
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              width: "100%",
-                              color: "gray",
-                            }}
-                          >
-                            {msg.content}
-                          </div>
-                        );
-                    }
-                  })}
+                          );
+                      }
+                    })}
                 </div>
               </div>
             </div>
 
             {/* Form for sending messages as "Me" */}
-            <form onSubmit={handleSend} className="flex mt-4">
-              <input
-                type="text"
-                value={meInput}
-                onChange={(e) => {
-                  setMeInput(e.target.value);
-                }}
-                className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-                placeholder="Type your lastMessage..."
-              />
-              <button
-                type="submit"
-                className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
-              >
-                <Send/>
-              </button>
-            </form>
+            {consented ? (
+              <form onSubmit={handleSend} className="flex mt-4">
+                <input
+                  type="text"
+                  value={meInput}
+                  onChange={(e) => {
+                    setMeInput(e.target.value);
+                  }}
+                  className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
+                  placeholder="Type your lastMessage..."
+                />
+                <button
+                  type="submit"
+                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
+                >
+                  <Send />
+                </button>
+              </form>
+            ) : null}
           </div>
         )}
         {/* Other users info and meetup info */}
@@ -625,7 +583,7 @@ const ChatPage: React.FC = () => {
               )}
 
               {otherUserData !== null && (
-                <ShopModal otherUser={otherUserData}>
+                <ShopModal otherUser={otherUserData} origin="chats">
                   <GenericButton
                     text="Visit Shop"
                     inverse={true}

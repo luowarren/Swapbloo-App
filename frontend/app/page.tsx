@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
+"use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ImageDisplay from "./components/ImageDisplay";
 import ItemImages from "./components/ItemImages";
 import Link from "next/link";
@@ -14,8 +15,39 @@ import {
   TreePalm,
   Twitter,
 } from "lucide-react";
+import { supabase } from "@/service/supabaseClient";
 
 export default function Home() {
+  const [user, setUser] = useState<any>(null); // State for user
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data) {
+        setUser(data.user);
+      } else if (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUser();
+
+    // Subscribe to auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUser(session.user); // Update the user state when logged in
+        } else {
+          setUser(null); // Clear the user state when logged out
+        }
+      }
+    );
+
+    // Cleanup listener on component unmount
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
   return (
     <div className="h-[100vh] overflow-scroll">
       <div className=" bg-white flex flex-col items-center justify-center">

@@ -33,8 +33,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Store the current user's ID
   const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal visibility state
-  console.log("I am sigmarig", ownerId)
-  console.log(myItems)
+
   // Fetch the current user's ID and fetch their listings
   useEffect(() => {
     const fetchUserItems = async () => {

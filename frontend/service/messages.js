@@ -1,22 +1,5 @@
-import dotenv from "dotenv";
-// import pkg from "@supabase/supabase-js";
 import { Filter } from 'bad-words'
-import { createClient } from '@supabase/supabase-js';
-
-// Load environment variables from .env file
-dotenv.config({ path: "../.env" });
-
-// const { createClient, SupabaseClient } = pkg;
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Supabase URL and key are required.");
-}
-
+import { supabase } from "./supabaseClient.js";
 /**
  * Get a most recent message for a chat
  *

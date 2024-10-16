@@ -64,12 +64,17 @@ const UserRating = ({
   };
 
   return (
-    <div style={{ textAlign: "center" }} className="text-sm">
+    <div
+      style={{ textAlign: "center", padding: num == -1 ? "10px" : undefined }}
+      className="text-sm"
+    >
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          marginBottom: num === -1 ? "20px" : undefined,
+          textAlign: "center",
+          justifyContent: num == -1 ? "center" : "start",
+          marginBottom: num === -1 ? "10px" : undefined,
         }}
       >
         {renderStars()}

@@ -14,7 +14,7 @@ const ListingCard = ({
 }) => {
   const router = useRouter();
   const truncateMessage = (msg: string) => {
-    return msg.length > 20 ? msg.slice(0, 20) + "..." : msg;
+    return msg.length > 19 ? msg.slice(0, 19) + "..." : msg;
   };
   return (
     <div className="w-full h-full">
