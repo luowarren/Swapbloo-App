@@ -431,7 +431,12 @@ const ChatPage: React.FC = () => {
           </div>
           <div className="flex flex-col h-[75vh] overflow-scroll">
             {chats !== null &&
-              chats.map((msg, index) => (
+              (chats.length == 0 ? 
+              <div>
+                You have no chats! Initiate a swap in listings to start chatting!
+              </div>
+              :
+              (chats.map((msg, index) => (
                 <div key={index} onClick={() => toggleMessageSelection(index)}>
                   <MessagePreview
                     name={msg.username}
@@ -448,7 +453,7 @@ const ChatPage: React.FC = () => {
                     }
                   />
                 </div>
-              ))}
+              ))))}
           </div>
         </div>
 
