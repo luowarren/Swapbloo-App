@@ -256,12 +256,12 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId, updateA
           >
             <div
               className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
-              onClick={() => {
-                async () => {
-                  await acceptSwap(swapId, [...myItems, ...requestingItems]);
-                  updateAccepted(true);
-                };
-              }}
+              onClick={async () => {
+                console.log("5666666"); // This will now print
+                await acceptSwap(swapId, [...myItems, ...requestingItems]);
+                updateAccepted(true);
+              }
+            }
             >
               Accept Offer
             </div>

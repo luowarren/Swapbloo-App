@@ -21,7 +21,7 @@ import {
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
-import { ChevronLeft, MessageCircleDashed, Send, Shirt } from "lucide-react";
+import { ChevronLeft, MessageCircleDashed, Send, Shirt, Star } from "lucide-react";
 import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 import { getAllBlocked } from "../../service/block";
 import MessagePreview from "../components/MessagePreview";
