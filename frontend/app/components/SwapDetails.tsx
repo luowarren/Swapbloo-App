@@ -208,7 +208,9 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
               Pending chat approval
             </div>
           ) : (
-            <div></div>
+            <div className="font-medium px-3 py-[2px] rounded-full bg-gray-200 text-gray-800 text-sm">
+              Swap pending
+            </div>
           )}
         </div>
       </div>
@@ -224,7 +226,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
             <DialogTrigger asChild>
               <div className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium hover:bg-gray-300 transition">
-                Accept Offer
+                Update Swap
               </div>
             </DialogTrigger>
             <DialogContent className="min-w-[80%] min-h-[80%]">
@@ -276,7 +278,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
               await withdrawOffer(swapId);
             }}
           >
-            Withdraw Offer
+            Withdraw Swap
           </div>
         )}
 

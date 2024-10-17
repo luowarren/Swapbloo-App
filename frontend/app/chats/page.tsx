@@ -418,7 +418,7 @@ const ChatPage: React.FC = () => {
     <div className="relative">
       {/* The relative container to position the grey overlay */}
       {/* Grey overlay */}
-      <div className="flex h-[100vh]">
+      <div className="flex h-[92vh]">
         {/* Sidebar for other chats */}
         <div className="flex flex-col w-1/5 py-2 pt-0 border-r overflow-y-auto h-full bg-white">
           <div
@@ -486,6 +486,7 @@ const ChatPage: React.FC = () => {
               height: "100%", // 'h-full'
               position: "relative",
             }}
+            className="pb-[75px]"
           >
             {/* SwapDetails */}
             <div
@@ -581,19 +582,22 @@ const ChatPage: React.FC = () => {
 
             {/* Form for sending messages as "Me" */}
             {consented ? (
-              <form onSubmit={handleSend} className="flex mt-4">
+              <form
+                onSubmit={handleSend}
+                className="flex mt-4 absolute bottom-5 w-[98%] mx-2"
+              >
                 <input
                   type="text"
                   value={meInput}
                   onChange={(e) => {
                     setMeInput(e.target.value);
                   }}
-                  className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-                  placeholder="Type your lastMessage..."
+                  className="flex-grow p-2 border border-gray-200 text-black rounded-md mr-2"
+                  placeholder="Type your message..."
                 />
                 <button
                   type="submit"
-                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
+                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-md"
                 >
                   <Send />
                 </button>
@@ -603,8 +607,8 @@ const ChatPage: React.FC = () => {
         )}
         {/* Other users info and meetup info */}
         {activeChat !== null && (
-          <div className="flex flex-col flex-grow py-4 pt-0 border-r overflow-y-auto h-full pr-3">
-            <div className="w-full bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 border">
+          <div className="flex flex-col flex-grow py-4 pt-0 border-l border-gray-300 overflow-y-auto h-full">
+            <div className="w-full bg-white text-black p-4 text-xl flex flex-col items-center mt-4 border-b border-gray-300">
               {otherUserData !== null ? (
                 <div className="flex flex-row items-start w-full ml-6 mb-4">
                   <ProfileImage userId={otherUserData.id}></ProfileImage>
@@ -642,7 +646,7 @@ const ChatPage: React.FC = () => {
               )}
             </div>
 
-            <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+            <div className="w-full text-black py-4 px-4 flex flex-col items-center mt-4">
               <div className="font-bold text-2xl mb-3">Meetup Info</div>
               {meetUpInfo !== null ? (
                 <LocationSelector
