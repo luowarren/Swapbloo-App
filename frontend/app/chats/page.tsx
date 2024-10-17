@@ -174,8 +174,7 @@ const ChatPage: React.FC = () => {
         { event: "INSERT", schema: "public", table: "Messages" },
         (payload) => {
           console.log("Change received!", payload, activeChat);
-          handleInitialDataFetches();
-
+         
           // update messages
           if (
             swapIdRef.current !== null &&
@@ -240,9 +239,23 @@ const ChatPage: React.FC = () => {
       if (activeChat !== null) {
         setActiveChat(0);
       }
+      return sortedChats;
+    }
+    return [];
+  };
 
+  
+  const goToChatWithId = (chatId: string) => {
+    if (!chats) return;
+  };
+
+  useEffect(() => {
+    // Create an async function inside the useEffect hook
+    const fetchData = async () => {
+      let sortedChats = await handleInitialDataFetches();
+  
       const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
-
+  
       if (chatId && sortedChats !== null) {
         const chatIndex = sortedChats.findIndex(
           (chat) => Number(chat.id) === Number(chatId)
@@ -251,16 +264,12 @@ const ChatPage: React.FC = () => {
           switchChat(chatIndex);
         }
       }
-    }
-  };
-
-  const goToChatWithId = (chatId: string) => {
-    if (!chats) return;
-  };
-
-  useEffect(() => {
-    handleInitialDataFetches();
-  }, []);
+    };
+  
+    // Call the async function
+    fetchData();
+  }, [searchParams]); // You should add searchParams or any other dependencies
+  
 
   const getAllMessages = async (chat_id: string) => {
     const texts = await getChat(chat_id);
