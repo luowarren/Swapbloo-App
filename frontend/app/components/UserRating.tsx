@@ -11,12 +11,14 @@ const UserRating = ({
   num = -1,
   size = "text-sm",
   reviewButton = true,
+  func = false
 }: {
   otherUser?: string | null;
   rating?: number;
   num?: number;
   size?: string;
   reviewButton?: boolean;
+  func?: boolean;
 }) => {
   const [currentRating, setCurrentRating] = useState(rating);
   const [reviewed, setReviewed] = useState(false);
@@ -89,9 +91,10 @@ const UserRating = ({
           {num === -1 && currentRating !== 0 ? (
             <GenericButton
               text="Leave a review"
-              click={() => {
-                if (otherUser) addRating(otherUser, currentRating);
+              click={async () => {
+                if (otherUser) await addRating(otherUser, currentRating);
                 submitReview(currentRating);
+                if (func) window.location.reload();
               }}
             />
           ) : null}

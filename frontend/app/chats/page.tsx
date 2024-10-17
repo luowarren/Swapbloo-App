@@ -21,7 +21,7 @@ import {
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
-import { ChevronLeft, MessageCircleDashed, Send, Shirt } from "lucide-react";
+import { ChevronLeft, MessageCircleDashed, Send, Shirt, Star } from "lucide-react";
 import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 import { getAllBlocked } from "../../service/block";
 import MessagePreview from "../components/MessagePreview";
@@ -141,6 +141,7 @@ const ChatPage: React.FC = () => {
       viewed: boolean;
       profilePic: string;
       username: string;
+      consented: boolean;
       latestMessage: {
         created_at: string;
         chat_id: string;
@@ -174,7 +175,7 @@ const ChatPage: React.FC = () => {
         { event: "INSERT", schema: "public", table: "Messages" },
         (payload) => {
           console.log("Change received!", payload, activeChat);
-          handleInitialDataFetches();
+          handleInitialDataFetches(false);
 
           // update messages
           if (
@@ -227,7 +228,7 @@ const ChatPage: React.FC = () => {
     return false;
   }
 
-  const handleInitialDataFetches = async () => {
+  const handleInitialDataFetches = async (checkUrl = true) => {
     const uid = await getUserId();
     setCurrUserId(uid);
     if (uid != null) {
@@ -241,14 +242,17 @@ const ChatPage: React.FC = () => {
         setActiveChat(0);
       }
 
-      const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
+      if (checkUrl) {
 
-      if (chatId && sortedChats !== null) {
-        const chatIndex = sortedChats.findIndex(
-          (chat) => Number(chat.id) === Number(chatId)
-        );
-        if (chatIndex !== -1) {
-          switchChat(chatIndex);
+        const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
+
+        if (chatId && sortedChats !== null) {
+          const chatIndex = sortedChats.findIndex(
+            (chat) => Number(chat.id) === Number(chatId)
+          );
+          if (chatIndex !== -1) {
+            switchChat(chatIndex);
+          }
         }
       }
     }
@@ -344,7 +348,7 @@ const ChatPage: React.FC = () => {
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
     if (messageBoxRef.current) {
-      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight + 100;
     }
   }, [messages]);
 
@@ -367,7 +371,7 @@ const ChatPage: React.FC = () => {
       location;
     if (currUserId !== null && swapId !== null) {
       sendMessage(currUserId, swapId, text);
-      handleInitialDataFetches();
+      handleInitialDataFetches(false);
     }
   };
 
@@ -377,7 +381,7 @@ const ChatPage: React.FC = () => {
       if (currUserId != null && swapId !== null) {
         sendMessage(currUserId, swapId, meInput);
         setMeInput("");
-        handleInitialDataFetches();
+        handleInitialDataFetches(false);
       }
     }
   };
@@ -464,7 +468,7 @@ const ChatPage: React.FC = () => {
                           ? true
                           : msg.viewed
                       }
-                      isSelected={activeChat === index} // Pass selection state
+                      isSelected={msg.username === otherUserData?.name} // Pass selection state
                       userId={
                         currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
                       }
@@ -576,6 +580,20 @@ const ChatPage: React.FC = () => {
                           );
                       }
                     })}
+                    {/* <div className="flex flex-row items-center justify-center w-full"> */}
+                      {/* <div className="flex flex-col gap-1 items-center text-sm justify-center border p-4 py-6 border-dashed rounded border-gray-300 text-gray-500 "> */}
+                        {/* <Star className="w-7 h-7 text-gray-400" /> */}
+                          {/* Help make Swapbloo better! */}
+                        {/* <div className="h-2"/> */}
+                        {/* <GenericButton text="Leave a review!" width="15vw" click={leaveReview} /> */}
+                        {/* <UserRating
+                          size="text-sm"
+                          num={-1}
+                          otherUser={otherUserData?.id}
+                          func={true}
+                        ></UserRating> */}
+                      {/* </div> */}
+                    {/* </div> */}
                 </div>
               </div>
             </div>
