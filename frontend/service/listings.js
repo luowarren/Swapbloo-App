@@ -161,10 +161,11 @@ export async function searchAndFilter(
   const words = searchString.split(/\s+/);
   // convert json to string
   const objectToString = (obj) => JSON.stringify(obj);
+  var temp;
 
   for (let i = 0; i < words.length; i++) {
     var word = words[i];
-    let temp = await supabase
+    temp = await supabase
       .from("Items")
       .select("*")
       // .ilike('title', `%${word}%`));
@@ -177,8 +178,10 @@ export async function searchAndFilter(
     if (temp["error"]) {
       return temp;
     }
-    Items = Items.concat(temp["data"]);
   }
+  if (temp != null)
+    Items = Items.concat(temp["data"]);
+  temp = null;
 
   // Count frequency of each JSON object
   const frequencyObject = {};
