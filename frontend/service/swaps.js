@@ -275,7 +275,7 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     };
   }
 
-  const swap = (swap1.length > 0) ? swap1[0] : swap2[0];
+  const swap = (swap1 && swap1.length > 0) ? swap1[0] : swap2[0];
   console.log(swap, swap1, swap2)
   const swapId = swap.id;
   const swapStatus = swap.status;
