@@ -21,7 +21,7 @@ import {
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
-import { ChevronLeft, MessageCircleDashed, Send, Shirt } from "lucide-react";
+import { ChevronLeft, MessageCircleDashed, Send, Shirt, Star } from "lucide-react";
 import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 import { getAllBlocked } from "../../service/block";
 import MessagePreview from "../components/MessagePreview";
@@ -141,6 +141,7 @@ const ChatPage: React.FC = () => {
       viewed: boolean;
       profilePic: string;
       username: string;
+      consented: boolean;
       latestMessage: {
         created_at: string;
         chat_id: string;
@@ -576,6 +577,20 @@ const ChatPage: React.FC = () => {
                           );
                       }
                     })}
+                    <div className="flex flex-row items-center justify-center w-full">
+                      <div className="flex flex-col gap-1 items-center text-sm justify-center border p-4 py-6 border-dashed rounded border-gray-300 text-gray-500 ">
+                        <Star className="w-7 h-7 text-gray-400" />
+                          Help make Swapbloo better!
+                        <div className="h-2"/>
+                        {/* <GenericButton text="Leave a review!" width="15vw" click={leaveReview} /> */}
+                        <UserRating
+                          size="text-sm"
+                          num={-1}
+                          otherUser={otherUserData?.id}
+                          func={true}
+                        ></UserRating>
+                      </div>
+                    </div>
                 </div>
               </div>
             </div>
