@@ -262,12 +262,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
             >
               Accept Offer
             </div>
-            {/* <GenericButton
-              text="Accept Offer"
-              click={async () => {
-                await acceptSwap(swapId, [...myItems, ...requestingItems]);
-              }}
-            /> */}
           </AcceptOfferModal>
         )}
 
@@ -281,12 +275,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
             Withdraw Swap
           </div>
         )}
-
-        {accepted && <GenericButton text="Accepted Offer" noClick={true} />}
       </div>
-      {/* <AcceptOfferModal otherUser={ownerId}>
-        <GenericButton text="Leave a rating" />
-      </AcceptOfferModal> */}
     </div>
   );
 };

@@ -53,7 +53,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   const handleDelete = async () => {
     const { error } = await deleteItemListing(item.id);
     window.location.reload();
-    
+    // TODO neeed to
   };
 
   return (
@@ -76,15 +76,12 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
             </p>
             <div className="flex space-x-2">
               {isMyItem ? (
-                <div>
-     
-                    <button
-                    onClick={handleDelete}
-                    className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
-                  >
-                    Delete Item
-                  </button>
-                </div>
+                <button
+                  onClick={handleDelete}
+                  className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                >
+                  Delete Item
+                </button>
               ) : (
                 <button
                   onClick={handleMakeOffer}
