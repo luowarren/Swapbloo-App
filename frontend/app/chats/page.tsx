@@ -570,7 +570,7 @@ const ChatPage: React.FC = () => {
                     setMeInput(e.target.value);
                   }}
                   className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-                  placeholder="Type your lastMessage..."
+                  placeholder="Type your message..."
                 />
                 <button
                   type="submit"
