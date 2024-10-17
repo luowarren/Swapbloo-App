@@ -181,32 +181,36 @@ export async function getUserIdsFromChat(chatId) {
 export async function getOrCreateChatBetweenUsers(user1Id, user2Id) {
   try {
     // Step 1: Check if a chat already exists between the two users
-    let { data, error } = await supabase
+    const { data: Items1, error: error1 }  = await supabase
       .from("Chats")
       .select("*")
-      .or(
-        `and(user1_id.eq.${user1Id},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user1_id.eq.${user1Id})`
-      )
-      
-    data = (data.length > 0) ? data[0] : data;
+      .eq("user1_id", user1Id)
+      .eq("user2_id", user2Id)
+    console.log("data chat 78", Items1)
+    
+    const { data: Items2, error: error2 } = await supabase
+        .from("Chats")
+        .select("*")
+        .eq("user1_id", user2Id)
+        .eq("user2_id", user1Id)
 
-    console.log("shut b4 you get cut up", data)
+    console.log("data chat 79", Items1, error1, error2, Items2)
+    const data = (Items1.length > 0) ? Items1[0] : ((Items2.length > 0) ? Items2[0] : Items2);
 
-    if (error && error.code !== "PGRST116") {
-      // If an error occurs other than "No rows found", return the error
-      return { chatId: null, chatError: error };
-    }
+    console.log("shut b4 you get cut up 568", error1, Items1, data.id)
 
-    if (data.length > 0) {
+    if (data.id != null) {
+      console.log("should reutrn here", data)
       // Chat exists, return the existing chat ID
       return { chatId: data.id, chatError: null };
     }
-
+    console.log("needing to check right here");
     const { swapExists, user1Items, user2Items, swapId, status, swap } =
     await getSwapDetailsBetweenUsers(user1Id, user2Id);
     console.log("shut up b4 you get cut up", swapExists, user1Items, swapId, status, swap)
     // Step 2: If no chat exists, create a new one
-    let { data: newChat, error: createError } = await supabase
+  
+      let { data: newChat, error: createError } = await supabase
       .from("Chats")
       .insert([
         { 
@@ -225,6 +229,8 @@ export async function getOrCreateChatBetweenUsers(user1Id, user2Id) {
     }
 
     return getChatBetweenUsers(user1Id, user2Id);
+
+    
   } catch (error) {
     return { chatId: null, chatError: error };
   }

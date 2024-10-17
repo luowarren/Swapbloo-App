@@ -640,7 +640,7 @@ const ChatPage: React.FC = () => {
                   <GenericButton
                     text="Visit Shop"
                     inverse={true}
-                    width="20vw"
+                    width="27vw"
                   />
                 </ShopModal>
               )}
