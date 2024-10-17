@@ -17,9 +17,10 @@ import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
 interface SwapDetailsProps {
   ownerId: string | null;
   requesterId: string | null;
+  updateAccepted: (b: boolean) => void;
 }
 
-const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
+const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId, updateAccepted = () => {} }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [succModalOpen, setsuccModalOpen] = useState(false);
   const [accepted, setAccepted] = useState(false);
@@ -255,9 +256,11 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           >
             <div
               className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
-              onClick={async () => {
-                console.log("5666666"); // This will now print
-                await acceptSwap(swapId, [...myItems, ...requestingItems]);
+              onClick={() => {
+                async () => {
+                  await acceptSwap(swapId, [...myItems, ...requestingItems]);
+                  updateAccepted(true);
+                };
               }}
             >
               Accept Offer
