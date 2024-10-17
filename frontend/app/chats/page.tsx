@@ -123,6 +123,8 @@ const ChatPage: React.FC = () => {
     if (users) {
       const { swapExists, user1Items, user2Items, swapId, status, swap } =
         await getSwapDetailsBetweenUsers(users?.accepterId, users?.requesterId);
+        console.log("got swap details, ", status)
+        setAccepted(status === "Accepted");
 
       if (swap) {
         setRequesterId(swap.requester_id); // Other user's ID
@@ -403,8 +405,6 @@ const ChatPage: React.FC = () => {
     if (chats != null) {
       fetchChatUsers(chats[chat].id);
     }
-
-    setAccepted(false);
   };
 
   // Toggle selection of a lastMessage preview
@@ -422,6 +422,10 @@ const ChatPage: React.FC = () => {
     }
     switchChat(index);
   };
+
+  function updateAccepted(status: boolean) {
+    setAccepted(status);
+  }
 
   return (
     <div className="relative">
@@ -504,7 +508,7 @@ const ChatPage: React.FC = () => {
               }`}
             >
               {activeChat != null && accepterId && requesterId && (
-                <SwapDetails ownerId={accepterId} requesterId={requesterId} />
+                <SwapDetails ownerId={accepterId} requesterId={requesterId} updateAccepted={updateAccepted} />
               )}
             </div>
 
@@ -585,6 +589,23 @@ const ChatPage: React.FC = () => {
                           );
                       }
                     })}
+                    {(accepted) && (
+                      <div className="flex flex-row items-center justify-center w-full">
+                      <div className="flex flex-col gap-1 items-center text-sm justify-center border p-4 py-6 border-dashed rounded border-gray-300 text-gray-500 ">
+                        <Star className="w-7 h-7 text-gray-400" />
+                          Help make Swapbloo better!
+                        <div className="h-2"/>
+                        {/* <GenericButton text="Leave a review!" width="15vw" click={leaveReview} /> */}
+                         <UserRating
+                          size="text-sm"
+                          num={-1}
+                          otherUser={otherUserData?.id}
+                          func={true}
+                        ></UserRating> 
+                      </div>
+                    </div>
+                    )
+                    }
                 </div>
               </div>
             </div>
