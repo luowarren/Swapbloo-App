@@ -1,6 +1,7 @@
 import { search } from "./listings";
 import { data } from "@/app/chats/data";
 import { supabase } from "./supabaseClient";
+import { getUserId } from "./auth";
 
 export async function loginUser(email, password) {
   let { data, error } = await supabase.auth.signInWithPassword({
@@ -16,11 +17,14 @@ export async function loginUser(email, password) {
  * @returns Items is a list of Item types, where swapped = false
  */
 export async function getActiveListings() {
+  const me = await getUserId();
+  console.log(me, "skibii")
   let { data: Items, error } = await supabase
     .from("Items")
     .select("*")
-    .eq("swapped", "false");
-
+    .eq("swapped", "false")
+    .neq("owner_id", me);
+  console.log("skibi", Items)
   if (error) {
     console.error("Error Items:", error.message);
     return { data: null, error };
