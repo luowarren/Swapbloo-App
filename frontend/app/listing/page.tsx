@@ -259,7 +259,7 @@ const ListAnItemPage: React.FC = () => {
 
             <section className="mb-8 w-full">
               <h2 className="text-xl font-bold mb-2 italic">
-                Description<span className="text-rose-400">*</span>
+                Description (optional)
               </h2>
               <textarea
                 placeholder="e.g. Stripey tee, only worn a few times."
@@ -287,7 +287,7 @@ const ListAnItemPage: React.FC = () => {
                 />
                 <section className="w-[60%] mt-4 mb-10">
                   <h2 className="text-sm font-bold mb-2 text-white italic">
-                    Brand<span className="text-rose-400">*</span>
+                    Brand (optional)
                   </h2>
                   <input
                     type="text"
