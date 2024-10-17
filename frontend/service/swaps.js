@@ -45,9 +45,9 @@ export async function createSwapRequest(
 ) {
   
   const { swapExists, user1Items, user2Items, swapId, status, swap } = await getSwapDetailsBetweenUsers(ownerId, requesterId);
-    
+  console.log("testing if swap exists", swapExists, swap, status, swapId)
   // If a swap already exists, modify the swap instead of creating a new one
-  if (swapExists && status != "Accepted") {
+  if (swapExists && status == "Pending") {
         
     // Merge existing items with new items
     const updatedMyItems = [
@@ -73,7 +73,7 @@ export async function createSwapRequest(
     }
 
     return { data, error };
-  } else if (swapExists && status == "Accepted") {
+  } else if (swapExists && status != "Pending") {
     const updatedMyItems = [
       ...new Set([...myItems.map(Number)]),
     ];
@@ -81,7 +81,6 @@ export async function createSwapRequest(
     const updatedRequestingItems = [
       ...new Set([...requestingItems.map(Number)]),
     ];
-    
     // Call modifySwapRequest to update the swap
     const { data, error } = await modifySwapRequest(
       swapId,
@@ -90,7 +89,7 @@ export async function createSwapRequest(
       ownerId,
       requesterId
     );
-
+    return {data, error};
   }
 
   const { data, error } = await supabase
@@ -262,6 +261,8 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     .eq('accepter_id', userId2)
     // Ensures there's only one swa
     console.log(error1, "kys emma2", swap2)
+
+  console.log("sigmat696969", swap1, swap2)
   if (error1 || error2 || ((swap1 != null && swap1.length < 1) && (swap2 != null && swap2.length < 1))) {
     // No swap found between the users
     return {

@@ -99,6 +99,8 @@ const MakeOffer = () => {
     try {
       console.log(ownerId, userId, "9999")
       const { chatId, chatError } = await getOrCreateChatBetweenUsers(ownerId, userId, swap_id); // Fetch the chat
+      console.log(chatId, "chatting like alphas together 222222222")
+  
       if (chatId) {
         setChatId(chatId); // Store the chatId in state
       } else {
@@ -110,7 +112,6 @@ const MakeOffer = () => {
     } 
   };
 
-  console.log(chatId, "chatting like alphas together 222222222")
   const handlePopupClose = () => {
     setIsPopupVisible(false);
     fetchChatId(ownerId, userId);
@@ -118,6 +119,7 @@ const MakeOffer = () => {
   };
 
   return (
+    <div className='h-[100vh] overflow-scroll pb-[50vh]'>
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">
       <h1 className="text-2xl font-bold mb-4">Make an Offer</h1>
       <form className="w-1/2 bg-gray-100 p-4 rounded-lg shadow" onSubmit={handleSubmit}>
@@ -194,6 +196,7 @@ const MakeOffer = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
