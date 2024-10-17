@@ -134,11 +134,11 @@ export async function createItemImage(item_id, image) {
  * @param {string} fileName - name of the image i want to put in the bucket
  * @returns
  */
-export async function uploadImage(image, fileName) {
+export async function uploadImage(image, fileName, bucket="images") {
   const response = await fetch(image);
   const blob = await response.blob();
   const { data, error } = await supabase.storage
-    .from("images")
+    .from(bucket)
     .upload(fileName, blob, {
       contentType: "image/*", // Adjust content type as needed
     });

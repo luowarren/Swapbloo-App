@@ -247,22 +247,23 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal
-            otherUser={requesterId}
-            modalOpen={succModalOpen}
-            setModalOpen={setsuccModalOpen}
+          // <AcceptOfferModal
+          //   otherUser={requesterId}
+          //   modalOpen={succModalOpen}
+          //   setModalOpen={setsuccModalOpen}
+          // >
+          <div
+            className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
+            onClick={() => {
+              async () => {
+                console.log("hi");
+                await acceptSwap(swapId, [...myItems, ...requestingItems]);
+              };
+            }}
           >
-            <div
-              className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
-              onClick={() => {
-                async () => {
-                  await acceptSwap(swapId, [...myItems, ...requestingItems]);
-                };
-              }}
-            >
-              Accept Offer
-            </div>
-          </AcceptOfferModal>
+            Accept Offer
+          </div>
+          // </AcceptOfferModal>
         )}
 
         {isRequester && !accepted && !rejected && !withdrawn && (
