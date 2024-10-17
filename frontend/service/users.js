@@ -247,7 +247,7 @@ export async function getRatings(userId) {
  * @param {string} userId - user u are rating
  * @param {number} rating - rating u want to add
  */
-export async function addRating(userId, rating) {
+export async function addRating(userId, rating, func=false) {
   let ratingData = await getRatings(userId);
   if (ratingData["error"]) return ratingData;
 
@@ -275,6 +275,9 @@ export async function addRating(userId, rating) {
     .select();
   if (numData["error"]) return numData;
   console.log("adeline", oldNum + 1, newRating)
+  if (func) {
+    window.location.reload()
+  }
 
   return ratingData;
 }
