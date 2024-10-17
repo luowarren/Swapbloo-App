@@ -34,6 +34,7 @@ const ListingCard = ({
                 height: "100%",
                 position: "relative",
                 aspectRatio: "1",
+                opacity: data.swapped ? "30%" : undefined,
               }}
             >
               <div className="w-full h-full scale-125">
@@ -51,7 +52,10 @@ const ListingCard = ({
               className="text-gray-700 font-bold"
               style={{ fontSize: font }}
             >
-              {truncateMessage(data.title)}
+              {truncateMessage(data.title)}{" "}
+              {data.swapped && (
+                <span className="text-indigo-500"> - Swapped!</span>
+              )}
             </span>
             <span className="text-gray-500 text-xs">
               {data.size} - {data.brand}
