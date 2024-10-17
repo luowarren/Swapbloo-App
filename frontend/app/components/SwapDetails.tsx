@@ -248,9 +248,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
 
         {accepted && <GenericButton text="Accepted Offer" noClick={true} />}
       </div>
-      <AcceptOfferModal otherUser={ownerId}>
-        <GenericButton text="Leave a rating" />
-      </AcceptOfferModal>
     </div>
   );
 };
