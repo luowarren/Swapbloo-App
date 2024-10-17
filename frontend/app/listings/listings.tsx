@@ -81,7 +81,7 @@ const Listings = ({
 
       const filterBlockedUsers = (data: any[]) => {
         const blockedIds = blockedUsers.map((user) => user.blockee);
-        return data.filter((item) => !blockedIds.includes(item.owner_id));
+        return data.filter((item) => !blockedIds.includes(item.owner_id) && item.owner_id !== self);
       };
 
       try {
