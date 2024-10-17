@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ItemPreview from "../components/ItemPreview";
 import GenericButton from "../components/GenericButton";
-import { ArrowRightLeft } from "lucide-react";
+import { ArrowRightLeft, ChevronsLeftRight } from "lucide-react";
 import UpdateSwapModal from "../components/UpdateSwapModal";
 import ItemImages from "./ItemImages";
 import AcceptOfferModal from "./AcceptOfferModal";
@@ -46,21 +46,20 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           setIsRequester(userId === realReqId);
           setSwapExists(true);
           setSwapId(swapId);
-          setAccepted(false)
+          setAccepted(false);
 
           if (status === "Accepted") setAccepted(true);
           else if (status === "Rejected") setRejected(true);
           else if (status === "Withdrawn") setWithdrawn(true);
 
-
-          if (userId == ownerId ) {
-             console.log("I am the requester", ownerId,  user1Items, user2Items)
-              setMyItems(user1Items || []); // Requester's items (myItems)
-              setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
-            } else {
-              setMyItems(user2Items || []); // Accepter's items (myItems)
-              setRequestingItems(user1Items || []); // Requester's items (requestingItems)
-            }
+          if (userId == ownerId) {
+            console.log("I am the requester", ownerId, user1Items, user2Items);
+            setMyItems(user1Items || []); // Requester's items (myItems)
+            setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
+          } else {
+            setMyItems(user2Items || []); // Accepter's items (myItems)
+            setRequestingItems(user1Items || []); // Requester's items (requestingItems)
+          }
         } else {
           setSwapExists(false);
         }
@@ -80,7 +79,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
     await updateSwapStatus(swapId, "Accepted", itemIds);
     await incrementSwapCount(requesterId);
     await incrementSwapCount(ownerId);
-
   }
 
   function closeItUp() {
@@ -88,7 +86,6 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
     setAccepted(!accepted);
   }
 
-  
   useEffect(() => {
     if (succModalOpen == false) {
       setAccepted(true);
@@ -129,34 +126,20 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
     return null;
   }
 
-  console.log("please i have not accepted", accepted)
+  console.log("please i have not accepted", accepted);
 
   return (
-    <div className="w-full bg-white text-black p-4 rounded-lg shadow-lg text-2xl font-bold flex flex-col items-center border mb-4 z-500">
-      <div className="font-bold text-2xl mb-4">Swap Details</div>
-      {accepted ? (
-        <div className="font-bold text-xl mb-4">Offer Accepted!</div>
-      ) : rejected ? (
-        <div className="font-bold text-xl mb-4">Offer Rejected</div>
-      ) : withdrawn ? (
-        <div className="font-bold text-xl mb-4">Offer Withdrawn</div>
-      ) : isRequester ? (
-        <div className="font-bold text-xl mb-4">
-          Waiting for the other person to accept or reject
-        </div>
-      ) : (
-        <div></div>
-      )}
+    <div className="w-full bg-white text-black p-4 text-2xl font-bold flex flex-col items-center z-500">
       <div
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "center",
+          justifyContent: "start",
           alignItems: "center",
-          marginBottom: "1em",
           width: "100%",
           flexWrap: "wrap",
         }}
+        className="gap-5 ml-4 "
       >
         <div
           style={{
@@ -170,12 +153,18 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           }}
         >
           {myItems.map((itemId, index) => (
-            <div style={{ width: "100px", margin: "5px 5px", borderRadius: "8px" }}>
-              <ItemImages key={index} itemId={itemId} className="" />
+            <div
+              className={
+                "w-14 h-14 overflow-hidden rounded-full bg-gray-200 border-2 border-indigo-500 -mx-4"
+              }
+            >
+              <div className="scale-125">
+                <ItemImages key={index} itemId={itemId} className="" />
+              </div>
             </div>
           ))}
         </div>
-        <ArrowRightLeft />
+        <ChevronsLeftRight className="text-indigo-500" />
         <div
           style={{
             display: "flex",
@@ -187,10 +176,42 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           }}
         >
           {requestingItems.map((itemId, index) => (
-            <div style={{ width: "100px", margin: "5px 5px", borderRadius: "8px" }}>
-              <ItemImages key={index} itemId={itemId} className="" />
+            <div
+              className={
+                "w-14 h-14 overflow-hidden rounded-full bg-gray-200 border-2 -mx-4 border-indigo-500"
+              }
+            >
+              <div className="scale-125">
+                <ItemImages key={index} itemId={itemId} className="" />
+              </div>
             </div>
           ))}
+        </div>
+        <div className="flex flex-col">
+          <div className="text-base font-medium text-gray-500">
+            Swap incoming
+          </div>
+          {accepted ? (
+            <div className="font-medium px-3 py-[2px] rounded-full bg-green-200 text-green-800 text-sm">
+              Offer withdrawn
+            </div>
+          ) : rejected ? (
+            <div className="font-medium px-3 py-[2px] rounded-full bg-red-200 text-red-800 text-sm">
+              Offer rejected
+            </div>
+          ) : withdrawn ? (
+            <div className="font-medium px-3 py-[2px] rounded-full bg-red-200 text-red-800 text-sm">
+              Offer withdrawn
+            </div>
+          ) : isRequester ? (
+            <div className="font-medium px-3 py-[2px] rounded-full bg-yellow-200 text-yellow-800 text-sm">
+              Pending chat approval
+            </div>
+          ) : (
+            <div className="font-medium px-3 py-[2px] rounded-full bg-gray-200 text-gray-800 text-sm">
+              Swap pending
+            </div>
+          )}
         </div>
       </div>
 
@@ -198,59 +219,74 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-around",
-          width: "50%",
         }}
+        className="w-full gap-2 mt-2"
       >
         {!accepted && !rejected && !withdrawn && (
           <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogTrigger asChild>
-            <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
-              Update Offer
-            </div>
-          </DialogTrigger>
-          <DialogContent className="min-w-[80%] min-h-[80%]">
-            <UpdateSwapModal
-              isVisible={true}
-              onClose={() => setModalOpen(false)}
-              swapId={swapId}
-              myItems={myItems}
-              requestingItems={requestingItems}
-              ownerId={ownerId}
-              requesterId={requesterId}
-              onUpdate={handleSwapUpdate}
-              modalOpen={modalOpen}
-              setModalOpen={setModalOpen}
-            />
-          </DialogContent>
-        </Dialog>
+            <DialogTrigger asChild>
+              <div className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium hover:bg-gray-300 transition">
+                Update Swap
+              </div>
+            </DialogTrigger>
+            <DialogContent className="min-w-[80%] min-h-[80%]">
+              <UpdateSwapModal
+                isVisible={true}
+                onClose={() => setModalOpen(false)}
+                swapId={swapId}
+                myItems={myItems}
+                requestingItems={requestingItems}
+                ownerId={ownerId}
+                requesterId={requesterId}
+                onUpdate={handleSwapUpdate}
+                modalOpen={modalOpen}
+                setModalOpen={setModalOpen}
+              />
+            </DialogContent>
+          </Dialog>
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          <AcceptOfferModal otherUser={requesterId} modalOpen={succModalOpen} setModalOpen={setsuccModalOpen}>
-            <GenericButton
+          <AcceptOfferModal
+            otherUser={requesterId}
+            modalOpen={succModalOpen}
+            setModalOpen={setsuccModalOpen}
+          >
+            <div
+              className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
+              onClick={() => {
+                async () => {
+                  await acceptSwap(swapId, [...myItems, ...requestingItems]);
+                };
+              }}
+            >
+              Accept Offer
+            </div>
+            {/* <GenericButton
               text="Accept Offer"
               click={async () => {
                 await acceptSwap(swapId, [...myItems, ...requestingItems]);
               }}
-            />
+            /> */}
           </AcceptOfferModal>
         )}
 
         {isRequester && !accepted && !rejected && !withdrawn && (
-          <GenericButton
-            text="Withdraw Offer"
-            click={async () => {
+          <div
+            className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
+            onClick={async () => {
               await withdrawOffer(swapId);
             }}
-          />
+          >
+            Withdraw Swap
+          </div>
         )}
 
         {accepted && <GenericButton text="Accepted Offer" noClick={true} />}
       </div>
-      <AcceptOfferModal otherUser={ownerId}>
+      {/* <AcceptOfferModal otherUser={ownerId}>
         <GenericButton text="Leave a rating" />
-      </AcceptOfferModal>
+      </AcceptOfferModal> */}
     </div>
   );
 };

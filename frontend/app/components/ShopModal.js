@@ -6,11 +6,11 @@ import ListingCard from "../listings/listing-card";
 import ProfileImage from "./ProfileImage";
 import { getListingsByUsers } from "@/service/items";
 import GenericButton from "./GenericButton";
-import {addNewBlockRecord, getAllBlocked} from "../../service/block"
+import { addNewBlockRecord, getAllBlocked } from "../../service/block";
 import { getUserId } from "../../service/users";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
 
-const ShopModal = ({ otherUser, children, origin="" }) => {
+const ShopModal = ({ otherUser, children, origin = "" }) => {
   const [listings, setListings] = useState([]);
   const router = useRouter();
 
@@ -94,7 +94,7 @@ const ShopModal = ({ otherUser, children, origin="" }) => {
             </div>
           </div>
           <GenericButton
-            text="Block (irreversible!)"
+            text="Report"
             // inverse={true}
             width="8vw"
             fontSize="1rem"
@@ -111,46 +111,52 @@ const ShopModal = ({ otherUser, children, origin="" }) => {
               padding: "16px 0", // Add padding to the parent to prevent margin collapsing
             }}
           >
-  <div style={{ flex: 1, marginRight: "16px", marginTop: "16px", marginBottom: "16px" }}>
-    <div style={{ fontWeight: "bold" }}>
-      {`${otherUser.name}'s Shop`}
-    </div>
-    <div style={{ fontSize: "18px" }}>
-      {`${otherUser.description}`}
-    </div>
-    <div style={{ marginTop: "16px", marginBottom: "32px" }}>
-      {`${otherUser.name}'s Preferred Location`}
-    </div>
-    <ShowMap selectedLocation={otherUser.location} />
-  </div>
+            <div
+              style={{
+                flex: 1,
+                marginRight: "16px",
+                marginTop: "16px",
+                marginBottom: "16px",
+              }}
+            >
+              <div style={{ fontWeight: "bold" }}>
+                {`${otherUser.name}'s Shop`}
+              </div>
+              <div style={{ fontSize: "18px" }}>
+                {`${otherUser.description}`}
+              </div>
+              <div style={{ marginTop: "16px", marginBottom: "32px" }}>
+                {`${otherUser.name}'s Preferred Location`}
+              </div>
+              <ShowMap selectedLocation={otherUser.location} />
+            </div>
 
-  <div style={{ flex: 1, marginTop: "16px", marginBottom: "16px",  }}>
-    <div style={{ marginLeft: "20px" }}>
-      {`${otherUser.name}'s Other Listings`}
-    </div>
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        width: "100%", // Change to 100% to avoid fixed width issues
-        overflow: "auto", // Change to auto for better scroll behavior
-        padding: "0 8px",
-        marginBottom: "16px",
-        width: "37.5rem"
-      }}
-    >
-      {listings.length > 0 ? (
-        listings.map((item, index) => (
-          <ListingCard key={index} data={item} size={40} font={13} />
-        ))
-      ) : (
-        <p>No items currently listed</p>
-      )}
-    </div>
-  </div>
-</div>
-
+            <div style={{ flex: 1, marginTop: "16px", marginBottom: "16px" }}>
+              <div style={{ marginLeft: "20px" }}>
+                {`${otherUser.name}'s Other Listings`}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  width: "100%", // Change to 100% to avoid fixed width issues
+                  overflow: "auto", // Change to auto for better scroll behavior
+                  padding: "0 8px",
+                  marginBottom: "16px",
+                  width: "37.5rem",
+                }}
+              >
+                {listings.length > 0 ? (
+                  listings.map((item, index) => (
+                    <ListingCard key={index} data={item} size={40} font={13} />
+                  ))
+                ) : (
+                  <p>No items currently listed</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

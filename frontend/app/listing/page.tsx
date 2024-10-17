@@ -58,7 +58,7 @@ const ListAnItemPage: React.FC = () => {
   useEffect(() => {
     if (canvasRef.current) {
       const uploadUrl = `https://93c9-61-68-215-159.ngrok-free.app/login`; // Generate unique upload URL
-      QRCode.toCanvas(canvasRef.current, uploadUrl, function (error) {
+      QRCode.toCanvas(canvasRef.current, uploadUrl, function (error: any) {
         if (error) console.error(error);
       });
     }
@@ -333,7 +333,7 @@ const ListAnItemPage: React.FC = () => {
             >
               <div className="flex gap-2 items-center justify-center">
                 <Send className="w-4 h-4 stroke-[2.5px]" />
-                Send it!
+                Upload listing!
               </div>
             </button>
           )}

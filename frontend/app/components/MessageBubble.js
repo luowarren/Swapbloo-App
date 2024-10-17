@@ -18,11 +18,11 @@ const MessageBubble = ({ sender, text, uid }) => {
   return (
     <div
       className={cn(
-        "inline-block rounded-2xl py-2 px-4 break-words ml-auto mr-0"
+        "inline-block rounded-lg py-2 px-4 break-words ml-auto mr-0"
       )}
       style={{
-        backgroundColor: isMe ? "#3730A3" : "#C7D2FE",
-        color: isMe ? "#FFF" : "#000",
+        backgroundColor: isMe ? "#4f46e5" : "#f3f4f6",
+        color: isMe ? "#FFF" : "#404040",
         marginLeft: isMe ? "auto" : "0",
         marginRight: isMe ? "0" : "auto",
         maxWidth: "60%",

@@ -1,15 +1,11 @@
 "use client"; // This marks the component as a Client Component
 
 import React, { useState, FormEvent, useRef, useEffect } from "react";
-import MessagePreview from "../components/MessagePreview";
 import MessageBubble from "../components/MessageBubble";
 import UserRating from "../components/UserRating";
-import UpdateSwapModal from "../components/UpdateSwapModal";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
-import ItemPreview from "../components/ItemPreview";
 import LocationSelector from "../components/Location";
 import GenericButton from "../components/GenericButton";
-import { sortData, placeholder } from "./helpers";
 import { updateMeetUp, getMeetUp } from "../../service/meetups";
 import SwapDetails from "../components/SwapDetails";
 import { getUserId, getUser } from "../../service/users";
@@ -25,10 +21,10 @@ import {
 } from "../../service/chat";
 import ShopModal from "../components/ShopModal";
 import ProfileImage from "../components/ProfileImage";
-import { Send } from "lucide-react";
-import SwapAccept from "../components/SwapAccept";
+import { ChevronLeft, MessageCircleDashed, Send, Shirt } from "lucide-react";
 import { getSwapDetailsBetweenUsers } from "@/service/swaps";
 import { getAllBlocked } from "../../service/block";
+import MessagePreview from "../components/MessagePreview";
 
 const ChatPage: React.FC = () => {
   const [currUserId, setCurrUserId] = useState<string | null>(null);
@@ -420,40 +416,62 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="relative">
-      {" "}
       {/* The relative container to position the grey overlay */}
       {/* Grey overlay */}
-      <div className="flex h-[85vh] bg-gray-100">
+      <div className="flex h-[92vh]">
         {/* Sidebar for other chats */}
-        <div className="flex flex-col w-1/5 py-4 pt-0 border-r overflow-y-auto h-full bg-white">
-          <div className="flex items-center text-black font-bold text-3xl p-2 pt-4 m-0 px-4 border h-[10vh] ">
+        <div className="flex flex-col w-1/5 py-2 pt-0 border-r overflow-y-auto h-full bg-white">
+          <div
+            className="flex items-center gap-1 rounded-sm py-1 px-2 bg-gray-100 w-fit text-gray-600 font-medium mt-2 ml-4 hover:bg-gray-200 transition cursor-pointer"
+            onClick={() => {
+              router.push("/listings");
+            }}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Go Back
+          </div>
+          <div className="flex items-center text-indigo-600 italic font-bold text-2xl m-0 px-4 py-2">
             <h2>Chats</h2>
           </div>
-          <div className="flex flex-col h-[75vh] overflow-scroll">
-            {chats !== null &&
-              (chats.length == 0 ? 
-              <div>
-                You have no chats! Initiate a swap in listings to start chatting!
-              </div>
-              :
-              (chats.map((msg, index) => (
-                <div key={index} onClick={() => toggleMessageSelection(index)}>
-                  <MessagePreview
-                    name={msg.username}
-                    lastMessage={msg.latestMessage.content}
-                    date={msg.latestMessage.created_at}
-                    viewed={
-                      msg.latestMessage.sender_id === currUserId
-                        ? true
-                        : msg.viewed
-                    }
-                    isSelected={activeChat === index} // Pass selection state
-                    userId={
-                      currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
-                    }
-                  />
+          <div className="flex flex-col h-[100vh] overflow-scroll mb-[25vh]">
+            {chats === null && (
+              <div className="h-[80vh] flex items-center justify-center">
+                <div className="animate-spin [animation-duration:500ms]">
+                  <Shirt className="text-indigo-600 stroke-[2.5px]" />
                 </div>
-              ))))}
+              </div>
+            )}
+
+            {chats !== null &&
+              (chats.length == 0 ? (
+                <div className="mx-4 flex flex-col gap-2 items-center py-4 p-10 text-center border rounded-t-lg border-dashed text-gray-500 text-sm border-gray-300 font-medium">
+                  <MessageCircleDashed className="w-7 h-7 text-gray-400" />
+                  You have no chats! Initiate a swap in listings to start
+                  chatting!
+                </div>
+              ) : (
+                chats.map((msg, index) => (
+                  <div
+                    key={index}
+                    onClick={() => toggleMessageSelection(index)}
+                  >
+                    <MessagePreview
+                      name={msg.username}
+                      lastMessage={msg.latestMessage.content}
+                      date={msg.latestMessage.created_at}
+                      viewed={
+                        msg.latestMessage.sender_id === currUserId
+                          ? true
+                          : msg.viewed
+                      }
+                      isSelected={activeChat === index} // Pass selection state
+                      userId={
+                        currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
+                      }
+                    />
+                  </div>
+                ))
+              ))}
           </div>
         </div>
 
@@ -466,13 +484,13 @@ const ChatPage: React.FC = () => {
               display: "flex",
               flexDirection: "column",
               height: "100%", // 'h-full'
-              padding: "1rem", // 'p-4' (4 units in Tailwind is usually 1rem)
               position: "relative",
             }}
+            className="pb-[75px]"
           >
             {/* SwapDetails */}
             <div
-              className={`sticky top-0 bg-white border-b transition-transform duration-300 ${
+              className={`sticky top-0 border-b transition-transform duration-300 ${
                 isSwapDetailsVisible ? "translate-y-0" : "-translate-y-full"
               }`}
             >
@@ -481,10 +499,11 @@ const ChatPage: React.FC = () => {
               )}
             </div>
 
+            {/* CHAT AREA */}
             <div
               ref={messageBoxRef} // Attach the ref here
               id="messageBox"
-              className="flex-grow p-4 bg-white rounded-lg shadow-lg overflow-auto relative border"
+              className="flex-grow px-6 pt-2 overflow-auto relative"
             >
               {otherUserData != null && (
                 <div
@@ -514,7 +533,8 @@ const ChatPage: React.FC = () => {
                   )}
                   {!consented && chats && requesterId == currUserId && (
                     <p style={{ paddingBottom: "10px" }}>
-                      Wait for {otherUserData.name} to consent before you start chatting
+                      Wait for {otherUserData.name} to consent before you start
+                      chatting
                     </p>
                   )}
                 </div>
@@ -562,19 +582,22 @@ const ChatPage: React.FC = () => {
 
             {/* Form for sending messages as "Me" */}
             {consented ? (
-              <form onSubmit={handleSend} className="flex mt-4">
+              <form
+                onSubmit={handleSend}
+                className="flex mt-4 absolute bottom-5 w-[98%] mx-2"
+              >
                 <input
                   type="text"
                   value={meInput}
                   onChange={(e) => {
                     setMeInput(e.target.value);
                   }}
-                  className="flex-grow p-2 border border-gray-300 text-black rounded-full mr-4"
-                  placeholder="Type your lastMessage..."
+                  className="flex-grow p-2 border border-gray-200 text-black rounded-md mr-2"
+                  placeholder="Type your message..."
                 />
                 <button
                   type="submit"
-                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-full"
+                  className="text-m bg-[#C7D2FE] text-indigo-800 hover:bg-indigo-200 py-2 pl-5 pr-5 rounded-md"
                 >
                   <Send />
                 </button>
@@ -584,8 +607,8 @@ const ChatPage: React.FC = () => {
         )}
         {/* Other users info and meetup info */}
         {activeChat !== null && (
-          <div className="flex flex-col flex-grow py-4 pt-0 border-r overflow-y-auto h-full pr-3">
-            <div className="w-full bg-white text-black p-4 rounded-lg text-xl flex flex-col items-center mt-4 border">
+          <div className="flex flex-col flex-grow py-4 pt-0 border-l border-gray-300 overflow-y-auto h-full">
+            <div className="w-full bg-white text-black p-4 text-xl flex flex-col items-center mt-4 border-b border-gray-300">
               {otherUserData !== null ? (
                 <div className="flex flex-row items-start w-full ml-6 mb-4">
                   <ProfileImage userId={otherUserData.id}></ProfileImage>
@@ -617,13 +640,13 @@ const ChatPage: React.FC = () => {
                   <GenericButton
                     text="Visit Shop"
                     inverse={true}
-                    width="20vw"
+                    width="27vw"
                   />
                 </ShopModal>
               )}
             </div>
 
-            <div className="w-full bg-white text-black py-4 px-4 rounded-lg flex flex-col items-center mt-4 border">
+            <div className="w-full text-black py-4 px-4 flex flex-col items-center mt-4">
               <div className="font-bold text-2xl mb-3">Meetup Info</div>
               {meetUpInfo !== null ? (
                 <LocationSelector

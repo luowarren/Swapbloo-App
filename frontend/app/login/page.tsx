@@ -25,6 +25,27 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError("");
+    try {
+      const { error: googleSignInError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/listings`, // Optional: Set redirect URL after sign-in
+        },
+      });
+
+      if (googleSignInError) {
+        setError(`Google sign-in failed: ${googleSignInError.message}`);
+        return;
+      }
+    } catch (error) {
+      console.error("Error occurred during Google sign-in:", error);
+      setError("An unexpected error occurred.");
+    } finally {
+    }
+  };
+
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-indigo-500"
@@ -82,13 +103,16 @@ const Login: React.FC = () => {
         <div className="w-full flex my-4 text-gray-400 font-bold justify-center">
           OR
         </div>
-        <div className="w-full flex flex-row items-center my-2 py-2 rounded-md bg-gray-100 font-medium justify-center text-gray-600">
+        <div
+          className="w-full flex flex-row items-center my-2 py-2 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer transition font-medium justify-center text-gray-600"
+          onClick={handleGoogleSignIn}
+        >
           <img
             src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
             alt="Google logo"
             className="w-7 h-7 mr-2"
           />
-          Sign in with Google
+          Login with Google
         </div>
       </div>
     </div>
