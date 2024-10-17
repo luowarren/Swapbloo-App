@@ -94,7 +94,7 @@ const ShopModal = ({ otherUser, children, origin = "" }) => {
             </div>
           </div>
           <GenericButton
-            text="Report"
+            text="Block"
             // inverse={true}
             width="8vw"
             fontSize="1rem"
@@ -119,37 +119,60 @@ const ShopModal = ({ otherUser, children, origin = "" }) => {
                 marginBottom: "16px",
               }}
             >
-              <div style={{ fontWeight: "bold" }}>
+              <div style={{ fontWeight: "bold", fontSize: "28px" }}>
                 {`${otherUser.name}'s Shop`}
               </div>
               <div style={{ fontSize: "18px" }}>
                 {`${otherUser.description}`}
               </div>
-              <div style={{ marginTop: "16px", marginBottom: "32px" }}>
+              <div
+                style={{
+                  marginTop: "16px",
+                  marginBottom: "32px",
+                  fontWeight: "bold",
+                }}
+              >
                 {`${otherUser.name}'s Preferred Location`}
               </div>
               <ShowMap selectedLocation={otherUser.location} />
             </div>
 
-            <div style={{ flex: 1, marginTop: "16px", marginBottom: "16px" }}>
-              <div style={{ marginLeft: "20px" }}>
+            <div
+              style={{
+                marginTop: "16px",
+                marginBottom: "16px",
+              }}
+            >
+              <div
+                style={{
+                  marginLeft: "20px",
+                  fontWeight: "bold",
+                  marginBottom: "10px",
+                }}
+              >
                 {`${otherUser.name}'s Other Listings`}
               </div>
               <div
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  width: "100%", // Change to 100% to avoid fixed width issues
-                  overflow: "auto", // Change to auto for better scroll behavior
-                  padding: "0 8px",
-                  marginBottom: "16px",
-                  width: "37.5rem",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)", // Default for small screens
+                  gap: "8px", // Tailwind gap-2
+                  width: "100%",
+                  padding: "16px", // Tailwind p-4
+                  paddingBottom: "208px", // Tailwind pb-52
+                  backgroundColor: "#f7fafc", // Tailwind bg-gray-100
+                  height: "fit",
                 }}
               >
                 {listings.length > 0 ? (
                   listings.map((item, index) => (
-                    <ListingCard key={index} data={item} size={40} font={13} />
+                    <ListingCard
+                      key={index}
+                      data={item}
+                      size={170}
+                      font={14}
+                      maxWidth={19}
+                    />
                   ))
                 ) : (
                   <p>No items currently listed</p>

@@ -7,14 +7,16 @@ const ListingCard = ({
   data,
   size = undefined,
   font = undefined,
+  maxWidth=27
 }: {
   data: any;
   size?: number;
   font?: number;
+  maxWidth?: number;
 }) => {
   const router = useRouter();
   const truncateMessage = (msg: string) => {
-    return msg.length > 19 ? msg.slice(0, 19) + "..." : msg;
+    return msg.length > maxWidth ? msg.slice(0, maxWidth) + "..." : msg;
   };
   return (
     <div className="w-full h-full">
@@ -34,7 +36,7 @@ const ListingCard = ({
                 height: "100%",
                 position: "relative",
                 aspectRatio: "1",
-                opacity: data.swapped ? "30%" : undefined,
+                opacity: data.swapped ? "60%" : undefined,
               }}
             >
               <div className="w-full h-full scale-125">
@@ -52,10 +54,10 @@ const ListingCard = ({
               className="text-gray-700 font-bold"
               style={{ fontSize: font }}
             >
-              {truncateMessage(data.title)}{" "}
-              {data.swapped && (
-                <span className="text-indigo-500"> - Swapped!</span>
-              )}
+              
+              {data.swapped ? (
+                <span className="text-indigo-500">Swapped!</span>
+              ) : (truncateMessage(data.title))}
             </span>
             <span className="text-gray-500 text-xs">
               {data.size} - {data.brand}
