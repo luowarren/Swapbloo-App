@@ -100,7 +100,7 @@ const ShopModal = ({ currUser, otherUser, children, origin = "" }) => {
               text="Block"
               // inverse={true}
               width="5vw"
-              fontSize="0.6rem"
+              fontSize="0.8rem"
               click={async () => {
                 await handleBlock();
                 alert("You have blocked " + otherUser.name)
