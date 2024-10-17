@@ -52,15 +52,12 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
 
   const handleDelete = async () => {
     const { error } = await deleteItemListing(item.id);
-    if (!error) {
-      setShowSuccessModal(true); // Show success modal on successful deletion
-    }
-    setModalOpen(false);
+    window.location.reload();
     // TODO neeed to
   };
 
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+    <Dialog>
       <DialogTrigger className="w-full">{children}</DialogTrigger>
       <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
@@ -79,14 +76,12 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
             </p>
             <div className="flex space-x-2">
               {isMyItem ? (
-                <div>
-                  <button
-                    onClick={handleDelete}
-                    className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
-                  >
-                    Delete Item
-                  </button>
-                </div>
+                <button
+                  onClick={handleDelete}
+                  className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                >
+                  Delete Item
+                </button>
               ) : (
                 <button
                   onClick={handleMakeOffer}
@@ -162,23 +157,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
         </div>
       </DialogContent>
 
-      {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">
-              Item Deleted Successfully!
-            </h2>
-            <p>Your item has been deleted.</p>
-            <button
-              onClick={handleCloseModal}
-              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      
     </Dialog>
   );
 };

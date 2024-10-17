@@ -72,7 +72,15 @@ const Onboard: React.FC = () => {
       }
 
       // Upload images
-      await handleUpload();
+
+      const fileName = `image_${Date.now()}.png`;
+
+      let uploadedImage = await uploadImage(
+        uploadedImages[0],
+        fileName,
+        "profilePictures"
+      );
+      if (uploadedImage.error) throw uploadedImage.error;
 
       // Create user with the uploaded data
       const userResponse = await createUser(
@@ -81,7 +89,7 @@ const Onboard: React.FC = () => {
         dob,
         storeDescription,
         location,
-        imageName
+        fileName
       );
 
       if (userResponse.error) {
@@ -95,22 +103,6 @@ const Onboard: React.FC = () => {
       setError(true);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleUpload = async () => {
-    try {
-      const uploadPromises = uploadedImages.map(async (image, index) => {
-        const fileName = `image_${Date.now()}_${index}.png`;
-        setImageName(fileName);
-        let uploadedImage = await uploadImage(image, fileName);
-        if (uploadedImage.error) throw uploadedImage.error;
-      });
-
-      await Promise.all(uploadPromises);
-    } catch (error) {
-      console.error("Error uploading listing:", error);
-      alert("Failed to upload listing.");
     }
   };
 
