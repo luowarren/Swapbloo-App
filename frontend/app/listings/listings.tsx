@@ -14,6 +14,7 @@ import {
 } from "@/service/constants";
 import { getUserId } from "@/service/users";
 import { getAllBlocked } from "../../service/block";
+import { list } from "postcss";
 
 const Listings = ({
   filter,
@@ -36,9 +37,9 @@ const Listings = ({
         const myId = await getUserId();
         setSelf(myId);
 
-        const listings = await getActiveListings();
+        const { data: listings} = await getActiveListings();
         const blocked = await getAllBlocked(myId);
-
+        console.log(listings)
         if (Array.isArray(blocked)) {
           setBlockedUsers(blocked);
         } else {
@@ -80,7 +81,7 @@ const Listings = ({
 
       const filterBlockedUsers = (data: any[]) => {
         const blockedIds = blockedUsers.map((user) => user.blockee);
-        return data.filter((item) => !blockedIds.includes(item.owner_id));
+        return data.filter((item) => !blockedIds.includes(item.owner_id) && item.owner_id !== self);
       };
 
       try {

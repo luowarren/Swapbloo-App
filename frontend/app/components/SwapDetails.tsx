@@ -52,7 +52,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           else if (status === "Rejected") setRejected(true);
           else if (status === "Withdrawn") setWithdrawn(true);
 
-          if (userId === realReqId && userId == ownerId) {
+          if (userId == ownerId) {
             console.log("I am the requester", ownerId, user1Items, user2Items);
             setMyItems(user1Items || []); // Requester's items (myItems)
             setRequestingItems(user2Items || []); // Accepter's items (requestingItems)
