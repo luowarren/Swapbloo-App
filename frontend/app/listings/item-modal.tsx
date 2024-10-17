@@ -57,7 +57,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
   };
 
   return (
-    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+    <Dialog>
       <DialogTrigger className="w-full">{children}</DialogTrigger>
       <DialogContent className="min-w-[80vw] h-[80vh] overflow-scroll">
         <div className="min-h-screen bg-white flex">
@@ -157,23 +157,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
         </div>
       </DialogContent>
 
-      {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">
-              Item Deleted Successfully!
-            </h2>
-            <p>Your item has been deleted.</p>
-            <button
-              onClick={handleCloseModal}
-              className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      
     </Dialog>
   );
 };

@@ -416,15 +416,18 @@ export async function incrementSwapCount(userId) {
     .from("Users")
     .select("swap_count")
     .eq("id", userId);
-
+  console.log(userData, "sigmas78976789876789")
     userData = userData.length > 0 ? userData[0] : userData;
+    
+  console.log(userData, "2sigmas78976789876789")
   if (userError) {
     console.error("Error retrieving user data:", userError);
     return { error: userError };
   }
 
-  const newSwapCount = (userData?.swapCount || 0) + 1;
+  const newSwapCount = (userData?.swap_count || 0) + 1;
 
+  console.log(newSwapCount, "newswapcount2sigmas78976789876789")
   // Update the swapCount with the incremented value
   const { data: updateData, error: updateError } = await supabase
     .from("Users")
@@ -432,6 +435,7 @@ export async function incrementSwapCount(userId) {
     .eq("id", userId)
     .select();
 
+    console.log(updateData, "updating2sigmas78976789876789")
   if (updateError) {
     console.error("Error updating swap count:", updateError);
     return { error: updateError };
@@ -486,7 +490,7 @@ export async function updateSwapStatus(swapId, status, itemIds) {
     .update({ status })
     .eq("id", swapId)
     .select();
-
+  console.log(swapData, "5666666")
   if (swapError) {
     console.error("Error updating swap status:", swapError.message);
     throw swapError;
@@ -497,7 +501,8 @@ export async function updateSwapStatus(swapId, status, itemIds) {
     .update({ swapped: true })
     .in("id", itemIds)
     .select();
-
+    console.log(itemsData, "5666666")
+  
   if (itemsError) {
     console.error("Error updating item statuses:", itemsError.message);
     throw itemsError;

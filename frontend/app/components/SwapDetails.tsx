@@ -76,6 +76,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
   };
 
   async function acceptSwap(swapId: number, itemIds: number[]) {
+    console.log("accpting swap 56666666 hery ");
     await updateSwapStatus(swapId, "Accepted", itemIds);
     await incrementSwapCount(requesterId);
     await incrementSwapCount(ownerId);
@@ -247,23 +248,21 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
         )}
 
         {!isRequester && !accepted && !rejected && !withdrawn && (
-          // <AcceptOfferModal
-          //   otherUser={requesterId}
-          //   modalOpen={succModalOpen}
-          //   setModalOpen={setsuccModalOpen}
-          // >
-          <div
-            className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
-            onClick={() => {
-              async () => {
-                console.log("hi");
-                await acceptSwap(swapId, [...myItems, ...requestingItems]);
-              };
-            }}
+          <AcceptOfferModal
+            otherUser={requesterId}
+            modalOpen={succModalOpen}
+            setModalOpen={setsuccModalOpen}
           >
-            Accept Offer
-          </div>
-          // </AcceptOfferModal>
+            <div
+              className="cursor-pointer w-full flex justify-center text-gray-600 rounded bg-gray-200 text-base py-1 font-medium  hover:bg-gray-300 transition"
+              onClick={async () => {
+                console.log("5666666"); // This will now print
+                await acceptSwap(swapId, [...myItems, ...requestingItems]);
+              }}
+            >
+              Accept Offer
+            </div>
+          </AcceptOfferModal>
         )}
 
         {isRequester && !accepted && !rejected && !withdrawn && (
