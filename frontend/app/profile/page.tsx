@@ -27,6 +27,7 @@ interface UserData {
   num_of_ratings: number;
   location: string;
   image: string;
+  swap_count: string;
 }
 
 interface ItemData {
@@ -133,12 +134,14 @@ const Login: React.FC = () => {
             <div className="flex gap-16">
               <div>
                 <div className="mt-6 text-gray-500">Active Listings</div>
-                <div className="mt-0 text-gray-700 text-2xl font-bold">7</div>
+                <div className="mt-0 text-gray-700 text-2xl font-bold">
+                  {items?.length}
+                </div>
               </div>
               <div>
                 <div className="mt-6 text-gray-500">CO2 saved</div>
                 <div className="mt-0 text-gray-700 text-2xl font-bold">
-                  1600mgs
+                  {Number(user.swap_count) * 7}kgs
                 </div>
               </div>
             </div>
