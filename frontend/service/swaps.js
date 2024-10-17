@@ -486,7 +486,7 @@ export async function updateSwapStatus(swapId, status, itemIds) {
     .update({ status })
     .eq("id", swapId)
     .select();
-
+  console.log(swapData, "5666666")
   if (swapError) {
     console.error("Error updating swap status:", swapError.message);
     throw swapError;
@@ -497,7 +497,8 @@ export async function updateSwapStatus(swapId, status, itemIds) {
     .update({ swapped: true })
     .in("id", itemIds)
     .select();
-
+    console.log(itemsData, "5666666")
+  
   if (itemsError) {
     console.error("Error updating item statuses:", itemsError.message);
     throw itemsError;
