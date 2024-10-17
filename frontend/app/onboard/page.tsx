@@ -222,7 +222,7 @@ const Onboard: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                "Take me to my store"
+                "Finish registration!"
               )}
             </button>
           </div>
