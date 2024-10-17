@@ -175,7 +175,7 @@ const ChatPage: React.FC = () => {
         { event: "INSERT", schema: "public", table: "Messages" },
         (payload) => {
           console.log("Change received!", payload, activeChat);
-          handleInitialDataFetches();
+          handleInitialDataFetches(false);
 
           // update messages
           if (
@@ -228,7 +228,7 @@ const ChatPage: React.FC = () => {
     return false;
   }
 
-  const handleInitialDataFetches = async () => {
+  const handleInitialDataFetches = async (checkUrl = true) => {
     const uid = await getUserId();
     setCurrUserId(uid);
     if (uid != null) {
@@ -242,14 +242,17 @@ const ChatPage: React.FC = () => {
         setActiveChat(0);
       }
 
-      const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
+      if (checkUrl) {
 
-      if (chatId && sortedChats !== null) {
-        const chatIndex = sortedChats.findIndex(
-          (chat) => Number(chat.id) === Number(chatId)
-        );
-        if (chatIndex !== -1) {
-          switchChat(chatIndex);
+        const chatId = searchParams.get("chatId"); // Get the chat ID from the URL
+
+        if (chatId && sortedChats !== null) {
+          const chatIndex = sortedChats.findIndex(
+            (chat) => Number(chat.id) === Number(chatId)
+          );
+          if (chatIndex !== -1) {
+            switchChat(chatIndex);
+          }
         }
       }
     }
@@ -345,7 +348,7 @@ const ChatPage: React.FC = () => {
   // Scroll to the bottom of the messageBox when messages change
   useEffect(() => {
     if (messageBoxRef.current) {
-      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight + 100;
     }
   }, [messages]);
 
@@ -368,7 +371,7 @@ const ChatPage: React.FC = () => {
       location;
     if (currUserId !== null && swapId !== null) {
       sendMessage(currUserId, swapId, text);
-      handleInitialDataFetches();
+      handleInitialDataFetches(false);
     }
   };
 
@@ -378,7 +381,7 @@ const ChatPage: React.FC = () => {
       if (currUserId != null && swapId !== null) {
         sendMessage(currUserId, swapId, meInput);
         setMeInput("");
-        handleInitialDataFetches();
+        handleInitialDataFetches(false);
       }
     }
   };
@@ -465,7 +468,7 @@ const ChatPage: React.FC = () => {
                           ? true
                           : msg.viewed
                       }
-                      isSelected={activeChat === index} // Pass selection state
+                      isSelected={msg.username === otherUserData?.name} // Pass selection state
                       userId={
                         currUserId == msg.user2_id ? msg.user1_id : msg.user2_id
                       }
