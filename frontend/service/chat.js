@@ -158,11 +158,12 @@ async function getViewedStatus(chat_id) {
  * @returns {Promise<{ requesterId: string, accepterId: string } | null>} - The user IDs if found, or null if not.
  */
 export async function getUserIdsFromChat(chatId) {
-  const { data: chat, error } = await supabase
+  let { data: chat, error } = await supabase
     .from("Chats")
     .select("user1_id, user2_id")
-    .eq("id", chatId)
-    .single();
+    .eq("id", chatId);
+  
+  chat = (chat.length > 0) ? chat[0] : chat;
 
   if (error || !chat) {
     console.error(
@@ -186,25 +187,37 @@ export async function getOrCreateChatBetweenUsers(user1Id, user2Id) {
       .or(
         `and(user1_id.eq.${user1Id},user2_id.eq.${user2Id}),and(user1_id.eq.${user2Id},user1_id.eq.${user1Id})`
       )
-      .single(); // Ensure only one chat is fetched
+      
+    data = (data.length > 0) ? data[0] : data;
+
+    console.log("shut b4 you get cut up", data)
+
     if (error && error.code !== "PGRST116") {
       // If an error occurs other than "No rows found", return the error
       return { chatId: null, chatError: error };
     }
 
-    const { swapExists, user1Items, user2Items, swapId, status, swap } =
-      await getSwapDetailsBetweenUsers(user1Id, user2Id);
-
-    if (data) {
+    if (data.length > 0) {
       // Chat exists, return the existing chat ID
       return { chatId: data.id, chatError: null };
     }
 
+    const { swapExists, user1Items, user2Items, swapId, status, swap } =
+    await getSwapDetailsBetweenUsers(user1Id, user2Id);
+    console.log("shut up b4 you get cut up", swapExists, user1Items, swapId, status, swap)
     // Step 2: If no chat exists, create a new one
-    const { data: newChat, error: createError } = await supabase
+    let { data: newChat, error: createError } = await supabase
       .from("Chats")
-      .insert([{ user1_id: user1Id, user2_id: user2Id, id: swapId }])
-      .single(); // Insert a new chat and return the row
+      .insert([
+        { 
+          id: swapId,
+          user1_id: user1Id, 
+          user2_id: user2Id,
+        }
+      ]);
+      
+
+    newChat = (newChat && newChat.length > 0) ? newChat[0] : newChat;
 
     if (createError) {
       // If chat creation fails, return the error

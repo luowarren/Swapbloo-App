@@ -365,7 +365,8 @@ export async function getItem(itemId) {
     .from("Items")
     .select("*")
     .eq("id", itemId)
-    .single();
+  
+  Item = Item.length > 0 ? Item[0] : Item;
   return { data: Item, error };
 }
 
@@ -379,7 +380,8 @@ export async function getUserProfileImageUrl(userId) {
     .from("Users")
     .select("image")
     .eq("id", userId)
-    .single();
+  
+  data = data.length > 0 ? data[0] : data;;
 
   if (!error) {
     const image = await getImageFromId(data.image, "profilePictures");

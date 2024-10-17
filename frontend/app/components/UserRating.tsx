@@ -3,19 +3,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faStarHalfAlt } from "@fortawesome/free-solid-svg-icons";
 import { faStar as farStar } from "@fortawesome/free-regular-svg-icons"; // Regular star
 import GenericButton from "./GenericButton";
+import { addRating } from "@/service/users";
 
 const UserRating = ({
+  otherUser = null,
   rating = 0,
   num = -1,
   size = "text-sm",
   reviewButton = true,
 }: {
+  otherUser?: string | null;
   rating?: number;
   num?: number;
   size?: string;
   reviewButton?: boolean;
 }) => {
   const [currentRating, setCurrentRating] = useState(rating);
+  const [reviewed, setReviewed] = useState(false);
   const clampedRating = Math.min(Math.max(currentRating, 0), 5);
 
   // Update currentRating when rating prop changes
@@ -85,7 +89,10 @@ const UserRating = ({
           {num === -1 && currentRating !== 0 ? (
             <GenericButton
               text="Leave a review"
-              click={() => submitReview(currentRating)}
+              click={() => {
+                if (otherUser) addRating(otherUser, currentRating);
+                submitReview(currentRating);
+              }}
             />
           ) : null}
           {num === -1 && currentRating === 0 ? (
