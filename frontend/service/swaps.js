@@ -111,6 +111,16 @@ export async function createSwapRequest(
 
   const createSwapId = data[0].id;
 
+  const { data: MeetUps, meetUpError } = await supabase
+    .from("MeetUps")
+    .insert([
+      {
+        swap_id: createSwapId, location: "UQ Union"
+      },
+    ])
+    .select();
+
+
   // Insert rows for the owner's items
   const ownerItems = myItems.map((itemId) => ({
     swap_id: createSwapId,
@@ -162,11 +172,10 @@ export async function modifySwapRequest(
     .from("Swaps")
     .select("*")
     .eq("id", `${swapId}`)
-    .single();
   if (error) return { data, error };
 
   // Check if requester_id is the current user (yourself)
- 
+  data = data.length > 0 ? data[0] : data;
   const THE_REQUESTER = data.requester_id;
   const accepter_id = data.accepter_id;
 
@@ -238,19 +247,22 @@ export async function modifySwapRequest(
  */
 export async function getSwapDetailsBetweenUsers(userId1, userId2) {
   // Step 1: Check if there's a swap between these two users
+  console.log(userId1, userId2, "sigmas fuck bitches")
   const { data: swap1, error1 } = await supabase
-    .from("Swaps")
+    .from('Swaps')
     .select("*")
-    .match({ requester_id: userId2, accepter_id: userId1 })
-    .limit(1)
-    .single(); // Ensures there's only one swap
+    .eq('requester_id', userId2)
+    .eq('accepter_id', userId1);
+
+    console.log(error1, swap1, "kys emma1")
   const { data: swap2, error2 } = await supabase
     .from("Swaps")
     .select("*")
-    .match({ requester_id: userId1, accepter_id: userId2 })
-    .limit(1)
-    .single(); // Ensures there's only one swa
-  if (error1 || error2 || (!swap1 && !swap2)) {
+    .eq('requester_id', userId1)
+    .eq('accepter_id', userId2)
+    // Ensures there's only one swa
+    console.log(error1, "kys emma2", swap2)
+  if (error1 || error2 || ((swap1 != null && swap1.length < 1) && (swap2 != null && swap2.length < 1))) {
     // No swap found between the users
     return {
       swapExists: false,
@@ -262,15 +274,16 @@ export async function getSwapDetailsBetweenUsers(userId1, userId2) {
     };
   }
 
-  const swap = swap1 ? swap1 : swap2;
+  const swap = (swap1.length > 0) ? swap1[0] : swap2[0];
+  console.log(swap, swap1, swap2)
   const swapId = swap.id;
   const swapStatus = swap.status;
 
   // Step 2: Get items associated with this swap for both users
   const { data: swapItems, error: itemsError } = await supabase
-    .from("SwapItems")
+    .from('SwapItems')
     .select("*")
-    .eq("swap_id", swapId);
+    .eq('swap_id', swapId);
 
   if (itemsError || !swapItems) {
     return {
@@ -321,7 +334,7 @@ if (swapStatus == "Accepted") {
 
 // Ensure both users have at least one non-swapped item
 if (user1ItemsNotSwapped.length < 1 || user2ItemsNotSwapped.length < 1) {
-  console.warn("Both users must have at least one non-swapped item.");
+  console.warn("Both users must have at least one non-swapped item.", itemsData, user1ItemsNotSwapped, user2ItemsNotSwapped);
   return {
     error: "Both users need at least one item that is not swapped.",
     swapExists: false,
@@ -346,12 +359,12 @@ return {
  * @returns {Promise<string | null>} - The user ID if found, or null if not.
  */
 export async function getUserIdByUsername(username) {
-  const { data: user, error } = await supabase
+  let { data: user, error } = await supabase
     .from("Users")
     .select("id")
     .eq("username", username)
-    .single(); // Expecting one user
 
+    user = user.length > 0 ? user[0] : user;
   if (error || !user) {
     console.error(
       "Error retrieving user ID:",
@@ -387,23 +400,23 @@ export async function getAllSwaps() {
  * @returns Swap is a list containing the Swap requested
  */
 export async function getSwapById(swapId) {
-  const { data: Swap, error } = await supabase
+  let { data: Swap, error } = await supabase
     .from("Swaps")
     .select("*")
-    .eq("id", swapId)
-    .single();
-
+    .eq("id", swapId);
+  
+    Swap = Swap.length > 0 ? Swap[0] : Swap;
   return { data: Swap, error };
 }
 
 export async function incrementSwapCount(userId) {
   // Retrieve the current swapCount for the user
-  const { data: userData, error: userError } = await supabase
+  let { data: userData, error: userError } = await supabase
     .from("Users")
     .select("swap_count")
-    .eq("id", userId)
-    .single();
+    .eq("id", userId);
 
+    userData = userData.length > 0 ? userData[0] : userData;
   if (userError) {
     console.error("Error retrieving user data:", userError);
     return { error: userError };

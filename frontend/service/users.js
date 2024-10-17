@@ -274,6 +274,7 @@ export async function addRating(userId, rating) {
     .eq("id", userId)
     .select();
   if (numData["error"]) return numData;
+  console.log("adeline", oldNum + 1, newRating)
 
   return ratingData;
 }

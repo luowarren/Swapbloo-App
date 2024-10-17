@@ -18,21 +18,24 @@ export type Article = {
 
 const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
   return (
-    <div className="max-w-lg rounded-lg overflow-hidden shadow-lg bg-white">
-      <div className="h-60 bg-gray-300">
+    <div className="max-w-lg overflow-hidden">
+      <div className="h-60">
         <img
           src={article.image}
           alt={article.title}
           className="w-full h-full object-cover rounded-lg"
         />
       </div>
-      <div className="p-6">
-        <p className="text-gray-900 text-xl font-semibold mb-4">
+
+      <div className="">
+        <p className="text-gray-600 italic text-xl font-semibold mt-4">
           {article.title}
         </p>
-        <Link href={`/resources/${article.id}`} className="text-blue-600 hover:underline text-lg block">
-          Read more
-        </Link>
+        <div className="bg-indigo-500 w-fit p-2 px-4 rounded-md text-white mt-4 hover:bg-indigo-800 transition">
+          <Link href={`/resources/${article.id}`} className="text-md block">
+            Read more
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -46,11 +49,15 @@ const ResourcesPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="mx-20 mt-8 text-2xl font-semibold text-gray-800 mb-6">
-        Resources
-      </h2>
-      <div className="justify-center mx-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+    <div className="flex flex-col items-center px-20 h-[100vh] overflow-scroll pb-[20vh]">
+      <div className="mt-8 text-5xl font-bold text-indigo-600 mb-2 w-full italic">
+        Learn eco!
+      </div>
+      <div className="text-md font-medium text-gray-500 mb-6 w-full">
+        Learn the latest news on fashion and clothing waste, and how SwapBloo
+        intends to fight it!
+      </div>
+      <div className="justify-center grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles.length > 0 ? (
           articles.map((article) => (
             <ArticleCard key={article.id} article={article} />

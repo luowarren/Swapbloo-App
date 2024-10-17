@@ -62,17 +62,34 @@ export default function Home() {
                       Swap old. Swap new. SwapBloo!
                     </p>
                     <div className="flex w-full gap-2">
-                      <Link href="/login">
-                        <p className="bg-indigo-600 hover:bg-indigo-400 text-white py-4 px-14 rounded-full transition">
-                          Log in
-                        </p>
-                      </Link>
+                      {user ? (
+                        <>
+                          <Link href="/listings">
+                            <p className="bg-indigo-600 hover:bg-indigo-400 text-white py-4 px-14 rounded-full transition">
+                              View listings
+                            </p>
+                          </Link>
+                          <Link href="/profile">
+                            <p className="text-white bg-indigo-900 hover:bg-indigo-700 py-4 px-14 rounded-full transition">
+                              Goto my store
+                            </p>
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link href="/login">
+                            <p className="bg-indigo-600 hover:bg-indigo-400 text-white py-4 px-14 rounded-full transition">
+                              Log in
+                            </p>
+                          </Link>
 
-                      <Link href="/signup">
-                        <p className="text-white bg-indigo-900 hover:bg-indigo-700 py-4 px-14 rounded-full transition">
-                          Sign up for free!
-                        </p>
-                      </Link>
+                          <Link href="/signup">
+                            <p className="text-white bg-indigo-900 hover:bg-indigo-700 py-4 px-14 rounded-full transition">
+                              Sign up for free!
+                            </p>
+                          </Link>
+                        </>
+                      )}
                     </div>
                     <div className="flex justify-start gap-4 mt-6 text-indigo-900">
                       <div className="flex items-center gap-1">
@@ -184,14 +201,11 @@ export default function Home() {
                 </div>
               </div>
 
-              <div
-                className="flex items-center justify-center text-center w-full mt-8"
-                id="see all button"
-              >
-                <button className="bg-white text-indigo-900 text-sm font-medium border border-indigo-900 px-2 py-1 rounded hover:bg-indigo-500">
-                  See all →
-                </button>
-              </div>
+              <Link href="/listings">
+                <p className="bg-indigo-600 hover:bg-indigo-400 text-white py-4 px-14 rounded-full transition mt-5">
+                  See all
+                </p>
+              </Link>
             </main>
           </div>
 

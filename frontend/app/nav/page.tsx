@@ -18,7 +18,10 @@ import {
   LogOut,
   Mail,
   MessageCircle,
+  MessageSquare,
+  MessagesSquare,
   Search,
+  ShirtIcon,
   Sprout,
   Store,
 } from "lucide-react";
@@ -125,14 +128,14 @@ const NavBar: React.FC = () => {
 
           <Link href="/listings">
             <div className="flex justify-center items-center bg-indigo-100 text-indigo-600 font-semibold p-2 rounded-full hover:bg-indigo-200 transition">
-              <HomeIcon />
+              <Store />
             </div>
           </Link>
 
           {user && (
             <Link href="/chats">
               <div className="flex justify-center items-center bg-indigo-100 text-indigo-600 font-semibold p-2 rounded-full hover:bg-indigo-200 transition">
-                <Mail />
+                <MessageSquare />
               </div>
             </Link>
           )}

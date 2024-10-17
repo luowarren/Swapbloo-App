@@ -6,6 +6,7 @@ import { getListingsByUsers } from "@/service/items"; // Function to fetch the u
 import { getUserId } from "@/service/auth"; // Function to get the current user ID
 import SuccessModal from "../components/SuccessModal";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 interface UpdateSwapModalProps {
   isVisible: boolean;
@@ -17,6 +18,8 @@ interface UpdateSwapModalProps {
   requesterId: string;
   onUpdate: () => void;
   children: any;
+  setModalOpen: any;
+  modalOpen: boolean;
 }
 
 const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
@@ -29,6 +32,8 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   requesterId,
   onUpdate,
   children,
+  modalOpen,
+  setModalOpen
 }) => {
   const [updatedMyItems, setUpdatedMyItems] = useState<number[]>([]); // The other user's items
   const [updatedRequestingItems, setUpdatedRequestingItems] = useState<
@@ -98,16 +103,26 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
       return;
     }
 
+    let psudeoMe, pseduoThem;
+    if (currentUserId != ownerId) {
+      psudeoMe = requesterId;
+      pseduoThem = ownerId;
+    } else {
+      psudeoMe = ownerId;
+      pseduoThem = requesterId;
+    }
+
     const { data, error } = await modifySwapRequest(
       swapId,
       updatedMyItems, // The other user's items
       updatedRequestingItems, // Your updated offered items
-      ownerId,
-      requesterId
+      psudeoMe,
+      pseduoThem
     );
     if (!error) {
       setShowSuccessModal(true); // Show success modal when swap is successful
       onUpdate(); // Call the onUpdate callback for any external updates
+      setModalOpen(false)
     } else {
       console.error(error);
     }
@@ -122,7 +137,7 @@ const UpdateSwapModal: React.FC<UpdateSwapModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <Dialog>
+    <Dialog open={modalOpen} onOpenChange={setModalOpen}>
       <DialogTrigger>
         {/* <div className="text-sm p-2 bg-indigo-700 text-white rounded-md cursor-pointer">
                 Update Offer
