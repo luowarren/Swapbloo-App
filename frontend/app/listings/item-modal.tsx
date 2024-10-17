@@ -52,10 +52,7 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
 
   const handleDelete = async () => {
     const { error } = await deleteItemListing(item.id);
-    if (!error) {
-      setShowSuccessModal(true); // Show success modal on successful deletion
-    }
-    setModalOpen(false);
+    window.location.reload();
     // TODO neeed to
   };
 
@@ -79,14 +76,12 @@ const ItemModal = ({ item, children }: { item: any; children: ReactNode }) => {
             </p>
             <div className="flex space-x-2">
               {isMyItem ? (
-                <div>
-                  <button
-                    onClick={handleDelete}
-                    className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
-                  >
-                    Delete Item
-                  </button>
-                </div>
+                <button
+                  onClick={handleDelete}
+                  className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 px-4 rounded-sm"
+                >
+                  Delete Item
+                </button>
               ) : (
                 <button
                   onClick={handleMakeOffer}
