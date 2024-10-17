@@ -51,15 +51,14 @@ const MessagePreview = ({
             justifyContent: "space-between",
           }}
         >
-          <div className="italic text-gray-700 font-medium text-sm">{name}</div>
+          <div className="text-gray-700 font-medium text-sm">{name}</div>
         </div>
         <div className="text-gray-400 text-sm">
-          {truncateMessage(lastMessage)} {displayTime(new Date(date))}
+          {truncateMessage(lastMessage)} - {displayTime(new Date(date))}
         </div>
       </div>
       <div
         style={{
-          backgroundColor: "#4299e1", // Equivalent to bg-blue-500
           minWidth: "8px",
           minHeight: "8px",
           borderRadius: "50%",
@@ -67,7 +66,8 @@ const MessagePreview = ({
           width: "8px",
           height: "8px",
         }}
-      ></div>
+        className="bg-indigo-400"
+      />
     </div>
   );
 };

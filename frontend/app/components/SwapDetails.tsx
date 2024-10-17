@@ -193,7 +193,7 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
           </div>
           {accepted ? (
             <div className="font-medium px-3 py-[2px] rounded-full bg-green-200 text-green-800 text-sm">
-              Offer withdrawn
+              Offer accepted
             </div>
           ) : rejected ? (
             <div className="font-medium px-3 py-[2px] rounded-full bg-red-200 text-red-800 text-sm">
@@ -205,11 +205,11 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ ownerId, requesterId }) => {
             </div>
           ) : isRequester ? (
             <div className="font-medium px-3 py-[2px] rounded-full bg-yellow-200 text-yellow-800 text-sm">
-              Pending chat approval
+              Offer pending
             </div>
           ) : (
-            <div className="font-medium px-3 py-[2px] rounded-full bg-gray-200 text-gray-800 text-sm">
-              Swap pending
+            <div className="font-medium px-3 py-[2px] rounded-full bg-yellow-200 text-yellow-800 text-sm">
+              Offer pending
             </div>
           )}
         </div>

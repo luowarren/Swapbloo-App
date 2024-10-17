@@ -490,7 +490,7 @@ const ChatPage: React.FC = () => {
           >
             {/* SwapDetails */}
             <div
-              className={`sticky top-0 border-b transition-transform duration-300 ${
+              className={`sticky top-0 border-b border-gray-300 transition-transform duration-300 ${
                 isSwapDetailsVisible ? "translate-y-0" : "-translate-y-full"
               }`}
             >
