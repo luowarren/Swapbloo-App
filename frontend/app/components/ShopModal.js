@@ -10,8 +10,9 @@ import { addNewBlockRecord, getAllBlocked } from "../../service/block";
 import { getUserId } from "../../service/users";
 import { useRouter } from "next/navigation"; // Next.js router for redirection
 
-const ShopModal = ({ otherUser, children, origin = "" }) => {
+const ShopModal = ({ currUser, otherUser, children, origin = "" }) => {
   const [listings, setListings] = useState([]);
+  // const [currUid, setCurrUid] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -27,7 +28,7 @@ const ShopModal = ({ otherUser, children, origin = "" }) => {
     const uid = await getUserId();
     const newBlockRecord = await addNewBlockRecord(uid, otherUser.id);
     // redirect user to homepage?
-    window.location.reload();
+    // window.location.reload();
     // router.push("/" + origin);
   }
 
@@ -93,13 +94,21 @@ const ShopModal = ({ otherUser, children, origin = "" }) => {
               </div>
             </div>
           </div>
-          <GenericButton
-            text="Block"
-            // inverse={true}
-            width="8vw"
-            fontSize="1rem"
-            click={async () => await handleBlock()}
-          />
+          {(currUser !== null && otherUser.id !== currUser) && 
+          (
+            <GenericButton
+              text="Block"
+              // inverse={true}
+              width="5vw"
+              fontSize="0.6rem"
+              click={async () => {
+                await handleBlock();
+                alert("You have blocked " + otherUser.name)
+                window.location.reload();
+              }}
+            />
+          )}
+          
 
           <div
             style={{
