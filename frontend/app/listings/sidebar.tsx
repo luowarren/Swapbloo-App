@@ -40,12 +40,14 @@ const Sidebar = ({
         </span>
       </div>
       <div className="flex flex-col mt-4">
-        <span className="font-bold text-sm my-1 text-gray-500">Filters</span>
-        <span className="font-bold text-indigo-600 my-1 text-sm">
-          Brisbane, Queensland - Within 5km
+        <span className="font-bold text italic mt-1 -mb-2 text-indigo-500">
+          Filter results
         </span>
+        {/* <span className="font-bold text-indigo-600 my-1 text-sm">
+          Brisbane, Queensland - Within 5km
+        </span> */}
 
-        <div
+        {/* <div
           className="flex flex-row items-center justify-between hover:bg-gray-100 transition cursor-pointer -m-1 p-1 rounded-sm"
           onClick={() => {
             setSortColl((prev) => !prev);
@@ -61,19 +63,16 @@ const Sidebar = ({
         {sortColl && (
           <div className="flex flex-col text-sm gap-2 pl-2 mt-2 text-gray-600">
             <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
-              Suggested
-            </div>
-            <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
               Newest
             </div>
             <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
               Oldest
             </div>
             <div className="hover:bg-gray-100 transition cursor-pointer py-2 p-1 -m-1 rounded-sm">
-              Nearest
+              Alphabetically
             </div>
           </div>
-        )}
+        )} */}
         <Demographic demos={filter.demographic} setDemos={setNewDemographic} />
         <Category cats={filter.category} setCats={setNewCategory} />
         <Size size={filter.size} setSize={setNewSize} />
