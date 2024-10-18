@@ -69,19 +69,6 @@ const SwapAccept: React.FC<MessageProps> = ({otherUser}) => {
           </div>
         </div>
       </div>
-      <div
-        style={{
-          border: '2px solid black',
-          borderRadius: '15px',
-          padding: '5px',
-          width: '100%',
-          textAlign: 'center',
-          fontWeight: 'bold',
-        }}
-      >
-        {/* <UserRating otherUser={otherUser} size="text-2xl" /> */}
-        
-      </div>
     </div>
   );
 };
