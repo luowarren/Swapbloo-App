@@ -79,7 +79,7 @@ const SwapAccept: React.FC<MessageProps> = ({otherUser}) => {
           fontWeight: 'bold',
         }}
       >
-        <UserRating otherUser={otherUser} size="text-2xl" />
+        {/* <UserRating otherUser={otherUser} size="text-2xl" /> */}
         
       </div>
     </div>
