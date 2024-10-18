@@ -50,7 +50,7 @@ const SwapAccept: React.FC<MessageProps> = ({otherUser}) => {
             }}
           >
             <div>You and Sohee saved:</div>
-            <div className="text-yellow-500 text-3xl font-bold">220kg</div>
+            <div className="text-yellow-500 text-3xl font-bold">+7kg</div>
             <div>of CO2 waste</div>
           </div>
           <div
