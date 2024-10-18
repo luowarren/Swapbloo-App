@@ -1,4 +1,4 @@
-<h3>
+<img width="1439" alt="image" src="https://github.com/user-attachments/assets/d9afa619-0fce-4493-b6d6-d3927d1a8697"><h3>
   Welcome to SwapBloo!! Swap to your heart's desire!
 </h3>
 
@@ -12,3 +12,4 @@ npm install
 // Start the development server
 npm run dev
 ```
+<img width="1440" alt="Screenshot 2024-10-18 at 1 33 58 pm" src="https://github.com/user-attachments/assets/56845ff3-0c6f-406d-9877-a3b2ed6bcda4">
