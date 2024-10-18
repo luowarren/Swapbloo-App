@@ -246,7 +246,6 @@ export async function modifySwapRequest(
  */
 export async function getSwapDetailsBetweenUsers(userId1, userId2) {
   // Step 1: Check if there's a swap between these two users
-  console.log(userId1, userId2, "sigmas fuck bitches")
   const { data: swap1, error1 } = await supabase
     .from('Swaps')
     .select("*")

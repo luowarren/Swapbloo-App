@@ -1,15 +1,12 @@
 import { supabase } from "./supabaseClient.js";
 
 export async function getMeetUp(swap_id) {
-    console.log("Allan qawejortfnselkzrgjfbdsborskflgjb")
     const {data: meetUpData, error: meetUpError} = await supabase
         .from('MeetUps')
         .select('*')
         .eq('swap_id', swap_id);
-        console.log("Allan qawejortfnselkzrgjfbdsborskflgjb2")
     if (meetUpError) {
         // console.log(`Error getting meet up for ${swap_id}`, error);
-        console.log("fucky fucl 2")
         return null;
     } else {
         console.log(`Successfully got meet up data for ${swap_id}`);
